@@ -1,0 +1,174 @@
+import { useContext, useState } from 'react';
+import { Link } from 'react-router-dom'
+import AuthContext from '../auth';
+import { GlobalStoreContext } from '../store'
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import Stack from '@mui/material/Stack';
+import SearchToolbar from './SearchToolbar'
+import CreatePostButton from './CreatePostButton'
+import SvgIcon from '@mui/material/SvgIcon';
+import Icon from '@mui/material/Icon';
+import Button from "@material-ui/core/Button";
+import Avatar from '@mui/material/Avatar';
+import { useTheme } from '@mui/material/styles';
+
+export default function AppBanner() {
+    const { auth } = useContext(AuthContext);
+    const { store } = useContext(GlobalStoreContext);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const isMenuOpen = Boolean(anchorEl);
+    const theme = useTheme();
+
+    const handleProfileMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleProfile = async () => {
+        auth.handleProfile(store.mediaType);
+    }
+
+    const handleLogout = async () => {
+        handleMenuClose();
+        await auth.logout();
+        store.initState();
+    }
+
+    const handleGuest = () => {
+        auth.guestUser();
+        handleMenuClose();
+    }
+
+    const handleUndoGuest = () => {
+        auth.undoGuest();
+        handleMenuClose();
+    }
+
+    const menuId = 'primary-search-account-menu';
+    const loggedOutMenu = (
+        <Menu
+            anchorEl={anchorEl}
+            anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}
+            id={menuId}
+            keepMounted
+            transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}
+            open={isMenuOpen}
+            onClose={handleMenuClose}
+        >
+            {
+            //TODO must add google signin link below
+            }
+            <MenuItem onClick={handleUndoGuest}><Link to='/register/'>Google Login</Link></MenuItem>
+            {/* <MenuItem onClick={handleUndoGuest}><Link to='/login/'>Login</Link></MenuItem> */}
+            {/* {(!auth.user || !auth.user.username ) ? <MenuItem onClick={handleGuest}><Link to='/'>Continue as Guest</Link></MenuItem> : ""} */}
+            
+        </Menu>
+    );
+    const loggedInMenu = 
+        <Menu
+            anchorEl={anchorEl}
+            anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}
+            id={menuId}
+            keepMounted
+            transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}
+            open={isMenuOpen}
+            onClose={handleMenuClose}
+        >
+            <MenuItem onClick={handleProfile}>Profile</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+        </Menu>        
+
+    let editToolbar = "";
+    let menu = loggedOutMenu;
+    if (true) {
+        menu = loggedInMenu;
+    }
+
+    const styles = {
+        paperContainer: {
+            backgroundImage: `url(${Image})`
+        }
+    };
+    
+    function getAccountMenu(loggedIn) {
+        if (true) {
+            //need to show user initials
+            return <img
+            style={{borderRadius: '50%', height: '50px', width: '50px'}}
+            src={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
+            srcSet={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
+            />;
+        }
+        return <AccountCircle sx={{ color: '#FF6D00', fontSize: 48 }} />;
+    }
+
+    function handleLogoClick() {
+        store.goHome();
+    }
+
+    let newPostButton = (auth.loggedIn) ? 
+        <CreatePostButton/> :
+        "";        
+
+    return (
+        <Stack spacing={0}>
+            <Box sx={{ flexGrow: 1}}>
+                <AppBar position="static" >
+                    <Toolbar id="app-banner" style={{backgroundColor: theme.palette.primary.dark}}>
+                        <IconButton
+                            size="large"
+                            edge="end"
+                            aria-label="logo"
+                            onClick={handleLogoClick}>
+                            <SvgIcon >
+                                <path d="M 10 10 H 90 V 90 H 10 L 10 10"/>
+                            </SvgIcon>
+                        </IconButton>
+                        <SearchToolbar />
+                        <Box sx={{ flexGrow: 1 }}>{editToolbar}</Box>
+                        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                            {newPostButton}
+                            <IconButton
+                                size="large"
+                                edge="end"
+                                aria-label="account of current user"
+                                aria-controls={menuId}
+                                aria-haspopup="true"
+                                onClick={handleProfileMenuOpen}
+                            >
+                                { getAccountMenu(auth.loggedIn) }
+                            </IconButton>
+                        </Box>
+                    </Toolbar>
+                </AppBar>
+                {
+                    menu
+                }
+            </Box>
+        </Stack>
+    );
+
+    // <Button sx={{ bgcolor: '#331BD8' }} variant="contained">Contained</Button>
+}
