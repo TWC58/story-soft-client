@@ -85,9 +85,9 @@ function PostScreen() {
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Tools</Typography>
                     </Box>
 
-                    <Box sx={{ borderRadius: '5px', width: '90%', height: '20%', bgcolor: theme.palette.primary.light }}></Box>
+                    <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}></Box>
 
-                    <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                    {/* <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Draw</Typography>
                     </Box>
 
@@ -97,7 +97,7 @@ function PostScreen() {
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Avatar</Typography>
                     </Box>
 
-                    <Box sx={{ borderRadius: '5px', width: '90%', height: '10%', bgcolor: theme.palette.primary.light }}></Box>
+                    <Box sx={{ borderRadius: '5px', width: '90%', height: '10%', bgcolor: theme.palette.primary.light }}></Box> */}
 
                     <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Description</Typography>
@@ -106,7 +106,7 @@ function PostScreen() {
                         <TextField
                             sx={{ width: '100%', height: '100%', marginBottom: 0 }}
                             multiline
-                            rows={7}
+                            rows={8}
                             id="post-content-field"
                             name="section-content"
                         />
