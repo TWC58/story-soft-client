@@ -44,7 +44,8 @@ export const GlobalStoreActionType = {
     SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
     LOAD_LISTS: "LOAD_LISTS",
-    SEARCH_LISTS: "SEARCH_LISTS"
+    SEARCH_LISTS: "SEARCH_LISTS",
+    SET_MEDIA: "SET_MEDIA"
 }
 
 // WITH THIS WE'RE MAKING OUR GLOBAL DATA STORE
@@ -72,6 +73,18 @@ function GlobalStoreContextProvider(props) {
         const { type, payload } = action;
         switch (type) {
             // LOADS A SET OF LISTS
+            case GlobalStoreActionType.SET_MEDIA: {
+                return setStore({
+                    mediaType: payload.mediaType,
+                    lists: [],
+                    allLists: [],
+                    currentList: null,
+                    editActive: false,
+                    listMarkedForDeletion: null,
+                    listViewMode: null,
+                    search: ""
+                });
+            }
             case GlobalStoreActionType.LOAD_LISTS: {
                 return setStore({
                     lists: payload.lists,
@@ -196,6 +209,15 @@ function GlobalStoreContextProvider(props) {
     // THESE ARE THE FUNCTIONS THAT WILL UPDATE OUR STORE AND
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
+
+    store.handleMediaSwitch = () => {
+        storeReducer({
+            type: GlobalStoreActionType.SET_MEDIA,
+            payload: {
+                mediaType: (store.mediaType === MediaType.STORY) ? MediaType.COMIC : MediaType.STORY
+            }
+        });
+    }
 
     store.goHome = () => {
         history.push("/");

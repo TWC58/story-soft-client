@@ -224,7 +224,8 @@ function AuthContextProvider(props) {
     }
 
     auth.handleProfile = (type) => {
-        history.push('/' + type + '/profile');
+        // history.push('/' + type + '/profile');
+        history.push('/profile');
     }
 
     return (

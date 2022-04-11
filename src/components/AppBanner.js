@@ -18,6 +18,7 @@ import Icon from '@mui/material/Icon';
 import Button from "@material-ui/core/Button";
 import Avatar from '@mui/material/Avatar';
 import { useTheme } from '@mui/material/styles';
+import MediaType from '../store'
 
 export default function AppBanner() {
     const { auth } = useContext(AuthContext);
@@ -25,6 +26,10 @@ export default function AppBanner() {
     const [anchorEl, setAnchorEl] = useState(null);
     const isMenuOpen = Boolean(anchorEl);
     const theme = useTheme();
+
+    const handleMediaSwitch = () => {
+        store.handleMediaSwitch();
+    }
 
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -128,7 +133,7 @@ export default function AppBanner() {
         store.goHome();
     }
 
-    let newPostButton = (auth.loggedIn) ? 
+    let newPostButton = (true) ? 
         <CreatePostButton/> :
         "";        
 
@@ -142,12 +147,28 @@ export default function AppBanner() {
                             edge="end"
                             aria-label="logo"
                             onClick={handleLogoClick}>
-                            <SvgIcon >
-                                <path d="M 10 10 H 90 V 90 H 10 L 10 10"/>
-                            </SvgIcon>
+                                {
+                                    store.mediaType === MediaType.STORY ? 
+                                    <img
+                                    style={{height: '60px', width: '60px'}}
+                                    src={`storyLogo.PNG`}
+                                    /> :
+                                    <img
+                                    style={{height: '60px', width: '60px'}}
+                                    src={`comicLogo.PNG`}
+                                    />
+                                }
+                            
                         </IconButton>
                         <SearchToolbar />
                         <Box sx={{ flexGrow: 1 }}>{editToolbar}</Box>
+                        {/* <Button sx={{paddingRight: '5%'}} variant='contained' onClick={handleMediaSwitch}>
+                            {
+                                store.mediaType === MediaType.STORY ?
+                                "Goto Comic" : 
+                                "Goto Story"
+                            }
+                        </Button> */}
                         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                             {newPostButton}
                             <IconButton
