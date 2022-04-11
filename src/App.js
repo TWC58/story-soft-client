@@ -1,5 +1,5 @@
 import './App.css';
-import { React } from 'react'
+import { React, useContext } from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { AuthContextProvider } from './auth';
 import { GlobalStoreContextProvider } from './store'
@@ -18,7 +18,7 @@ import useStyles from './styling/styles';
 import { ThemeProvider } from '@mui/material/styles';
 import { storyTheme, comicTheme } from './styling/themes';
 import { useState } from 'react';
-
+import ThemeWrapper from './ThemeWrapper';
 /*
     This is our application's top-level component.
     
@@ -32,30 +32,17 @@ import { useState } from 'react';
 */
 
 const App = () => {
-    
-    const theme = comicTheme; //use story theme for now
 
     return (
         <BrowserRouter>
             <AuthContextProvider>
                 <GlobalStoreContextProvider>  
-                    <ThemeProvider theme = {theme}>
-                    <ModalDelete /> 
-                    <ModalAlert />           
-                    <AppBanner />
-                    <Switch>
-                        <Route path="/" exact component={HomeScreen} />
-                        <Route path="/register/" exact component={RegisterScreen} />
-                        <Route path="/login/" exact component={LoginScreen} />
-                        <Route path="/top5list/:id" exact component={WorkspaceScreen} />
-                        <Route path="/profile" exact component={ProfileScreen} />
-                    </Switch>
-                    {/* <Statusbar /> */}
-                    </ThemeProvider>
+                    <ThemeWrapper>
+                    </ThemeWrapper>
                 </GlobalStoreContextProvider>
             </AuthContextProvider>
         </BrowserRouter>
     )
 }
 
-export default App
+export default App;
