@@ -15,6 +15,7 @@ import ListItemsSummary from './ListItemsSummary'
 import ListCommentArea from './ListCommentArea'
 import Comment from './Comment'
 import ProfileScreen from './ProfileScreen'
+import PostScreen from './PostScreen'
 
 
 /*
@@ -40,4 +41,6 @@ export {
     ListItemsSummary,
     ListCommentArea,
     ProfileScreen,
-    Comment }
+    Comment,
+    PostScreen
+}

@@ -12,6 +12,7 @@ import {
     LoginScreen,
     ProfileScreen,
     WorkspaceScreen,
+    PostScreen,
     ModalAlert,
     ModalDelete
 } from './components'
@@ -35,6 +36,7 @@ const ThemeWrapper = () => {
                         <Route path="/login/" exact component={LoginScreen} />
                         <Route path="/top5list/:id" exact component={WorkspaceScreen} />
                         <Route path="/profile" exact component={ProfileScreen} />
+                        <Route path="/post" exact component={PostScreen} />
                     </Switch>
                 </ThemeProvider>
     )
