@@ -13,7 +13,7 @@
 import axios from 'axios'
 axios.defaults.withCredentials = true;
 const api = axios.create({
-    baseURL: 'http://localhost:4000/api',
+    baseURL: 'http://localhost:4000',
 })
 
 // THESE ARE ALL THE REQUESTS WE`LL BE MAKING, ALL REQUESTS HAVE A
@@ -40,6 +40,7 @@ export const getLoggedIn = () => api.get(`/loggedIn/`);
 export const registerUser = (payload) => api.post(`/register/`, payload)
 export const loginUser = (payload) => api.post(`/login/`, payload)
 export const logout = () => api.get(`/logout/`)
+export const updateUser = (user) => api.post('/auth/updateUser');//story-soft
 
 export const postComment = (id, payload) => api.post(`/top5list/comment/${id}`, payload);
 
@@ -62,6 +63,7 @@ const apis = {
     registerUser,
     loginUser,
     logout,
+    updateUser,//store-soft
 
     postComment
 }
