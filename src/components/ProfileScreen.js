@@ -30,6 +30,7 @@ export default function ProfileScreen() {
 
     const [editActive, setEditActive] = useState(false);
     const [bio, setBio] = useState("CS Professor at Stony Brook University and literature lover. Also rank 1 in Starcraft.");
+    const [tempBio, setTempBio] = useState('');
     const theme = useTheme();
 
     const examplePost = {
@@ -44,20 +45,23 @@ export default function ProfileScreen() {
     const sampleList = [examplePost, examplePost, examplePost, examplePost, examplePost, examplePost, examplePost];
 
     const handleEditProfile = () => {
+        if(editActive) { setBio(tempBio); setTempBio(''); }
         setEditActive(!editActive);
     }
 
     const handleDiscard = () => {
+        console.log(bio);
+        setBio(bio);
         setEditActive(!editActive);
     }
 
     const handleBioChange = (e) => {
-        setBio(e.target.value);
+        setTempBio(e.target.value);
     }
 
     return (
-        <div className="flex-row" style={{maxHeight: '90%', maxWidth: '100%', topMargin: '5%'}}>
-            <div style={{textAlign: 'center', alignContent: 'center', width: '25%', paddingTop: '10%'}}>
+        <div className="flex-row" style={{maxHeight: '90%', maxWidth: '100%', topMargin: '5%', bottomMargin: '5%'}}>
+            <div style={{textAlign: 'center', alignContent: 'center', width: '25%', paddingTop: '5%'}}>
                 <div className="image-overlay-container">
                     <img
                         style={{borderRadius: '50%', height: '300px', width: '300px'}}
