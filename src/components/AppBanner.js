@@ -107,7 +107,7 @@ export default function AppBanner() {
 
     let editToolbar = "";
     let menu = loggedOutMenu;
-    if (true) {
+    if (auth.loggedIn) {
         menu = loggedInMenu;
     }
 
@@ -118,7 +118,7 @@ export default function AppBanner() {
     };
     
     function getAccountMenu(loggedIn) {
-        if (true) {
+        if (auth.loggedIn) {
             //need to show user initials
             return <img
             style={{borderRadius: '50%', height: '50px', width: '50px'}}
@@ -133,7 +133,7 @@ export default function AppBanner() {
         store.goHome();
     }
 
-    let newPostButton = (true) ? 
+    let newPostButton = (auth.loggedIn) ? 
         <CreatePostButton/> :
         "";        
 

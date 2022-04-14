@@ -17,7 +17,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Icon from '@mui/material/Icon';
 import Button from "@material-ui/core/Button";
 import ImageListItem from '@mui/material/ImageListItem';
-import { AddBox, Unpublished } from '@mui/icons-material';
+import { AddBox, Biotech, Unpublished } from '@mui/icons-material';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import MostPopular from './MostPopular';
@@ -29,8 +29,8 @@ export default function ProfileScreen() {
     const { store } = useContext(GlobalStoreContext);
 
     const [editActive, setEditActive] = useState(false);
-    const [bio, setBio] = useState("CS Professor at Stony Brook University and literature lover. Also rank 1 in Starcraft.");
-    const [tempBio, setTempBio] = useState('');
+    const [bio, setBio] = useState(auth.user.bio);
+    const [profileImage, setProfileImage] = useState(auth.user.profile_pic_url);
     const theme = useTheme();
 
     const examplePost = {
@@ -45,13 +45,24 @@ export default function ProfileScreen() {
     const sampleList = [examplePost, examplePost, examplePost, examplePost, examplePost, examplePost, examplePost];
 
     const handleEditProfile = () => {
-        if(editActive) { setBio(tempBio); setTempBio(''); }
+        if (editActive)
+            handleSave();
         setEditActive(!editActive);
     }
 
+    const handleSave = () => {
+        //update the users info on the server with the entered info
+        auth.updateUser({
+            id: auth.user._id,
+            username: auth.user.username,
+            profile_pic_url: profileImage,
+            bio: bio
+        });
+    }
+
     const handleDiscard = () => {
-        console.log(bio);
-        setBio(bio);
+        setBio(auth.user.bio);
+        setProfileImage(auth.user.profile_pic_url);
         setEditActive(!editActive);
     }
 
@@ -65,8 +76,8 @@ export default function ProfileScreen() {
                 <div className="image-overlay-container">
                     <img
                         style={{borderRadius: '50%', height: '300px', width: '300px'}}
-                        src={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
-                        srcSet={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
+                        src={profileImage}
+                        srcSet={profileImage}
                     />
                     {
                         editActive ?
@@ -74,8 +85,8 @@ export default function ProfileScreen() {
                         : ""
                     }
                 </div>
-                <Typography variant='h5' sx={{marginTop: '20px'}}><strong>TheMcKillaGorilla</strong></Typography>
-                <Typography variant='h7' sx={{display: 'block', marginTop: '20px'}}><strong>140k</strong> Followers</Typography>
+                <Typography variant='h5' sx={{marginTop: '20px'}}><strong>{auth.user.username}</strong></Typography>
+                <Typography variant='h7' sx={{display: 'block', marginTop: '20px'}}><strong>{auth.user.followers.length}</strong> Followers</Typography>
                 {
                     editActive ? 
                         <TextareaAutosize

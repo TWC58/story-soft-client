@@ -14,10 +14,24 @@ export const AuthActionType = {
     ERROR: "ERROR"
 }
 
+const testUser = {
+    username: "TheMcKillaGorilla",
+    _id: "123456",
+    email: "abc@gmail.com",
+    profile_pic_url: "https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY",
+    bio: "CS Professor at Stony Brook University and literature lover. Also rank 1 in Starcraft.",
+    likes: [],
+    dislikes: [],
+    followers: [],
+    following: [],
+    bookmarks: []
+}
+
 function AuthContextProvider(props) {
 
     const [auth, setAuth] = useState({
-        user: null,
+        // user: null,
+        user: testUser,
         loggedIn: false,
         error: null
     });
@@ -70,6 +84,25 @@ function AuthContextProvider(props) {
         }
     }
 
+    auth.updateUser = async (user) => {
+        const response = await api.updateUser(user).catch((err) => {
+            return authReducer({
+                type: AuthActionType.LOGOUT,
+                payload: {
+                    error: err
+                }
+            });
+        });
+        if (typeof response !== 'undefined' && response.status === 200) {
+            authReducer({
+                type: AuthActionType.LOGIN,
+                payload: {
+                    user: response.data.user
+                }
+            });
+        }
+    }
+
     auth.guestUser = () => {
         return authReducer({
             type: AuthActionType.GET_LOGGED_IN,
@@ -100,8 +133,8 @@ function AuthContextProvider(props) {
             return authReducer({
                 type: AuthActionType.GET_LOGGED_IN,
                 payload: {
-                    loggedIn: false,
-                    user: null
+                    loggedIn: true,//TODO back to false
+                    user: testUser//TODO back to null
                 }
             });
         });
