@@ -19,6 +19,7 @@ import {
 import { ThemeProvider } from '@mui/material/styles';
 import { storyTheme, comicTheme } from './styling/themes';
 import { GlobalStoreContext } from './store/index'
+import { LoginSuccess, LoginFailure } from './components/google/loginSuccess';
 
 const ThemeWrapper = () => {
     var currentTheme = null;
@@ -26,19 +27,21 @@ const ThemeWrapper = () => {
     store.mediaType === "STORY" ? currentTheme = storyTheme : currentTheme = comicTheme;
 
     return (
-                <ThemeProvider theme = {currentTheme}>
-                    <ModalDelete /> 
-                    <ModalAlert />           
-                    <AppBanner />
-                    <Switch>
-                        <Route path="/" exact component={HomeScreen} />
-                        <Route path="/register/" exact component={RegisterScreen} />
-                        <Route path="/login/" exact component={LoginScreen} />
-                        <Route path="/top5list/:id" exact component={WorkspaceScreen} />
-                        <Route path="/profile" exact component={ProfileScreen} />
-                        <Route path="/post" exact component={PostScreen} />
-                    </Switch>
-                </ThemeProvider>
+        <ThemeProvider theme={currentTheme}>
+            <ModalDelete />
+            <ModalAlert />
+            <AppBanner />
+            <Switch>
+                <Route path="/" exact component={HomeScreen} />
+                <Route path="/register/" exact component={RegisterScreen} />
+                <Route path="/login/" exact component={LoginScreen} />
+                <Route path="/top5list/:id" exact component={WorkspaceScreen} />
+                <Route path="/profile" exact component={ProfileScreen} />
+                <Route path="/post" exact component={PostScreen} />
+                <Route path="/login/success" exact component={LoginSuccess} />
+                <Route path='/login/failure' exact component={LoginFailure} />
+            </Switch>
+        </ThemeProvider>
     )
 }
 

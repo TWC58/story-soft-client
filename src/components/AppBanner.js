@@ -19,6 +19,13 @@ import Button from "@material-ui/core/Button";
 import Avatar from '@mui/material/Avatar';
 import { useTheme } from '@mui/material/styles';
 import MediaType from '../store'
+import GoogleLogin from './google/login'
+import GoogleLogout from './google/logout'
+import { gapi } from 'gapi-script';
+import { useEffect } from 'react';
+
+const clientId = "540240407763-v90k1276kl5v93s6hu5jfc8n42vk1c5b.apps.googleusercontent.com";
+const clientSecret = "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";
 
 export default function AppBanner() {
     const { auth } = useContext(AuthContext);
@@ -26,6 +33,16 @@ export default function AppBanner() {
     const [anchorEl, setAnchorEl] = useState(null);
     const isMenuOpen = Boolean(anchorEl);
     const theme = useTheme();
+
+    useEffect(() => {
+        function start() {
+            gapi.client.init({
+                client_id: clientId,
+                scope: 'https://www.googleapis.com/auth/userinfo.email'
+            })
+        }
+        gapi.load('client:auth2', start);
+    });
 
     const handleMediaSwitch = () => {
         store.handleMediaSwitch();
@@ -77,16 +94,18 @@ export default function AppBanner() {
             onClose={handleMenuClose}
         >
             {
-            //TODO must add google signin link below
+                //TODO must add google signin link below
             }
-            <MenuItem onClick={handleUndoGuest}><Link to='/register/'>Google Login</Link></MenuItem>
+            <MenuItem onClick={handleUndoGuest}>
+                <GoogleLogin />
+            </MenuItem>
             {/* <MenuItem onClick={handleUndoGuest}><Link to='/login/'>Login</Link></MenuItem> */}
             {/* {(!auth.user || !auth.user.username ) ? <MenuItem onClick={handleGuest}><Link to='/'>Continue as Guest</Link></MenuItem> : ""} */}
-            
+
         </Menu>
     );
-    const loggedInMenu = 
-        <Menu
+    const loggedInMenu =
+        <Menu sx={{display: 'inline', flex: '1', flexDirection: 'column'}}
             anchorEl={anchorEl}
             anchorOrigin={{
                 vertical: 'top',
@@ -102,8 +121,8 @@ export default function AppBanner() {
             onClose={handleMenuClose}
         >
             <MenuItem onClick={handleProfile}>Profile</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-        </Menu>        
+            <MenuItem onClick={handleLogout}><GoogleLogout /></MenuItem>
+        </Menu>
 
     let editToolbar = "";
     let menu = loggedOutMenu;
@@ -116,14 +135,14 @@ export default function AppBanner() {
             backgroundImage: `url(${Image})`
         }
     };
-    
+
     function getAccountMenu(loggedIn) {
         if (auth.loggedIn) {
             //need to show user initials
             return <img
-            style={{borderRadius: '50%', height: '50px', width: '50px'}}
-            src={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
-            srcSet={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
+                style={{ borderRadius: '50%', height: '50px', width: '50px' }}
+                src={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
+                srcSet={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
             />;
         }
         return <AccountCircle sx={{ color: '#FF6D00', fontSize: 48 }} />;
@@ -133,32 +152,32 @@ export default function AppBanner() {
         store.goHome();
     }
 
-    let newPostButton = (auth.loggedIn) ? 
-        <CreatePostButton/> :
-        "";        
+    let newPostButton = (auth.loggedIn) ?
+        <CreatePostButton /> :
+        "";
 
     return (
         <Stack spacing={0}>
-            <Box sx={{ flexGrow: 1}}>
+            <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static" >
-                    <Toolbar id="app-banner" style={{backgroundColor: theme.palette.primary.dark}}>
+                    <Toolbar id="app-banner" style={{ backgroundColor: theme.palette.primary.dark }}>
                         <IconButton
                             size="large"
                             edge="end"
                             aria-label="logo"
                             onClick={handleLogoClick}>
-                                {
-                                    store.mediaType === MediaType.STORY ? 
+                            {
+                                store.mediaType === MediaType.STORY ?
                                     <img
-                                    style={{height: '60px', width: '60px'}}
-                                    src={`storyLogo.PNG`}
+                                        style={{ height: '60px', width: '60px' }}
+                                        src={`storyLogo.PNG`}
                                     /> :
                                     <img
-                                    style={{height: '60px', width: '60px'}}
-                                    src={`comicLogo.PNG`}
+                                        style={{ height: '60px', width: '60px' }}
+                                        src={`comicLogo.PNG`}
                                     />
-                                }
-                            
+                            }
+
                         </IconButton>
                         <SearchToolbar />
                         <Box sx={{ flexGrow: 1 }}>{editToolbar}</Box>
@@ -179,7 +198,7 @@ export default function AppBanner() {
                                 aria-haspopup="true"
                                 onClick={handleProfileMenuOpen}
                             >
-                                { getAccountMenu(auth.loggedIn) }
+                                {getAccountMenu(auth.loggedIn)}
                             </IconButton>
                         </Box>
                     </Toolbar>

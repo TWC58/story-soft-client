@@ -32,7 +32,7 @@ export default function CreatePostButton() {
         <Icon
             baseClassName="fas"
             className="fa-plus-circle"
-            sx={{ color: '#FF6D00', fontSize: 30 }}
+            sx={{ color: '#FF6D00', fontSize: 30, marginRight: '20%' }}
             onClick={handleCreatePost}
         />
     </IconButton>

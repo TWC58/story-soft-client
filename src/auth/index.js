@@ -31,7 +31,7 @@ function AuthContextProvider(props) {
 
     const [auth, setAuth] = useState({
         // user: null,
-        user: testUser,
+        user: null,
         loggedIn: false,
         error: null
     });
@@ -52,6 +52,7 @@ function AuthContextProvider(props) {
                 });
             }
             case AuthActionType.LOGOUT: {
+                console.log('AuthActionType.LOGOUT triggered...');
                 return setAuth({
                     user: null,
                     loggedIn: false,
@@ -86,6 +87,7 @@ function AuthContextProvider(props) {
 
     auth.updateUser = async (user) => {
         const response = await api.updateUser(user).catch((err) => {
+            console.log(err);
             return authReducer({
                 type: AuthActionType.LOGOUT,
                 payload: {
@@ -95,7 +97,7 @@ function AuthContextProvider(props) {
         });
         if (typeof response !== 'undefined' && response.status === 200) {
             authReducer({
-                type: AuthActionType.LOGIN,
+                type: AuthActionType.u,
                 payload: {
                     user: response.data.user
                 }
@@ -129,21 +131,23 @@ function AuthContextProvider(props) {
     }
 
     auth.getLoggedIn = async function () {
+        console.log("getting logged in");
         const response = await api.getLoggedIn().catch((err) => {
             return authReducer({
                 type: AuthActionType.GET_LOGGED_IN,
                 payload: {
-                    loggedIn: true,//TODO back to false
-                    user: testUser//TODO back to null
+                    loggedIn: false,//TODO back to false
+                    user: null//TODO back to null
                 }
             });
         });
         if (typeof response !== 'undefined' && response.status === 200) {
+            console.log(response);
             authReducer({
                 type: AuthActionType.GET_LOGGED_IN,
                 payload: {
-                    loggedIn: response.data.loggedIn,
-                    user: response.data.user
+                    loggedIn: true,
+                    user: response.data
                 }
             });
         }
@@ -213,6 +217,13 @@ function AuthContextProvider(props) {
                 }
             })
             history.push("/");
+        }
+    }
+
+    auth.googleLogin = async function() {
+        const response = await api.googleLogin();
+        if (response.status === 200) {
+            auth.getLoggedIn();
         }
     }
 

@@ -13,7 +13,7 @@
 import axios from 'axios'
 axios.defaults.withCredentials = true;
 const api = axios.create({
-    baseURL: 'http://localhost:4000',
+    baseURL: 'http://localhost:5000'//'https://story-soft.herokuapp.com',
 })
 
 // THESE ARE ALL THE REQUESTS WE`LL BE MAKING, ALL REQUESTS HAVE A
@@ -36,11 +36,11 @@ export const viewCommunityList = (id) => api.get(`/community/top5list/view/${id}
 export const likeList = (id, payload) => api.post(`/top5list/like/${id}`, payload);
 export const unlikeList = (id, payload) => api.post(`/top5list/unlike/${id}`, payload);
 
-export const getLoggedIn = () => api.get(`/loggedIn/`);
+export const getLoggedIn = () => api.get(`/auth/getLoggedIn`, { withCredentials: true });
 export const registerUser = (payload) => api.post(`/register/`, payload)
 export const loginUser = (payload) => api.post(`/login/`, payload)
-export const logout = () => api.get(`/logout/`)
-export const updateUser = (user) => api.post('/auth/updateUser');//story-soft
+export const logout = () => api.post(`/auth/logout`, {withCredentials: true});
+export const updateUser = (user) => api.post('/auth/updateUser', user);//story-soft
 
 export const postComment = (id, payload) => api.post(`/top5list/comment/${id}`, payload);
 

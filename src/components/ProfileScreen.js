@@ -23,6 +23,7 @@ import TextareaAutosize from '@mui/material/TextareaAutosize';
 import MostPopular from './MostPopular';
 import NotPublished from './NotPublished';
 import { useTheme } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
 
 export default function ProfileScreen() {
     const { auth } = useContext(AuthContext);
@@ -31,6 +32,7 @@ export default function ProfileScreen() {
     const [editActive, setEditActive] = useState(false);
     const [bio, setBio] = useState(auth.user.bio);
     const [profileImage, setProfileImage] = useState(auth.user.profile_pic_url);
+    const [username, setUsername] = useState(auth.user.username);
     const theme = useTheme();
 
     const examplePost = {
@@ -54,7 +56,7 @@ export default function ProfileScreen() {
         //update the users info on the server with the entered info
         auth.updateUser({
             id: auth.user._id,
-            username: auth.user.username,
+            username: username,
             profile_pic_url: profileImage,
             bio: bio
         });
@@ -63,11 +65,19 @@ export default function ProfileScreen() {
     const handleDiscard = () => {
         setBio(auth.user.bio);
         setProfileImage(auth.user.profile_pic_url);
+        setUsername(auth.user.username);
         setEditActive(!editActive);
     }
 
     const handleBioChange = (e) => {
-        setTempBio(e.target.value);
+        setBio(e.target.value);
+    }
+
+    const handleImageChange = () => { //TODO with cloudinary
+        
+    }
+    const handleUsernameChange = (e) => {
+        setUsername(e.target.value);
     }
 
     return (
@@ -81,11 +91,16 @@ export default function ProfileScreen() {
                     />
                     {
                         editActive ?
-                        <button className="image-overlay-button">Edit Image</button>
+                        <button className="image-overlay-button" onClick={handleImageChange}>Edit Image</button>
                         : ""
                     }
                 </div>
-                <Typography variant='h5' sx={{marginTop: '20px'}}><strong>{auth.user.username}</strong></Typography>
+                {
+                    editActive ?
+                    <TextField required id="username" label="Username" defaultValue={auth.user.username} onChange={handleUsernameChange}/>
+                    :
+                    <Typography variant='h5' sx={{marginTop: '20px'}}><strong>{auth.user.username}</strong></Typography>
+                }
                 <Typography variant='h7' sx={{display: 'block', marginTop: '20px'}}><strong>{auth.user.followers.length}</strong> Followers</Typography>
                 {
                     editActive ? 
