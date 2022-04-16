@@ -12,11 +12,10 @@ function Logout() {
 
     const handleLogout = async () => {
         console.log("Logging Out...");
-        auth.logout();
     }
 
     return (
-        <Button onClick={handleLogout}>Logout</Button>
+        <Button>Logout</Button>
     )
 };
 

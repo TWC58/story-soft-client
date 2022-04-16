@@ -21,6 +21,7 @@ function Login() {
             var intervalID = setInterval(() => {
                 if(newWindow.closed) {
                     console.log('authenticated user');
+                    auth.getLoggedIn();
                     if(intervalID) clearInterval(intervalID);
                 }
             }, 500);

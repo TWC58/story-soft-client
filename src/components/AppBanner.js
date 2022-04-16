@@ -141,7 +141,7 @@ export default function AppBanner() {
             //need to show user initials
             return <img
                 style={{ borderRadius: '50%', height: '50px', width: '50px' }}
-                src={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
+                src={`auth.user.profile_pic_url`}
                 srcSet={`https://i.picsum.photos/id/1064/300/300.jpg?hmac=x2Qoo-SsJIdhmNkLPrIFXDRsuEAd0ITP-T5pwIt_4yY`}
             />;
         }
