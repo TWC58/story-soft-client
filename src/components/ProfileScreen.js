@@ -24,6 +24,14 @@ import MostPopular from './MostPopular';
 import NotPublished from './NotPublished';
 import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
+import { styled } from '@mui/material/styles';
+import Axios from 'axios';
+import { Image } from 'cloudinary-react';
+
+const Input = styled('input')({
+    display: 'none',
+  });
+  
 
 export default function ProfileScreen() {
     const { auth } = useContext(AuthContext);
@@ -73,58 +81,73 @@ export default function ProfileScreen() {
         setBio(e.target.value);
     }
 
-    const handleImageChange = () => { //TODO with cloudinary
-        
+    const handleImageChange = async (e) => { //TODO with cloudinary
+        const img = e.target.files[0];
+        console.log(img);    
+        const formData = new FormData();
+        formData.append("api_key",'');
+        formData.append("file", img);
+        formData.append("upload_preset", "story-soft");
+        Axios.post("https://api.cloudinary.com/v1_1/dkyezrwib/image/upload", formData, { withCredentials: false}).then((response) => {
+            console.log(response);
+            if (response.status === 200) setProfileImage(response.data.secure_url);
+        });
     }
+
     const handleUsernameChange = (e) => {
         setUsername(e.target.value);
     }
 
     return (
-        <div className="flex-row" style={{maxHeight: '90%', maxWidth: '100%', topMargin: '5%', bottomMargin: '5%'}}>
-            <div style={{textAlign: 'center', alignContent: 'center', width: '25%', paddingTop: '5%'}}>
+        <div className="flex-row" style={{ maxHeight: '90%', maxWidth: '100%', topMargin: '5%', bottomMargin: '5%' }}>
+            <div style={{ textAlign: 'center', alignContent: 'center', width: '25%', paddingTop: '5%' }}>
                 <div className="image-overlay-container">
                     <img
-                        style={{borderRadius: '50%', height: '300px', width: '300px'}}
+                        style={{ borderRadius: '50%', height: '300px', width: '300px' }}
                         src={profileImage}
                         srcSet={profileImage}
                     />
                     {
                         editActive ?
-                        <button className="image-overlay-button" onClick={handleImageChange}>Edit Image</button>
-                        : ""
+                            <label htmlFor="contained-button-file">
+                                <Input onChange={handleImageChange} accept="image/*" id="contained-button-file" multiple type="file" />
+                                <Button variant="contained" component="span">
+                                    Upload Image
+                                </Button>
+                            </label>
+                            : ""
                     }
                 </div>
                 {
                     editActive ?
-                    <TextField required id="username" label="Username" defaultValue={auth.user.username} onChange={handleUsernameChange}/>
-                    :
-                    <Typography variant='h5' sx={{marginTop: '20px'}}><strong>{auth.user.username}</strong></Typography>
+                        <TextField required id="username" label="Username" defaultValue={auth.user.username} onChange={handleUsernameChange} />
+                        :
+                        <Typography variant='h5' sx={{ marginTop: '20px' }}><strong>{username}</strong></Typography>
                 }
-                <Typography variant='h7' sx={{display: 'block', marginTop: '20px'}}><strong>{auth.user.followers.length}</strong> Followers</Typography>
+                <Typography variant='h7' sx={{ display: 'block', marginTop: '20px' }}><strong>{auth.user.followers.length}</strong> Followers</Typography>
                 {
-                    editActive ? 
+                    editActive ?
                         <TextareaAutosize
-                        maxRows={4}
-                        defaultValue={bio}
-                        style={{ width: 200, display: 'block' }}
-                        className="profile-bio"
-                        onChange={handleBioChange}
+                            maxRows={4}
+                            defaultValue={bio}
+                            style={{ width: 200, display: 'block' }}
+                            className="profile-bio"
+                            onChange={handleBioChange}
                         /> :
-                        <Typography className="profile-bio" sx={{display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px'}}>{bio}</Typography>
+                        <Typography className="profile-bio" sx={{ display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px' }}>{bio}</Typography>
                 }
                 {
-                    editActive ? 
-                    <Button onClick={handleDiscard} variant='contained' sx={{display: 'block', marginTop: '20px'}}>Discard</Button>
-                    : ""
+                    editActive ?
+                        <Button onClick={handleDiscard} variant='contained' sx={{ display: 'block', marginTop: '20px' }}>Discard</Button>
+                        : ""
                 }
-                <Button onClick={handleEditProfile} variant='contained' sx={{display: 'block', marginTop: '20px'}}>{editActive ? "Save" : "Edit Profile"}</Button>
+                <Button onClick={handleEditProfile} variant='contained' sx={{ display: 'block', marginTop: '20px' }}>{editActive ? "Save" : "Edit Profile"}</Button>
             </div>
-            <div style={{textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll'}}>
-                <MostPopular posts={sampleList}/>
+            <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
+                <MostPopular posts={sampleList} />
             </div>
-            <div style={{textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll'}}>
-                <NotPublished posts={sampleList}/>
+            <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
+                <NotPublished posts={sampleList} />
             </div>
         </div>
         // <Box sx={{backgroundImage: 'public/data/_117883014_gorilla_dianfosseygorillafund1.jpg', backgroundSize: 'contain', borderRadius: '50%', height: '200px', width: '1200px'}}>TEST</Box>
