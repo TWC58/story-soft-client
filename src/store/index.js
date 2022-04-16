@@ -35,16 +35,12 @@ export const MediaType = {
 // THESE ARE ALL THE TYPES OF UPDATES TO OUR GLOBAL
 // DATA STORE STATE THAT CAN BE PROCESSED
 export const GlobalStoreActionType = {
-    CHANGE_LIST_NAME: "CHANGE_LIST_NAME",
-    CLOSE_CURRENT_LIST: "CLOSE_CURRENT_LIST",
-    CREATE_NEW_LIST: "CREATE_NEW_LIST",
-    MARK_LIST_FOR_DELETION: "MARK_LIST_FOR_DELETION",
-    UNMARK_LIST_FOR_DELETION: "UNMARK_LIST_FOR_DELETION",
-    SET_CURRENT_LIST: "SET_CURRENT_LIST",
-    SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE",
-    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
-    LOAD_LISTS: "LOAD_LISTS",
-    SEARCH_LISTS: "SEARCH_LISTS",
+    SET_CURRENT_POST: "SET_CURRENT_POST",
+    SET_EXPLORE_POSTS: "SET_EXPLORE_POSTS",
+    SET_FOLLOWING_POSTS: "SET_FOLLOWING_POSTS",
+    MARK_POST_FOR_DELETION: "MARK_POST_FOR_DELETION",
+    SET_EDIT_ACTIVE: "SET_EDIT_ACTIVE",
+    SET_POST_VIEW_MODE: "SET_POST_VIEW_MODE",
     SET_MEDIA: "SET_MEDIA"
 }
 
@@ -54,13 +50,11 @@ function GlobalStoreContextProvider(props) {
     // THESE ARE ALL THE THINGS OUR DATA STORE WILL MANAGE
     const [store, setStore] = useState({
         mediaType: MediaType.STORY,
-        lists: [],
-        allLists: [],
-        currentList: null,
-        editActive: false,
-        listMarkedForDeletion: null,
-        listViewMode: null,
-        search: ""
+        explorePosts: [],
+        followingPosts: [],
+        currentPost: null,
+        postMarkedForDeletion: null,
+        postViewMode: null
     });
     const history = useHistory();
 
@@ -72,133 +66,34 @@ function GlobalStoreContextProvider(props) {
     const storeReducer = (action) => {
         const { type, payload } = action;
         switch (type) {
-            // LOADS A SET OF LISTS
             case GlobalStoreActionType.SET_MEDIA: {
                 return setStore({
                     mediaType: payload.mediaType,
-                    lists: [],
-                    allLists: [],
-                    currentList: null,
-                    editActive: false,
-                    listMarkedForDeletion: null,
-                    listViewMode: null,
-                    search: ""
+                    explorePosts: store.explorePosts,
+                    followingPosts: store.followingPosts,
+                    currentPost: null,
+                    postMarkedForDeletion: null,
+                    postViewMode: null
                 });
             }
-            case GlobalStoreActionType.LOAD_LISTS: {
+            case GlobalStoreActionType.SET_EXPLORE_POSTS: {
                 return setStore({
-                    lists: payload.lists,
-                    allLists: payload.lists,
-                    currentList: null,
-                    editActive: false,
-                    listMarkedForDeletion: null,
-                    listViewMode: payload.listViewMode,
-                    search: ""
+                    mediaType: store.mediaType,
+                    explorePosts: payload.explorePosts,
+                    followingPosts: store.followingPosts,
+                    currentPost: null,
+                    postMarkedForDeletion: null,
+                    postViewMode: null
                 });
             }
-            // SEARCH A SET OF LISTS
-            case GlobalStoreActionType.SEARCH_LISTS: {
+            case GlobalStoreActionType.SET_FOLLOWING_POSTS: {
                 return setStore({
-                    lists: payload.lists,
-                    allLists: store.allLists,
-                    currentList: null,
-                    editActive: false,
-                    listMarkedForDeletion: null,
-                    listViewMode: store.listViewMode,
-                    search: payload.search
-                });
-            }
-            // LIST UPDATE OF ITS NAME
-            case GlobalStoreActionType.CHANGE_LIST_NAME: {
-                return setStore({
-                    idNamePairs: payload.idNamePairs,
-                    currentList: payload.top5List,
-                    newListCounter: store.newListCounter,
-                    isListNameEditActive: false,
-                    isItemEditActive: false,
-                    listMarkedForDeletion: null
-                });
-            }
-            // STOP EDITING THE CURRENT LIST
-            case GlobalStoreActionType.CLOSE_CURRENT_LIST: {
-                return setStore({
-                    lists: store.lists,
-                    allLists: store.allLists,
-                    currentList: null,
-                    editActive: false,
-                    listMarkedForDeletion: store.listMarkedForDeletion,
-                    listViewMode: store.listViewMode,
-                    search: store.search
-                })
-            }
-            // CREATE A NEW LIST
-            case GlobalStoreActionType.CREATE_NEW_LIST: {
-                return setStore({
-                    lists: store.lists,
-                    allLists: store.allLists,
-                    currentList: payload,
-                    editActive: true,
-                    listMarkedForDeletion: null,
-                    listViewMode: store.listViewMode,
-                    search: store.search
-                })
-            }
-            // PREPARE TO DELETE A LIST
-            case GlobalStoreActionType.MARK_LIST_FOR_DELETION: {
-                return setStore({
-                    lists: store.lists,
-                    allLists: store.allLists,
-                    currentList: null,
-                    editActive: true,
-                    listMarkedForDeletion: payload,
-                    listViewMode: store.listViewMode,
-                    search: store.search
-                });
-            }
-            // PREPARE TO DELETE A LIST
-            case GlobalStoreActionType.UNMARK_LIST_FOR_DELETION: {
-                return setStore({
-                    lists: store.lists,
-                    allLists: store.allLists,
-                    currentList: null,
-                    editActive: false,
-                    listMarkedForDeletion: null,
-                    listViewMode: store.listViewMode,
-                    search: store.search
-                });
-            }
-            // UPDATE A LIST
-            case GlobalStoreActionType.SET_CURRENT_LIST: {
-                return setStore({
-                    lists: store.lists,
-                    allLists: store.allLists,
-                    currentList: payload,
-                    editActive: true,
-                    listMarkedForDeletion: null,
-                    listViewMode: store.listViewMode,
-                    search: store.search
-                });
-            }
-            // START EDITING A LIST ITEM
-            case GlobalStoreActionType.SET_ITEM_EDIT_ACTIVE: {
-                return setStore({
-                    idNamePairs: store.idNamePairs,
-                    currentList: store.currentList,
-                    newListCounter: store.newListCounter,
-                    isListNameEditActive: false,
-                    isItemEditActive: payload,
-                    listMarkedForDeletion: null
-                });
-            }
-            // START EDITING A LIST NAME
-            case GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE: {
-                return setStore({
-                    idNamePairs: store.idNamePairs,
-                    currentList: payload,
-                    newListCounter: store.newListCounter,
-                    isListNameEditActive: true,
-                    isItemEditActive: false,
-                    listMarkedForDeletion: null
+                    mediaType: store.mediaType,
+                    explorePosts: store.explorePosts,
+                    followingPosts: payload.followingPosts,
+                    currentPost: null,
+                    postMarkedForDeletion: null,
+                    postViewMode: null
                 });
             }
             default:
@@ -591,14 +486,23 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.initState = () => {
-        setStore({
-            lists: [],
-            allLists: [],
-            currentList: null,
-            editActive: false,
-            listMarkedForDeletion: null,
-            listViewMode: null
+        let explorePosts = null; //TODO need to implement functionality to fetch these posts
+        let followingPosts = null; //TODO need to implement functionality to fetch these posts
+        
+        storeReducer({
+            type: GlobalStoreActionType.SET_EXPLORE_POSTS,
+            payload: {
+                explorePosts: explorePosts
+            }
         });
+        
+        storeReducer({
+            type: GlobalStoreActionType.SET_FOLLOWING_POSTS,
+            payload: {
+                followingPosts: followingPosts
+            }
+        });
+        
     }
 
     store.addMoveItemTransaction = function (start, end) {
