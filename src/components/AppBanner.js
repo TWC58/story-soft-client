@@ -169,11 +169,11 @@ export default function AppBanner() {
                                 store.mediaType === MediaType.STORY ?
                                     <img
                                         style={{ height: '60px', width: '60px' }}
-                                        src={`storyLogo.PNG`}
+                                        src={`/storyLogo.PNG`}
                                     /> :
                                     <img
                                         style={{ height: '60px', width: '60px' }}
-                                        src={`comicLogo.PNG`}
+                                        src={`/comicLogo.PNG`}
                                     />
                             }
 

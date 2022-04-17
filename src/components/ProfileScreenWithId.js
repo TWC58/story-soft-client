@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'
 import AuthContext from '../auth';
 import { GlobalStoreContext } from '../store'
@@ -28,7 +28,6 @@ import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import Axios from 'axios';
 import { Image } from 'cloudinary-react';
-import { useEffect } from 'react';
 
 const Input = styled('input')({
     display: 'none',
@@ -38,15 +37,15 @@ export default function ProfileScreenWithId() {
     const { auth } = useContext(AuthContext);
     const { store } = useContext(GlobalStoreContext);
 
-    useEffect(() => {
-        store.getUserInfo(window.location.href.substring(30));
-    }, []);
-
     const profileId = window.location.href.substring(30);
-    console.log('profileID: ', profileId);
-    const profileOwner = store.profileInfo;
-    console.log("Profile: ", profileOwner);
-    console.log(profileOwner);
+    
+
+    useEffect(() => {
+        if (!store.profileInfo)
+            store.getUserInfo(profileId);
+    })
+    
+    console.log(store.profileInfo);
 
     const theme = useTheme();
 
@@ -69,15 +68,15 @@ export default function ProfileScreenWithId() {
                 <div className="image-overlay-container">
                     <img
                         style={{ borderRadius: '50%', height: '300px', width: '300px' }}
-                        src={profileOwner.profile_pic_url}
+                        src={store.profileInfo ? store.profileInfo.profile_pic_url : ""}
                     />
                 </div>
                 {
-                <Typography variant='h5' sx={{ marginTop: '20px' }}><strong>{profileOwner.username}</strong></Typography>
+                <Typography variant='h5' sx={{ marginTop: '20px' }}><strong>{store.profileInfo ? store.profileInfo.username : "Username"}</strong></Typography>
                 }
                 <Typography variant='h7' sx={{ display: 'block', marginTop: '20px' }}><strong>0</strong> Followers</Typography>
                 {
-                        <Typography className="profile-bio" sx={{ display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px' }}>{profileOwner.bio}</Typography>
+                        <Typography className="profile-bio" sx={{ display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px' }}>{store.profileInfo ? store.profileInfo.bio : "Example bio"}</Typography>
                 }
                 <Button variant='contained' sx={{ display: 'block', marginTop: '20px' }}>Follow</Button>
             </div>
