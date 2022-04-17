@@ -628,7 +628,9 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.getUserInfo = async function (id) {
+        console.log("Getting user info for ", id);
         const response = await api.getUserInfo(id);
+        console.log("Info: ", response);
         if (response.status == 200) {
             let userInfo = response.data;
             console.log(userInfo);

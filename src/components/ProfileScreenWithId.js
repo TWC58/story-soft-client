@@ -28,6 +28,7 @@ import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import Axios from 'axios';
 import { Image } from 'cloudinary-react';
+import { useEffect } from 'react';
 
 const Input = styled('input')({
     display: 'none',
@@ -37,8 +38,14 @@ export default function ProfileScreenWithId() {
     const { auth } = useContext(AuthContext);
     const { store } = useContext(GlobalStoreContext);
 
+    useEffect(() => {
+        store.getUserInfo(window.location.href.substring(30));
+    }, []);
+
     const profileId = window.location.href.substring(30);
-    const profileOwner = store.getUserInfo(profileId);
+    console.log('profileID: ', profileId);
+    const profileOwner = store.profileInfo;
+    console.log("Profile: ", profileOwner);
     console.log(profileOwner);
 
     const theme = useTheme();
