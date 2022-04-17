@@ -28,12 +28,12 @@ export default function CreatePostButton() {
         size="large"
         edge="end"
         aria-label="create post"
+        onClick={handleCreatePost}
     >
         <Icon
             baseClassName="fas"
             className="fa-plus-circle"
             sx={{ color: '#FF6D00', fontSize: 30, marginRight: '20%' }}
-            onClick={handleCreatePost}
         />
     </IconButton>
   );

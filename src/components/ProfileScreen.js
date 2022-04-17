@@ -38,9 +38,9 @@ export default function ProfileScreen() {
     const { store } = useContext(GlobalStoreContext);
 
     const [editActive, setEditActive] = useState(false);
-    const [bio, setBio] = useState(auth.user.bio);
-    const [profileImage, setProfileImage] = useState(auth.user.profile_pic_url);
-    const [username, setUsername] = useState(auth.user.username);
+    const [bio, setBio] = useState(auth.user ? auth.user.bio : "You don't have a bio; enter one here!");
+    const [profileImage, setProfileImage] = useState(auth.user ? auth.user.profile_pic_url : "");
+    const [username, setUsername] = useState(auth.user ? auth.user.username : "ExampleUsername");
     const theme = useTheme();
 
     const examplePost = {
@@ -104,8 +104,7 @@ export default function ProfileScreen() {
                 <div className="image-overlay-container">
                     <img
                         style={{ borderRadius: '50%', height: '300px', width: '300px' }}
-                        src={profileImage}
-                        srcSet={profileImage}
+                        src={profileImage === "" && auth.user ? auth.user.profile_pic_url : profileImage}
                     />
                     {
                         editActive ?
@@ -120,21 +119,21 @@ export default function ProfileScreen() {
                 </div>
                 {
                     editActive ?
-                        <TextField required id="username" label="Username" defaultValue={auth.user.username} onChange={handleUsernameChange} />
+                        <TextField required id="username" label="Username" defaultValue={auth.user ? auth.user.username : username} onChange={handleUsernameChange} />
                         :
-                        <Typography variant='h5' sx={{ marginTop: '20px' }}><strong>{username}</strong></Typography>
+                        <Typography variant='h5' sx={{ marginTop: '20px' }}><strong>{auth.user ? auth.user.username : username}</strong></Typography>
                 }
-                <Typography variant='h7' sx={{ display: 'block', marginTop: '20px' }}><strong>{auth.user.followers.length}</strong> Followers</Typography>
+                <Typography variant='h7' sx={{ display: 'block', marginTop: '20px' }}><strong>{auth.user ? auth.user.followers.length : 0}</strong> Followers</Typography>
                 {
                     editActive ?
                         <TextareaAutosize
                             maxRows={4}
-                            defaultValue={bio}
+                            defaultValue={auth.user ? auth.user.bio : bio}
                             style={{ width: 200, display: 'block' }}
                             className="profile-bio"
                             onChange={handleBioChange}
                         /> :
-                        <Typography className="profile-bio" sx={{ display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px' }}>{bio}</Typography>
+                        <Typography className="profile-bio" sx={{ display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px' }}>{auth.user ? auth.user.bio : bio}</Typography>
                 }
                 {
                     editActive ?

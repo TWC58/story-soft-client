@@ -23,7 +23,7 @@ export default function ModalDelete() {
   return (
     <div>
       <Dialog
-        open={store.listMarkedForDeletion !== null}
+        open={store.postMarkedForDeletion !== null}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"

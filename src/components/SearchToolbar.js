@@ -137,14 +137,14 @@ export default function SearchToolbar() {
     <Box sx={{ flexGrow: 1 }}>
       <Toolbar>
           <Search
-            disabled={store.currentList !== null}
+            disabled={store.currentPost !== null}
             className="toolbar-black"
             onKeyPress={handleSearchEnter}>
             <SearchIconWrapper>
               <SearchIcon/>
             </SearchIconWrapper>
             <StyledInputBase color={theme.palette.primary.dark}
-              disabled={store.currentList !== null}
+              disabled={store.currentPost !== null}
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
             />
