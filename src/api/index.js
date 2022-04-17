@@ -38,12 +38,14 @@ export const viewList = (id) => api.get(`/top5list/view/${id}`);
 export const viewCommunityList = (id) => api.get(`/community/top5list/view/${id}`);
 export const likeList = (id, payload) => api.post(`/top5list/like/${id}`, payload);
 export const unlikeList = (id, payload) => api.post(`/top5list/unlike/${id}`, payload);
+export const getUserInfo = (id) => api.get(`/auth/getUser/${id}`, id);
 
 export const getLoggedIn = () => api.get(`/auth/getLoggedIn`, { withCredentials: true });
 export const registerUser = (payload) => api.post(`/register/`, payload)
 export const loginUser = (payload) => api.post(`/login/`, payload)
 export const logout = () => api.post(`/auth/logout`, {withCredentials: true});
 export const updateUser = (user) => api.post('/auth/updateUser', user);//story-soft
+
 
 export const postComment = (id, payload) => api.post(`/top5list/comment/${id}`, payload);
 
@@ -61,12 +63,14 @@ const apis = {
     viewCommunityList,
     likeList,
     unlikeList,
+    getUserInfo,
 
     getLoggedIn,
     registerUser,
     loginUser,
     logout,
     updateUser,//store-soft
+
 
     postComment
 }

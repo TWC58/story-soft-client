@@ -41,7 +41,8 @@ export const GlobalStoreActionType = {
     MARK_POST_FOR_DELETION: "MARK_POST_FOR_DELETION",
     SET_EDIT_ACTIVE: "SET_EDIT_ACTIVE",
     SET_POST_VIEW_MODE: "SET_POST_VIEW_MODE",
-    SET_MEDIA: "SET_MEDIA"
+    SET_MEDIA: "SET_MEDIA",
+    GET_USER_INFO: "GET_USER_INFO",
 }
 
 // WITH THIS WE'RE MAKING OUR GLOBAL DATA STORE
@@ -54,7 +55,8 @@ function GlobalStoreContextProvider(props) {
         followingPosts: [],
         currentPost: null,
         postMarkedForDeletion: null,
-        postViewMode: null
+        postViewMode: null,
+        profileInfo: null,
     });
     const history = useHistory();
 
@@ -95,6 +97,17 @@ function GlobalStoreContextProvider(props) {
                     postMarkedForDeletion: null,
                     postViewMode: null
                 });
+            }
+            case GlobalStoreActionType.GET_USER_INFO: {
+                return setStore({
+                    mediaType: store.mediaType,
+                    explorePosts: store.explorePosts,
+                    followingPosts: store.followingPosts,
+                    currentPost: store.currentPost,
+                    postMarkedForDeletion: store.postMarkedForDeletion,
+                    postViewMode: store.postViewMode,
+                    profileInfo: payload.profileInfo,
+                })
             }
             default:
                 return store;
@@ -612,6 +625,20 @@ function GlobalStoreContextProvider(props) {
             type: GlobalStoreActionType.SET_ITEM_EDIT_ACTIVE,
             payload: status
         });
+    }
+
+    store.getUserInfo = async function (id) {
+        const response = await api.getUserInfo(id);
+        if (response.status == 200) {
+            let userInfo = response.data;
+            console.log(userInfo);
+            storeReducer({
+                type: GlobalStoreActionType.GET_USER_INFO,
+                payload: {
+                    profileInfo: userInfo
+                }
+            });
+        }
     }
 
     return (

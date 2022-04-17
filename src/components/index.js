@@ -16,6 +16,7 @@ import ListCommentArea from './ListCommentArea'
 import Comment from './Comment'
 import ProfileScreen from './ProfileScreen'
 import PostScreen from './PostScreen'
+import ProfileScreenWithId from './ProfileScreenWithId'
 
 
 /*
@@ -42,5 +43,6 @@ export {
     ListCommentArea,
     ProfileScreen,
     Comment,
-    PostScreen
+    PostScreen,
+    ProfileScreenWithId
 }

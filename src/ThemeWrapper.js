@@ -14,7 +14,8 @@ import {
     WorkspaceScreen,
     PostScreen,
     ModalAlert,
-    ModalDelete
+    ModalDelete,
+    ProfileScreenWithId
 } from './components'
 import { ThemeProvider } from '@mui/material/styles';
 import { storyTheme, comicTheme } from './styling/themes';
@@ -28,8 +29,8 @@ const ThemeWrapper = () => {
 
     return (
         <ThemeProvider theme={currentTheme}>
-            <ModalDelete />
-            <ModalAlert />
+            {/* <ModalDelete />
+            <ModalAlert /> */}
             <AppBanner />
             <Switch>
                 <Route path="/" exact component={HomeScreen} />
@@ -37,6 +38,7 @@ const ThemeWrapper = () => {
                 <Route path="/login/" exact component={LoginScreen} />
                 <Route path="/top5list/:id" exact component={WorkspaceScreen} />
                 <Route path="/profile" exact component={ProfileScreen} />
+                <Route path="/profile/:id" exact component={ProfileScreenWithId} />
                 <Route path="/post" exact component={PostScreen} />
                 <Route path="/login/success" exact component={LoginSuccess} />
                 <Route path='/login/failure' exact component={LoginFailure} />
