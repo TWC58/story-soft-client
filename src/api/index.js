@@ -11,10 +11,13 @@
 */
 
 import axios from 'axios'
+
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+
 axios.defaults.withCredentials = true;
 const api = axios.create({
-    baseURL: 'http://localhost:5000'//'https://story-soft.herokuapp.com',
-})
+    baseURL: BACKEND_URL,
+});
 
 // THESE ARE ALL THE REQUESTS WE`LL BE MAKING, ALL REQUESTS HAVE A
 // REQUEST METHOD (like get) AND PATH (like /top5list). SOME ALSO
