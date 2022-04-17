@@ -45,6 +45,7 @@ function AuthContextProvider(props) {
         const { type, payload } = action;
         switch (type) {
             case AuthActionType.LOGIN: {
+                console.log(payload);
                 return setAuth({
                     user: payload.user,
                     loggedIn: true,
@@ -95,11 +96,12 @@ function AuthContextProvider(props) {
                 }
             });
         });
+        console.log("Updated USer:", response);
         if (typeof response !== 'undefined' && response.status === 200) {
-            authReducer({
-                type: AuthActionType.u,
+            return authReducer({
+                type: AuthActionType.LOGIN,
                 payload: {
-                    user: response.data.user
+                    user: response.data
                 }
             });
         }

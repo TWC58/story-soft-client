@@ -30,8 +30,7 @@ import { Image } from 'cloudinary-react';
 
 const Input = styled('input')({
     display: 'none',
-  });
-  
+});
 
 export default function ProfileScreen() {
     const { auth } = useContext(AuthContext);
@@ -39,7 +38,7 @@ export default function ProfileScreen() {
 
     const [editActive, setEditActive] = useState(false);
     const [bio, setBio] = useState(auth.user ? auth.user.bio : "You don't have a bio; enter one here!");
-    const [profileImage, setProfileImage] = useState(auth.user ? auth.user.profile_pic_url : "");
+    const [profileImage, setProfileImage] = useState(auth.user.profile_pic_url);// ? auth.user.profile_pic_url : "");
     const [username, setUsername] = useState(auth.user ? auth.user.username : "ExampleUsername");
     const theme = useTheme();
 
@@ -62,6 +61,7 @@ export default function ProfileScreen() {
 
     const handleSave = () => {
         //update the users info on the server with the entered info
+        if(profileImage == "") setProfileImage(auth.user.profile_pic_url);
         auth.updateUser({
             id: auth.user._id,
             username: username,
@@ -90,7 +90,7 @@ export default function ProfileScreen() {
         formData.append("upload_preset", "story-soft");
         Axios.post("https://api.cloudinary.com/v1_1/dkyezrwib/image/upload", formData, { withCredentials: false}).then((response) => {
             console.log(response);
-            if (response.status === 200) setProfileImage(response.data.secure_url);
+            if (response.status === 200) setProfileImage(response.data.url);
         });
     }
 
