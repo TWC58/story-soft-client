@@ -25,44 +25,50 @@ const api = axios.create({
 // WORK, AND SOME REQUIRE DATA, WHICH WE CALL THE payload, FOR WHEN
 // WE NEED TO PUT THINGS INTO THE DATABASE OR IF WE HAVE SOME
 // CUSTOM FILTERS FOR QUERIES
-export const createTop5List = (payload) => api.post(`/top5list/`, payload)
-export const getMyTop5Lists = () => api.get(`/mytop5lists`)
-export const getAllPublishedTop5Lists = () => api.get(`/publishedtop5lists`)
-export const getAllTop5Lists = () => api.get(`/top5lists/`)
-export const getTop5ListsByUsername = (username) => api.get(`/top5lists/user/${username}`)
-export const updateTop5ListById = (id, payload) => api.put(`/top5list/${id}`, payload)
-export const deleteTop5ListById = (id) => api.delete(`/top5list/${id}`)
-export const getTop5ListById = (id) => api.get(`/top5list/${id}`)
-export const getCommunityTop5Lists = () => api.get(`/community/top5lists`);
-export const viewList = (id) => api.get(`/top5list/view/${id}`);
-export const viewCommunityList = (id) => api.get(`/community/top5list/view/${id}`);
-export const likeList = (id, payload) => api.post(`/top5list/like/${id}`, payload);
-export const unlikeList = (id, payload) => api.post(`/top5list/unlike/${id}`, payload);
 export const getUserInfo = (id) => api.get(`/auth/getUser/${id}`, id);
 
 export const getLoggedIn = () => api.get(`/auth/getLoggedIn`, { withCredentials: true });
 export const registerUser = (payload) => api.post(`/register/`, payload)
 export const loginUser = (payload) => api.post(`/login/`, payload)
 export const logout = () => api.post(`/auth/logout`, {withCredentials: true});
-export const updateUser = (user) => api.post('/auth/updateUser', user);//story-soft
+export const updateUser = (user) => api.post('/auth/updateUser', user);
 
+//POST ROUTES
+//pass in the mediaType string to pick the type of post being created, use MediaType options in Store index.js
+export const createPost = (mediaType) => api.post(`/post/${mediaType}/createpost`);
+export const updatePost = (mediaType, id) => api.put(`/post/${mediaType}/updatepost/${id}`);
+export const getPost = (mediaType, id) => api.get(`/post/${mediaType}/getpost/${id}`);
+/* 
+format of the payload for getPosts:
+    {
+        search: "search string, such as story title or tag, etc."
+        searchBy: "AUTHOR"|"TITLE"|"TAG"|"NONE"
+    }
+AUTHOR: search by the username of the content creator
+TITLE: search by the name of the story
+TAG: search for any stories with the given tag (example: "horror")
+NONE: returns all posts for the given mediaType
+*/
+export const getPosts = (mediaType, payload) => api.post(`/post/${mediaType}/getPosts`, payload);
+export const deletePost = (mediaType, id) => api.delete(`/post/${mediaType}/deletepost/${id}`);
+/*
+format of the payload for likePost:
+    {
+        "like": "LIKE"|"DISLIKE"
+    }
+sending "LIKE" will like the post, "DISLIKE" will dislike the post
+*/
+export const likePost = (mediaType, id, payload) => api.post(`/post/${mediaType}/likepost/${id}`, payload);
+export const getTags = (mediaType) => api.get(`/post/${mediaType}/getTags`);
+//END POST ROUTES
 
-export const postComment = (id, payload) => api.post(`/top5list/comment/${id}`, payload);
+//SECTION ROUTES
+export const addSection = (parentSectionId) => api.post(`/post/addSection/${parentSectionId}`);
+export const deleteSection = (sectionId) => api.delete(`/post/deleteSection/${sectionId}`);
+export const getSection = (sectionId) => api.get(`/post/getSection/${sectionId}`);
+//END SECTION ROUTES
 
 const apis = {
-    createTop5List,
-    getMyTop5Lists,
-    getAllPublishedTop5Lists,
-    getAllTop5Lists,
-    getTop5ListsByUsername,
-    updateTop5ListById,
-    deleteTop5ListById,
-    getTop5ListById,
-    getCommunityTop5Lists,
-    viewList,
-    viewCommunityList,
-    likeList,
-    unlikeList,
     getUserInfo,
 
     getLoggedIn,
@@ -71,8 +77,16 @@ const apis = {
     logout,
     updateUser,//store-soft
 
-
-    postComment
+    createPost,
+    updatePost,
+    getPost,
+    getPosts,
+    deletePost,
+    likePost,
+    getTags,
+    addSection,
+    deleteSection,
+    getSection,
 }
 
 export default apis
