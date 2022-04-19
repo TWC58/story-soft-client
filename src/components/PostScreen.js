@@ -11,6 +11,10 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import { ListItem } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { MediaType } from '../store/index.js'
+import ComicWorkspace from './ComicWorkspace'
+
+
 /*
     This React component lets us edit a loaded list, which only
     happens when we are on the proper route.
@@ -60,15 +64,19 @@ function PostScreen() {
                             name="section"
                             inputProps={{ style: { fontWeight: 'bold', fontSize: '16pt' } }}
                         />
-                        <TextField
-                            sx={{ width: '95%', marginBottom: 3 }}
-                            multiline
-                            rows={15}
-                            label="Section Content"
-                            variant='outlined'
-                            id="post-content-field"
-                            name="section-content"
-                        />
+                        {
+                        store.mediaType === MediaType.STORY ?
+                            <TextField
+                                sx={{ width: '95%', marginBottom: 3 }}
+                                multiline
+                                rows={15}
+                                label="Section Content"
+                                variant='outlined'
+                                id="post-content-field"
+                                name="section-content"
+                            /> : 
+                            <ComicWorkspace />
+                        }
                         <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 2 }}>
                             <Button sx={{ width: '100%', marginRight: 4 }} variant="contained"  >Save</Button>
                             <Button sx={{ width: '100%' }} variant="contained" >Publish</Button>
@@ -83,6 +91,12 @@ function PostScreen() {
                 <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
                     <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Tools</Typography>
+                        {
+                            store.mediaType === MediaType.COMIC ? 
+                            ""
+                            :
+                            ""
+                        }
                     </Box>
 
                     <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}></Box>

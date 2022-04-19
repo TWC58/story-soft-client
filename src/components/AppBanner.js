@@ -18,7 +18,7 @@ import Icon from '@mui/material/Icon';
 import Button from "@material-ui/core/Button";
 import Avatar from '@mui/material/Avatar';
 import { useTheme } from '@mui/material/styles';
-import MediaType from '../store'
+import { MediaType } from '../store/index'
 import GoogleLogin from './google/login'
 import GoogleLogout from './google/logout'
 import { gapi } from 'gapi-script';
@@ -155,6 +155,9 @@ export default function AppBanner() {
         <CreatePostButton /> :
         "";
 
+    console.log("Media type is story: ", store.mediaType === MediaType.STORY);
+    console.log("Media type is comic: ", store.mediaType === MediaType.COMIC);
+
     return (
         <Stack spacing={0}>
             <Box sx={{ flexGrow: 1 }}>
@@ -180,13 +183,15 @@ export default function AppBanner() {
                         </IconButton>
                         <SearchToolbar />
                         <Box sx={{ flexGrow: 1 }}>{editToolbar}</Box>
-                        {/* <Button sx={{paddingRight: '5%'}} variant='contained' onClick={handleMediaSwitch}>
+                        {
+                            <Button sx={{paddingRight: '5%'}} variant='contained' onClick={handleMediaSwitch}>
                             {
                                 store.mediaType === MediaType.STORY ?
                                 "Goto Comic" : 
                                 "Goto Story"
                             }
-                        </Button> */}
+                            </Button> 
+                        }
                         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                             {newPostButton}
                             <IconButton
