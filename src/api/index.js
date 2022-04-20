@@ -12,7 +12,7 @@
 
 import axios from 'axios'
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 axios.defaults.withCredentials = true;
 const api = axios.create({
