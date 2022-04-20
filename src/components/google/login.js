@@ -12,7 +12,7 @@ function Login() {
     const { auth } = useContext(AuthContext);
 
     const handleLogin = async () => {
-        console.log(BACKEND_URL);
+        console.log(process.env.BACKEND_URL);
         const googleLoginURL = BACKEND_URL +'/auth/google';
         const newWindow = window.open(
             googleLoginURL,
