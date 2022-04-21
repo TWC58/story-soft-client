@@ -14,7 +14,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { MediaType } from '../store/index.js'
 import ComicWorkspace from './ComicWorkspace'
 import SectionTree from './SectionTree'
-
+import AddIcon from '@mui/icons-material/Add';
 
 /*
     This React component lets us edit a loaded list, which only
@@ -27,12 +27,14 @@ function PostScreen() {
     const { auth } = useContext(AuthContext);
     const [currentPostName, setCurrentPostName] = useState(null);
     const [currentSectionName, setCurrentSectionName] = useState(null);
+    const [currentSectionId, setCurrentSectionId] = useState("12324");
 
     useEffect(async () => {
         if (currentPostName === null && store.currentPost) {
             await store.recursiveSectionBuilder(store.currentPost.rootSection);
             setCurrentPostName(store.currentPost.name);
             setCurrentSectionName(store.currentPost.loadedRoot.name);
+            setCurrentSectionId(store.currentPost.loadedRoot._id);
         } else if (!store.currentPost) {
             // store.goHome();
         }
@@ -51,6 +53,17 @@ function PostScreen() {
         await store.updatePost(store.currentPost);
     }
 
+    const handleSetCurrentSection = (sectionId) => {
+        if (currentSectionId !== sectionId)
+            setCurrentSectionId(sectionId);
+    }
+
+    const handleAddSection = async () => {
+        let newSection = await store.addSection(currentSectionId);
+        setCurrentSectionId(newSection._id);
+        setCurrentSectionName(newSection.name);
+    }
+
     const theme = useTheme();
 
     return (
@@ -59,8 +72,11 @@ function PostScreen() {
                 <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main }}>
                     <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Sections</Typography>
+                        <IconButton onClick={handleAddSection} sx={{}} aria-label="delete" size="small">
+                            <AddIcon fontSize="small" />
+                        </IconButton>
                     </Box>
-                    <SectionTree rootSection={store.currentPost ? store.currentPost.loadedRoot : {name: "RootSection", children: [], _id: "12324"}}/>
+                    <SectionTree rootSection={store.currentPost ? store.currentPost.loadedRoot : {name: "RootSection", children: [], _id: "12324"}} currentSection={currentSectionId} handleSetCurrentSection={handleSetCurrentSection}/>
                 </Box>
 
             </div>

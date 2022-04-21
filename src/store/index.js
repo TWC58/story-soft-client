@@ -130,6 +130,21 @@ function GlobalStoreContextProvider(props) {
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
+    //SECTIONS
+
+    store.addSection = async function(parentSectionId) {
+        let response = await api.addSection(parentSectionId).catch((err) => {
+            console.log(err);
+            if (err.response)
+                auth.setError(err.response.errorMessage);
+        });;
+
+        if (response?.data.success) {
+            await store.recursiveSectionBuilder(store.currentPost.rootSection);
+            return response.data.section;//the new section created
+        }
+    }
+
     store.recursiveSectionBuilder = async function(rootSectionId) {
         console.log("Recursive section builder from root call")
         let response = await api.getSection(rootSectionId);
@@ -144,14 +159,18 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.recursiveSectionBuilderHelper = async (section) => {
-        console.log("Recursive section builder HELPER call")
+        console.log("Recursive section builder HELPER call for: " + JSON.stringify(section));
         section.loadedChildren = []
+
+        if (!section)
+            return;
+
         for (let child of section.children) {
             let response = await api.getSection(child);
 
             if (response?.data.success) {
                 section.loadedChildren.push(response.data.section);
-                store.recursiveSectionBuilderHelper(section.loadedChildren.slice(-1));
+                store.recursiveSectionBuilderHelper(section.loadedChildren.slice(-1)[0]);
             }
         }
     }
@@ -171,6 +190,7 @@ function GlobalStoreContextProvider(props) {
         history.push("/");
     }
 
+    //POSTS
     store.createPost = async function () {
         let response = await api.createPost(this.mediaType).catch((err) => {
             console.log(err);
