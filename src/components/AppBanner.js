@@ -45,6 +45,7 @@ export default function AppBanner() {
     });
 
     const handleMediaSwitch = () => {
+        console.log("MEDIA SWITCH HIT");
         store.handleMediaSwitch();
     }
 

@@ -4,8 +4,13 @@ import Box from '@mui/material/Box';
 import { green } from '@mui/material/colors';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
+import { useContext } from 'react';
+import { GlobalStoreContext } from '../store'
 
 export default function CreatePostButton() {
+
+  const { store } = useContext(GlobalStoreContext);
+
   React.useEffect(() => {
     const node = loadCSS(
       'https://use.fontawesome.com/releases/v5.14.0/css/all.css',
@@ -19,8 +24,7 @@ export default function CreatePostButton() {
   }, []);
 
     const handleCreatePost = () => {
-        //TODO
-        return
+      store.createPost();
     }
 
   return (

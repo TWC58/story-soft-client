@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { useTheme } from '@mui/material/styles';
 import Top5ItemEdit from './Top5ItemEdit.js'
 import List from '@mui/material/List';
@@ -13,6 +13,7 @@ import { ListItem } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { MediaType } from '../store/index.js'
 import ComicWorkspace from './ComicWorkspace'
+import SectionTree from './SectionTree'
 
 
 /*
@@ -24,8 +25,26 @@ import ComicWorkspace from './ComicWorkspace'
 function PostScreen() {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext);
-    const [currentListNameText, setListNameText] = useState((store.currentList) ? store.currentList.name : "");
-    const history = useHistory();
+    const [currentPostName, setCurrentPostName] = useState(null);
+    const [currentSectionName, setCurrentSectionName] = useState(null);
+
+    useEffect(async () => {
+        if (currentPostName === null && store.currentPost) {
+            await store.recursiveSectionBuilder(store.currentPost.rootSection);
+            setCurrentPostName(store.currentPost.name);
+            setCurrentSectionName(store.currentPost.loadedRoot.name);
+        } else if (!store.currentPost) {
+            // store.goHome();
+        }
+    })
+
+    const handlePostNameChange = (e) => {
+        setCurrentPostName(e.target.value);
+    }
+
+    const handleSectionNameChange = (e) => {
+        setCurrentSectionName(e.target.value);
+    }
 
     const theme = useTheme();
 
@@ -36,12 +55,7 @@ function PostScreen() {
                     <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Sections</Typography>
                     </Box>
-                    <List sx={{ fontFamily: 'Arial, sans-serif' }}>
-                        <ListItem sx={{ cursor: 'pointer' }}>
-                            <ArrowRightIcon />
-                            Section 1
-                        </ListItem>
-                    </List>
+                    {/* <SectionTree rootSection={store.currentPost ? store.currentPost.loadedRoot : {name: "RootSection", children: [], _id: "12324"}}/> */}
                 </Box>
 
             </div>
@@ -55,6 +69,8 @@ function PostScreen() {
                             id="post-title-textfield"
                             name="title"
                             inputProps={{ style: { fontWeight: 'bold', fontSize: '24pt' } }}
+                            value={currentPostName ? currentPostName : ""}
+                            onChange={handlePostNameChange}
                         />
                         <TextField
                             sx={{ width: '95%', marginBottom: 3 }}
@@ -63,6 +79,8 @@ function PostScreen() {
                             id="post-section-textfield"
                             name="section"
                             inputProps={{ style: { fontWeight: 'bold', fontSize: '16pt' } }}
+                            value={currentSectionName ? currentSectionName : ""}
+                            onChange={handleSectionNameChange}
                         />
                         {
                         store.mediaType === MediaType.STORY ?

@@ -68,6 +68,17 @@ function GlobalStoreContextProvider(props) {
     const storeReducer = (action) => {
         const { type, payload } = action;
         switch (type) {
+            case GlobalStoreActionType.SET_CURRENT_POST: {
+                return setStore({
+                    mediaType: store.mediaType,
+                    explorePosts: store.explorePosts,
+                    followingPosts: store.followingPosts,
+                    currentPost: payload.currentPost,
+                    postMarkedForDeletion: store.postMarkedForDeletion,
+                    postViewMode: store.postViewMode,
+                    profileInfo: store.profileInfo,
+                })
+            }
             case GlobalStoreActionType.SET_MEDIA: {
                 return setStore({
                     mediaType: payload.mediaType,
@@ -76,7 +87,7 @@ function GlobalStoreContextProvider(props) {
                     currentPost: null,
                     postMarkedForDeletion: null,
                     postViewMode: null
-                });
+                }, () => { console.log("SET MEDIA to " + store.mediaType) });
             }
             case GlobalStoreActionType.SET_EXPLORE_POSTS: {
                 return setStore({
@@ -118,131 +129,60 @@ function GlobalStoreContextProvider(props) {
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
+    store.recursiveSectionBuilder = async function(rootSectionId) {
+
+        let response = await api.getSection(rootSectionId);
+
+        if (response?.data.success) {
+            let rootSection = response.data.section;
+            await store.recursiveSectionBuilderHelper(rootSection);
+            store.currentPost.loadedRoot = rootSection;
+            return rootSection;
+        }
+        return null;
+    }
+
+    store.recursiveSectionBuilderHelper = async (section) => {
+        section.loadedChildren = []
+        for (let child of section.children) {
+            let response = await api.getSection(child);
+
+            if (response?.data.success) {
+                section.loadedChildren.push(response.data.section);
+            }
+        }
+    }
+
     store.handleMediaSwitch = () => {
+        console.log("Handle media switch start: " + store.mediaType);
         storeReducer({
             type: GlobalStoreActionType.SET_MEDIA,
             payload: {
                 mediaType: (store.mediaType === MediaType.STORY) ? MediaType.COMIC : MediaType.STORY
             }
         });
+        console.log("Handle media switch end: "  + store.mediaType);
     }
 
     store.goHome = () => {
         history.push("/");
     }
 
-    store.clearListsForUserView = () => {
-        storeReducer({
-            type: GlobalStoreActionType.LOAD_LISTS,
-            payload: {
-                lists: [],
-                listViewMode: ListViewMode.USER_LISTS
-            }
-        });
-    }
+    store.createPost = async function () {
+        let response = await api.createPost(this.mediaType).catch((err) => {
+            console.log(err);
+            if (err.response)
+                auth.setError(err.response.errorMessage);
+        });;
 
-    store.hasPublishedListName = (name) => {
-        if (!store.allLists || store.listViewMode !== ListViewMode.MY_LISTS) {
-            auth.setError("ERROR: You must reload your personal lists to enable publishing");
-            return true;
-        }
-
-        for (let i = 0; i < store.allLists.length; i++) {
-            if (store.allLists[i].published && store.allLists[i].name.toLowerCase() === name.toLowerCase())
-                return true;
-        }
-
-        return false;
-    }
-
-    store.reloadLists = async function () {
-        if (store.listViewMode === ListViewMode.MY_LISTS) {
-            store.loadMyLists();
-        }
-    }
-
-    store.loadCommunityLists = async function () {
-        let response = await api.getCommunityTop5Lists();
-        if (response.data.success) {
-            let top5Lists = response.data.data;
+        if (response?.data.success) {
             storeReducer({
-                type: GlobalStoreActionType.LOAD_LISTS,
+                type: GlobalStoreActionType.SET_CURRENT_POST,
                 payload: {
-                    lists: top5Lists,
-                    listViewMode: ListViewMode.COMMUNITY_LISTS
+                    currentPost: response.data.post
                 }
             });
-        }
-        history.push("/");
-    }
-
-    store.loadMyLists = async function () {
-        let response = await api.getMyTop5Lists();
-        if (response.data.success) {
-            let top5Lists = response.data.data;
-            // alert(top5Lists);
-            storeReducer({
-                type: GlobalStoreActionType.LOAD_LISTS,
-                payload: {
-                    lists: top5Lists,
-                    listViewMode: ListViewMode.MY_LISTS
-                }
-            });
-        }
-        history.push("/");
-    }
-
-    store.loadPublishedLists = async function () {
-        let response = await api.getAllPublishedTop5Lists();
-        if (response.data.success) {
-            let top5Lists = response.data.data;
-            storeReducer({
-                type: GlobalStoreActionType.LOAD_LISTS,
-                payload: {
-                    lists: top5Lists,
-                    listViewMode: ListViewMode.PUBLISHED_LISTS
-                }
-            });
-        }
-        history.push("/");
-    }
-
-    store.loadListsByUsername = async function (username) {
-        let response = await api.getTop5ListsByUsername(username);
-        if (response.data.success) {
-            let top5Lists = response.data.data;
-            storeReducer({
-                type: GlobalStoreActionType.LOAD_LISTS,
-                payload: {
-                    lists: top5Lists,
-                    listViewMode: ListViewMode.USER_LISTS
-                }
-            });
-            storeReducer({
-                type: GlobalStoreActionType.LOAD_LISTS,
-                payload: {
-                    lists: top5Lists,
-                    listViewMode: ListViewMode.USER_LISTS
-                }
-            });
-
-            // storeReducer({
-            //     type: GlobalStoreActionType.SEARCH_LISTS,
-            //     payload: {
-            //         lists: store.lists,
-            //         search: username
-            //     }
-            // });
-
-        }
-        history.push("/");
-    }
-
-    store.viewList = async function (list) {
-        let response = await api.viewList(list._id);
-        if (response.data.success) {
-            list.views = list.views + 1;
-            return list;
+            history.push("/post");
         }
     }
 
