@@ -23,15 +23,15 @@ function ComicWorkspace() {
     const pStore = createStore();
 
     return (
-        <PolotnoContainer style={{ width: '100vw', height: '100vh' }}>
+        <PolotnoContainer>
             <WorkspaceWrap>
-                <SidePanelWrap>
-                    <SidePanel store={pStore} />
-                </SidePanelWrap>
                 <Toolbar store={pStore} downloadButtonEnabled />
                 <Workspace store={pStore} />
                 <ZoomButtons store={pStore} />
             </WorkspaceWrap>
+            <SidePanelWrap>
+                <SidePanel store={pStore} />
+            </SidePanelWrap>
         </PolotnoContainer>
     )
 }

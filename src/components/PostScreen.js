@@ -13,6 +13,14 @@ import { ListItem } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { MediaType } from '../store/index.js'
 import ComicWorkspace from './ComicWorkspace'
+import { PolotnoContainer, SidePanelWrap, WorkspaceWrap } from 'polotno';
+import { createStore } from 'polotno/model/store';
+import { Toolbar } from 'polotno/toolbar/toolbar';
+import { ZoomButtons } from 'polotno/toolbar/zoom-buttons';
+import { SidePanel } from 'polotno/side-panel';
+import { Workspace } from 'polotno/canvas/workspace';
+
+
 
 
 /*
@@ -27,6 +35,7 @@ function PostScreen() {
     const [currentListNameText, setListNameText] = useState((store.currentList) ? store.currentList.name : "");
     const history = useHistory();
 
+    const pStore = createStore();
     const theme = useTheme();
 
     return (
@@ -45,63 +54,74 @@ function PostScreen() {
                 </Box>
 
             </div>
-            <div id="post-edit">
-                <Box sx={{ width: '100%', height: '97%' }}>
-                    <Box sx={{ width: '100%', height: '85%', marginTop: '2%', display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-                        <TextField
-                            sx={{ width: '95%', marginBottom: 2 }}
-                            label="Title"
-                            variant='outlined'
-                            id="post-title-textfield"
-                            name="title"
-                            inputProps={{ style: { fontWeight: 'bold', fontSize: '24pt' } }}
-                        />
-                        <TextField
-                            sx={{ width: '95%', marginBottom: 3 }}
-                            label="Section"
-                            variant='outlined'
-                            id="post-section-textfield"
-                            name="section"
-                            inputProps={{ style: { fontWeight: 'bold', fontSize: '16pt' } }}
-                        />
-                        {
-                        store.mediaType === MediaType.STORY ?
+            <PolotnoContainer>
+                <div id="post-edit">
+                    <Box sx={{ width: '100%', height: '97%' }}>
+                        <Box sx={{ width: '100%', height: '85%', marginTop: '2%', display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+                            <TextField
+                                sx={{ width: '95%', marginBottom: 2 }}
+                                label="Title"
+                                variant='outlined'
+                                id="post-title-textfield"
+                                name="title"
+                                inputProps={{ style: { fontWeight: 'bold', fontSize: '24pt' } }}
+                            />
                             <TextField
                                 sx={{ width: '95%', marginBottom: 3 }}
-                                multiline
-                                rows={15}
-                                label="Section Content"
+                                label="Section"
                                 variant='outlined'
-                                id="post-content-field"
-                                name="section-content"
-                            /> : 
-                            <ComicWorkspace />
-                        }
-                        <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 2 }}>
-                            <Button sx={{ width: '100%', marginRight: 4 }} variant="contained"  >Save</Button>
-                            <Button sx={{ width: '100%' }} variant="contained" >Publish</Button>
+                                id="post-section-textfield"
+                                name="section"
+                                inputProps={{ style: { fontWeight: 'bold', fontSize: '16pt' } }}
+                            />
+                            {
+                                store.mediaType === MediaType.STORY ?
+                                    <TextField
+                                        sx={{ width: '95%', marginBottom: 3 }}
+                                        multiline
+                                        rows={15}
+                                        label="Section Content"
+                                        variant='outlined'
+                                        id="post-content-field"
+                                        name="section-content"
+                                    /> :
+                                    // <ComicWorkspace />
+                                    <WorkspaceWrap>
+                                        {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
+                                        <Toolbar store={pStore} />
+                                        <Workspace store={pStore} components={{ PageControls: () => null }} style={{ }} />
+                                        <ZoomButtons store={pStore} />
+                                    </WorkspaceWrap>
+                            }
+                            <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 2 }}>
+                                <Button sx={{ width: '100%', marginRight: 4 }} variant="contained"  >Save</Button>
+                                <Button sx={{ width: '100%' }} variant="contained" >Publish</Button>
+                            </Box>
+                            <Button color="error" variant="contained" className="workspace-button"  >Delete Section</Button>
+
                         </Box>
-                        <Button color="error" variant="contained" className="workspace-button"  >Delete Section</Button>
 
                     </Box>
+                </div>
+                <div id="post-tools">
+                    <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+                        <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                            <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Tools</Typography>
+                        </Box>
 
-                </Box>
-            </div>
-            <div id="post-tools">
-                <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-                    <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
-                        <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Tools</Typography>
-                        {
-                            store.mediaType === MediaType.COMIC ? 
-                            ""
-                            :
-                            ""
-                        }
-                    </Box>
+                        <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
 
-                    <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}></Box>
+                            {
+                                store.mediaType === MediaType.COMIC ?
+                                    <SidePanelWrap>
+                                        <SidePanel store={pStore} />
+                                    </SidePanelWrap>
+                                    :
+                                    ""
+                            }
+                        </Box>
 
-                    {/* <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                        {/* <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Draw</Typography>
                     </Box>
 
@@ -113,20 +133,21 @@ function PostScreen() {
 
                     <Box sx={{ borderRadius: '5px', width: '90%', height: '10%', bgcolor: theme.palette.primary.light }}></Box> */}
 
-                    <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
-                        <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Description</Typography>
+                        <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                            <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Description</Typography>
+                        </Box>
+                        <Box sx={{ borderRadius: '5px', width: '90%', bgcolor: theme.palette.primary.light }}>
+                            <TextField
+                                sx={{ width: '100%', height: '100%', marginBottom: 0 }}
+                                multiline
+                                rows={8}
+                                id="post-content-field"
+                                name="section-content"
+                            />
+                        </Box>
                     </Box>
-                    <Box sx={{ borderRadius: '5px', width: '90%', bgcolor: theme.palette.primary.light }}>
-                        <TextField
-                            sx={{ width: '100%', height: '100%', marginBottom: 0 }}
-                            multiline
-                            rows={8}
-                            id="post-content-field"
-                            name="section-content"
-                        />
-                    </Box>
-                </Box>
-            </div>
+                </div>
+            </PolotnoContainer>
         </div>
     )
 }
