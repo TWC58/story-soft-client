@@ -46,6 +46,11 @@ function PostScreen() {
         setCurrentSectionName(e.target.value);
     }
 
+    const handleSave = async () => {
+        store.currentPost.name = currentPostName;
+        await store.updatePost(store.currentPost);
+    }
+
     const theme = useTheme();
 
     return (
@@ -55,7 +60,7 @@ function PostScreen() {
                     <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Sections</Typography>
                     </Box>
-                    {/* <SectionTree rootSection={store.currentPost ? store.currentPost.loadedRoot : {name: "RootSection", children: [], _id: "12324"}}/> */}
+                    <SectionTree rootSection={store.currentPost ? store.currentPost.loadedRoot : {name: "RootSection", children: [], _id: "12324"}}/>
                 </Box>
 
             </div>
@@ -96,7 +101,7 @@ function PostScreen() {
                             <ComicWorkspace />
                         }
                         <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 2 }}>
-                            <Button sx={{ width: '100%', marginRight: 4 }} variant="contained"  >Save</Button>
+                            <Button sx={{ width: '100%', marginRight: 4 }} variant="contained" onClick={handleSave} >Save</Button>
                             <Button sx={{ width: '100%' }} variant="contained" >Publish</Button>
                         </Box>
                         <Button color="error" variant="contained" className="workspace-button"  >Delete Section</Button>

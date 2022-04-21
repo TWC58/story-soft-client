@@ -36,7 +36,7 @@ export const updateUser = (user) => api.post('/auth/updateUser', user);
 //POST ROUTES
 //pass in the mediaType string to pick the type of post being created, use MediaType options in Store index.js
 export const createPost = (mediaType) => api.post(`/post/${mediaType}/createpost`);
-export const updatePost = (mediaType, id) => api.put(`/post/${mediaType}/updatepost/${id}`);
+export const updatePost = (mediaType, id, payload) => api.put(`/post/${mediaType}/updatepost/${id}`, payload);
 export const getPost = (mediaType, id) => api.get(`/post/${mediaType}/getpost/${id}`);
 /* 
 format of the payload for getPosts:

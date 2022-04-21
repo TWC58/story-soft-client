@@ -80,6 +80,7 @@ function GlobalStoreContextProvider(props) {
                 })
             }
             case GlobalStoreActionType.SET_MEDIA: {
+                console.log("SET MEDIA to " + payload.mediaType);
                 return setStore({
                     mediaType: payload.mediaType,
                     explorePosts: store.explorePosts,
@@ -87,7 +88,7 @@ function GlobalStoreContextProvider(props) {
                     currentPost: null,
                     postMarkedForDeletion: null,
                     postViewMode: null
-                }, () => { console.log("SET MEDIA to " + store.mediaType) });
+                });
             }
             case GlobalStoreActionType.SET_EXPLORE_POSTS: {
                 return setStore({
@@ -130,7 +131,7 @@ function GlobalStoreContextProvider(props) {
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
     store.recursiveSectionBuilder = async function(rootSectionId) {
-
+        console.log("Recursive section builder from root call")
         let response = await api.getSection(rootSectionId);
 
         if (response?.data.success) {
@@ -143,12 +144,14 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.recursiveSectionBuilderHelper = async (section) => {
+        console.log("Recursive section builder HELPER call")
         section.loadedChildren = []
         for (let child of section.children) {
             let response = await api.getSection(child);
 
             if (response?.data.success) {
                 section.loadedChildren.push(response.data.section);
+                store.recursiveSectionBuilderHelper(section.loadedChildren.slice(-1));
             }
         }
     }
@@ -183,6 +186,18 @@ function GlobalStoreContextProvider(props) {
                 }
             });
             history.push("/post");
+        }
+    }
+
+    store.updatePost = async function(post) {
+        let response = await api.updatePost(store.mediaType, post._id, post).catch((err) => {
+            console.log(err);
+            if (err.response)
+                auth.setError(err.response.errorMessage);
+        });
+
+        if (response?.data.success) {
+            auth.setError("Post saved!");
         }
     }
 

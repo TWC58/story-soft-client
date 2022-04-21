@@ -29,8 +29,8 @@ const ThemeWrapper = () => {
 
     return (
         <ThemeProvider theme={currentTheme}>
-            {/* <ModalDelete />
-            <ModalAlert /> */}
+            <ModalDelete />
+            <ModalAlert />
             <AppBanner />
             <Switch>
                 <Route path="/" exact component={HomeScreen} />
