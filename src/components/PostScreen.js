@@ -28,16 +28,25 @@ function PostScreen() {
     const [currentPostName, setCurrentPostName] = useState(null);
     const [currentSectionName, setCurrentSectionName] = useState(null);
     const [currentSectionId, setCurrentSectionId] = useState("12324");
+    const [currentDescription, setCurrentDescription] = useState(null);
+    const [readyToSave, setReadyToSave] = useState(false); //when updated, we know we can make API call bc react respects order of state changes
     // const [loadAttempted, setLoadAttempted] = useState(false);
 
     let loadAttempted = false;
 
     useEffect(async () => {
+        if(readyToSave){
+            store.currentPost.name = currentPostName;
+            store.currentPost.summary = currentDescription;
+            await store.updatePost(store.currentPost);
+            setReadyToSave(false);
+        }
         if (currentPostName === null && store.currentPost) {
             await store.recursiveSectionBuilder(store.currentPost.rootSection);
             setCurrentPostName(store.currentPost.name);
             setCurrentSectionName(store.currentPost.loadedRoot.name);
             setCurrentSectionId(store.currentPost.loadedRoot._id);
+            setCurrentDescription(store.currentPost.summary);
         } else if (!store.currentPost && !loadAttempted) {
             const postId = window.location.pathname.substring("/post/".length);
             await store.getPost(postId);
@@ -47,7 +56,7 @@ function PostScreen() {
         } else if (loadAttempted) {
             auth.setError("Post not found!");
         }
-    })
+    }, [readyToSave]);
 
     const handlePostNameChange = (e) => {
         setCurrentPostName(e.target.value);
@@ -58,13 +67,16 @@ function PostScreen() {
     }
 
     const handleSave = async () => {
-        store.currentPost.name = currentPostName;
-        await store.updatePost(store.currentPost);
+        setReadyToSave(true); //wait for this to call useEffect and save
     }
 
     const handleSetCurrentSection = (sectionId) => {
         if (currentSectionId !== sectionId)
             setCurrentSectionId(sectionId);
+    }
+
+    const handleDescriptionChange = (e) => {
+        setCurrentDescription(e.target.value);
     }
 
     const handleAddSection = async () => {
@@ -171,6 +183,8 @@ function PostScreen() {
                             rows={8}
                             id="post-content-field"
                             name="section-content"
+                            value={currentDescription ? currentDescription : ""}
+                            onChange={handleDescriptionChange}
                         />
                     </Box>
                 </Box>

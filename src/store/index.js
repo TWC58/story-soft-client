@@ -205,7 +205,7 @@ function GlobalStoreContextProvider(props) {
                     currentPost: response.data.post
                 }
             });
-            history.push("/post/" + store.currentPost._id);
+            history.push("/post/" + response.data.post._id);
         }
     }
 
