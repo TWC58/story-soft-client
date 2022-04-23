@@ -39,7 +39,7 @@ const ThemeWrapper = () => {
                 <Route path="/top5list/:id" exact component={WorkspaceScreen} />
                 <Route path="/profile" exact component={ProfileScreen} />
                 <Route path="/profile/:id" exact component={ProfileScreenWithId} />
-                <Route path="/post" exact component={PostScreen} />
+                <Route path="/post/:id" exact component={PostScreen} />
                 <Route path="/login/success" exact component={LoginSuccess} />
                 <Route path='/login/failure' exact component={LoginFailure} />
             </Switch>
