@@ -50,7 +50,7 @@ export const GlobalStoreActionType = {
 function GlobalStoreContextProvider(props) {
     // THESE ARE ALL THE THINGS OUR DATA STORE WILL MANAGE
     const [store, setStore] = useState({
-        mediaType: MediaType.STORY,
+        mediaType: MediaType.COMIC,
         explorePosts: [],
         followingPosts: [],
         currentPost: null,
@@ -205,7 +205,7 @@ function GlobalStoreContextProvider(props) {
                     currentPost: response.data.post
                 }
             });
-            history.push("/post");
+            history.push("/post/" + store.currentPost._id);
         }
     }
 
@@ -218,6 +218,23 @@ function GlobalStoreContextProvider(props) {
 
         if (response?.data.success) {
             auth.setError("Post saved!");
+        }
+    }
+
+    store.getPost = async function(postId) {
+        let response = await api.getPost(store.mediaType, postId).catch((err) => {
+            console.log(err);
+            if (err.response)
+                auth.setError(err.response.errorMessage);
+        });
+
+        if (response?.data.success) {
+            storeReducer({
+                type: GlobalStoreActionType.SET_CURRENT_POST,
+                payload: {
+                    currentPost: response.data.post
+                }
+            });
         }
     }
 

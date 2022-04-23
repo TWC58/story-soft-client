@@ -28,6 +28,9 @@ function PostScreen() {
     const [currentPostName, setCurrentPostName] = useState(null);
     const [currentSectionName, setCurrentSectionName] = useState(null);
     const [currentSectionId, setCurrentSectionId] = useState("12324");
+    // const [loadAttempted, setLoadAttempted] = useState(false);
+
+    let loadAttempted = false;
 
     useEffect(async () => {
         if (currentPostName === null && store.currentPost) {
@@ -35,8 +38,14 @@ function PostScreen() {
             setCurrentPostName(store.currentPost.name);
             setCurrentSectionName(store.currentPost.loadedRoot.name);
             setCurrentSectionId(store.currentPost.loadedRoot._id);
-        } else if (!store.currentPost) {
-            // store.goHome();
+        } else if (!store.currentPost && !loadAttempted) {
+            const postId = window.location.pathname.substring("/post/".length);
+            await store.getPost(postId);
+            loadAttempted = true;
+            if (store.currentPost)
+                await store.recursiveSectionBuilder(store.currentPost.rootSection);
+        } else if (loadAttempted) {
+            auth.setError("Post not found!");
         }
     })
 
