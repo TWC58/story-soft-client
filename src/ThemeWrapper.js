@@ -16,7 +16,7 @@ import {
     ModalAlert,
     ModalDelete,
     ProfileScreenWithId
-} from './components'
+} from './components';
 import { ThemeProvider } from '@mui/material/styles';
 import { storyTheme, comicTheme } from './styling/themes';
 import { GlobalStoreContext } from './store/index'
