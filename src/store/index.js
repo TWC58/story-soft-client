@@ -660,6 +660,27 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    store.deleteSection= async function (sectionId) {
+        let response = await api.getSection(sectionId);
+        if (response.status == 200) {
+            let currentSection = response.data.section;
+            console.log(currentSection);
+            if (currentSection.parent == null) {
+                console.log("Cannot delete root section");
+            }
+            else {
+                console.log(sectionId);
+                response = await api.deleteSection(sectionId);
+                if (response.status == 200) {
+                    console.log("Successfully deleted section");
+                    console.log(response.data);
+                }
+            }
+        }
+    }
+
+    
+
     return (
         <GlobalStoreContext.Provider value={{
             store
