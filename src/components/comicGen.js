@@ -28,7 +28,8 @@ export default function ComicGen() {
     useEffect(() => {
         console.log("NEW STATE: ", avatarOptions);
         console.log(avatarURL);
-    }, [avatarURL]);
+        setAvatarURL(`https://gramener.com/comicgen/v1/comic?name=${avatarOptions.name}&gender=${avatarOptions.gender}&character=${avatarOptions.character}&facestyle=${avatarOptions.facestyle}&emotion=${avatarOptions.emotion}&attire=${avatarOptions.attire}&pose=${avatarOptions.pose}&face=%23${avatarOptions.face.slice(1)}&shirt=%23${avatarOptions.shirt.slice(1)}&pant=%23${avatarOptions.pant.slice(1)}&box=${avatarOptions.box}&boxcolor=%23${avatarOptions.boxcolor.slice(1)}&boxgap=${avatarOptions.boxgap}&mirror=${avatarOptions.mirror}`);
+    }, [avatarOptions, avatarURL]);
 
     //add current character to current comic panel
     const handleSubmit = () => {
@@ -38,9 +39,7 @@ export default function ComicGen() {
     //give user update in the cahracter they can add
     const handleChange = async (e) => {
         const value = e.target.value;
-        setAvatarOptions({ ...avatarOptions, [e.target.name]: value },
-            setAvatarURL(`https://gramener.com/comicgen/v1/comic?name=${avatarOptions.name}&gender=${avatarOptions.gender}&character=${avatarOptions.character}&facestyle=${avatarOptions.facestyle}&emotion=${avatarOptions.emotion}&attire=${avatarOptions.attire}&pose=${avatarOptions.pose}&face=%23${avatarOptions.face.slice(1)}&shirt=%23${avatarOptions.shirt.slice(1)}&pant=%23${avatarOptions.pant.slice(1)}&box=${avatarOptions.box}&boxcolor=%23${avatarOptions.boxcolor.slice(1)}&boxgap=${avatarOptions.boxgap}&mirror=${avatarOptions.mirror}`)
-        );
+        setAvatarOptions({ ...avatarOptions, [e.target.name]: value });
     };
 
     return (

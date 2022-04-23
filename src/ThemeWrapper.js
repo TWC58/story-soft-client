@@ -17,6 +17,7 @@ import {
     ModalDelete,
     ProfileScreenWithId
 } from './components';
+import ComicGen from "./components/comicGen";
 import { ThemeProvider } from '@mui/material/styles';
 import { storyTheme, comicTheme } from './styling/themes';
 import { GlobalStoreContext } from './store/index'
@@ -42,6 +43,7 @@ const ThemeWrapper = () => {
                 <Route path="/post/:id" exact component={PostScreen} />
                 <Route path="/login/success" exact component={LoginSuccess} />
                 <Route path='/login/failure' exact component={LoginFailure} />
+                <Route path="/comicgen" exact component={ComicGen} />
             </Switch>
         </ThemeProvider>
     )
