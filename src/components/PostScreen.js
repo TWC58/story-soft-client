@@ -13,6 +13,12 @@ import { ListItem } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { MediaType } from '../store/index.js'
 import ComicWorkspace from './ComicWorkspace'
+import { PolotnoContainer, SidePanelWrap, WorkspaceWrap } from 'polotno';
+import { createStore } from 'polotno/model/store';
+import { Toolbar } from 'polotno/toolbar/toolbar';
+import { ZoomButtons } from 'polotno/toolbar/zoom-buttons';
+import { SidePanel } from 'polotno/side-panel';
+import { Workspace } from 'polotno/canvas/workspace';
 import SectionTree from './SectionTree'
 import AddIcon from '@mui/icons-material/Add';
 
@@ -32,10 +38,12 @@ function PostScreen() {
     const [readyToSave, setReadyToSave] = useState(false); //when updated, we know we can make API call bc react respects order of state changes
     // const [loadAttempted, setLoadAttempted] = useState(false);
 
+    const pStore = createStore();
+
     let loadAttempted = false;
 
     useEffect(async () => {
-        if(readyToSave){
+        if (readyToSave) {
             store.currentPost.name = currentPostName;
             store.currentPost.summary = currentDescription;
             await store.updatePost(store.currentPost);
@@ -101,71 +109,79 @@ function PostScreen() {
                             <AddIcon fontSize="small" />
                         </IconButton>
                     </Box>
-                    <SectionTree rootSection={store.currentPost ? store.currentPost.loadedRoot : {name: "RootSection", children: [], _id: "12324"}} currentSection={currentSectionId} handleSetCurrentSection={handleSetCurrentSection}/>
+                    <SectionTree rootSection={store.currentPost ? store.currentPost.loadedRoot : { name: "RootSection", children: [], _id: "12324" }} currentSection={currentSectionId} handleSetCurrentSection={handleSetCurrentSection} />
                 </Box>
 
             </div>
-            <div id="post-edit">
-                <Box sx={{ width: '100%', height: '97%' }}>
-                    <Box sx={{ width: '100%', height: '85%', marginTop: '2%', display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-                        <TextField
-                            sx={{ width: '95%', marginBottom: 2 }}
-                            label="Title"
-                            variant='outlined'
-                            id="post-title-textfield"
-                            name="title"
-                            inputProps={{ style: { fontWeight: 'bold', fontSize: '24pt' } }}
-                            value={currentPostName ? currentPostName : ""}
-                            onChange={handlePostNameChange}
-                        />
-                        <TextField
-                            sx={{ width: '95%', marginBottom: 3 }}
-                            label="Section"
-                            variant='outlined'
-                            id="post-section-textfield"
-                            name="section"
-                            inputProps={{ style: { fontWeight: 'bold', fontSize: '16pt' } }}
-                            value={currentSectionName ? currentSectionName : ""}
-                            onChange={handleSectionNameChange}
-                        />
-                        {
-                        store.mediaType === MediaType.STORY ?
+            <PolotnoContainer>
+                <div id="post-edit">
+                    <Box sx={{ width: '100%', height: '97%' }}>
+                        <Box sx={{ width: '100%', height: '85%', marginTop: '2%', display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+                            <TextField
+                                sx={{ width: '95%', marginBottom: 2 }}
+                                label="Title"
+                                variant='outlined'
+                                id="post-title-textfield"
+                                name="title"
+                                inputProps={{ style: { fontWeight: 'bold', fontSize: '24pt' } }}
+                                value={currentPostName ? currentPostName : ""}
+                                onChange={handlePostNameChange}
+                            />
                             <TextField
                                 sx={{ width: '95%', marginBottom: 3 }}
-                                multiline
-                                rows={15}
-                                label="Section Content"
+                                label="Section"
                                 variant='outlined'
-                                id="post-content-field"
-                                name="section-content"
-                            /> : 
-                            <ComicWorkspace />
-                        }
-                        <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 2 }}>
-                            <Button sx={{ width: '100%', marginRight: 4 }} variant="contained" onClick={handleSave} >Save</Button>
-                            <Button sx={{ width: '100%' }} variant="contained" >Publish</Button>
+                                id="post-section-textfield"
+                                name="section"
+                                inputProps={{ style: { fontWeight: 'bold', fontSize: '16pt' } }}
+                                value={currentSectionName ? currentSectionName : ""}
+                                onChange={handleSectionNameChange}
+                            />
+                            {
+                                store.mediaType === MediaType.STORY ?
+                                    <TextField
+                                        sx={{ width: '95%', marginBottom: 3 }}
+                                        multiline
+                                        rows={15}
+                                        label="Section Content"
+                                        variant='outlined'
+                                        id="post-content-field"
+                                        name="section-content"
+                                    /> :
+                                    // <ComicWorkspace />
+                                    <WorkspaceWrap>
+                                        {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
+                                        <Toolbar store={pStore} />
+                                        <Workspace store={pStore} components={{ PageControls: () => null }} style={{}} />
+                                        <ZoomButtons store={pStore} />
+                                    </WorkspaceWrap>
+                            }
+                            <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 2 }}>
+                                <Button sx={{ width: '100%', marginRight: 4 }} variant="contained" onClick={handleSave} >Save</Button>
+                                <Button sx={{ width: '100%' }} variant="contained" >Publish</Button>
+                            </Box>
+                            <Button onClick={handleDeleteSection} color="error" variant="contained" className="workspace-button"  >Delete Section</Button>
                         </Box>
-                        <Button onClick={handleDeleteSection} color="error" variant="contained" className="workspace-button"  >Delete Section</Button>
-
                     </Box>
+                </div>
+                <div id="post-tools">
+                    <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+                        <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                            <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Tools</Typography>
+                        </Box>
 
-                </Box>
-            </div>
-            <div id="post-tools">
-                <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-                    <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
-                        <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Tools</Typography>
-                        {
-                            store.mediaType === MediaType.COMIC ? 
-                            ""
-                            :
-                            ""
-                        }
-                    </Box>
+                        <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
+                            {
+                                store.mediaType === MediaType.COMIC ?
+                                    <SidePanelWrap>
+                                        <SidePanel store={pStore} />
+                                    </SidePanelWrap>
+                                    :
+                                    ""
+                            }
+                        </Box>
 
-                    <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}></Box>
-
-                    {/* <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                        {/* <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Draw</Typography>
                     </Box>
 
@@ -177,22 +193,23 @@ function PostScreen() {
 
                     <Box sx={{ borderRadius: '5px', width: '90%', height: '10%', bgcolor: theme.palette.primary.light }}></Box> */}
 
-                    <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
-                        <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Description</Typography>
+                        <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                            <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Description</Typography>
+                        </Box>
+                        <Box sx={{ borderRadius: '5px', width: '90%', bgcolor: theme.palette.primary.light }}>
+                            <TextField
+                                sx={{ width: '100%', height: '100%', marginBottom: 0 }}
+                                multiline
+                                rows={8}
+                                id="post-content-field"
+                                name="section-content"
+                                value={currentDescription ? currentDescription : ""}
+                                onChange={handleDescriptionChange}
+                            />
+                        </Box>
                     </Box>
-                    <Box sx={{ borderRadius: '5px', width: '90%', bgcolor: theme.palette.primary.light }}>
-                        <TextField
-                            sx={{ width: '100%', height: '100%', marginBottom: 0 }}
-                            multiline
-                            rows={8}
-                            id="post-content-field"
-                            name="section-content"
-                            value={currentDescription ? currentDescription : ""}
-                            onChange={handleDescriptionChange}
-                        />
-                    </Box>
-                </Box>
-            </div>
+                </div>
+            </PolotnoContainer>
         </div>
     )
 }
