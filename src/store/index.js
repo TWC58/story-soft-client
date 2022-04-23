@@ -43,6 +43,7 @@ export const GlobalStoreActionType = {
     SET_POST_VIEW_MODE: "SET_POST_VIEW_MODE",
     SET_MEDIA: "SET_MEDIA",
     GET_USER_INFO: "GET_USER_INFO",
+    SET_SEARCH_POSTS: "SET_SEARCH_POSTS",
 }
 
 // WITH THIS WE'RE MAKING OUR GLOBAL DATA STORE
@@ -53,6 +54,7 @@ function GlobalStoreContextProvider(props) {
         mediaType: MediaType.COMIC,
         explorePosts: [],
         followingPosts: [],
+        searchPosts: [],
         currentPost: null,
         postMarkedForDeletion: null,
         postViewMode: null,
@@ -108,6 +110,12 @@ function GlobalStoreContextProvider(props) {
                     currentPost: null,
                     postMarkedForDeletion: null,
                     postViewMode: null
+                });
+            }
+            case GlobalStoreActionType.SET_SEARCH_POSTS: {
+                console.log("SETTING SEARCH POSTS");
+                return setStore({...store,
+                    searchPosts: payload.searchPosts
                 });
             }
             case GlobalStoreActionType.GET_USER_INFO: {
@@ -235,6 +243,23 @@ function GlobalStoreContextProvider(props) {
                     currentPost: response.data.post
                 }
             });
+        }
+    }
+
+    store.getSearchPosts = async function(search, searchBy) {
+        let response = await api.getPosts(store.mediaType, { search: search, searchBy: searchBy }).catch((err) => {
+            console.log(err);
+            if(err.response)
+                auth.setError(err.response.errorMessage);
+        });
+        console.log(response.data.data);
+        if(response?.data.success){
+            storeReducer({
+                type: GlobalStoreActionType.SET_SEARCH_POSTS,
+                payload: {
+                    searchPosts: response.data.data
+                }
+            }, console.log("STORE UPDATE COMPLETE:", store.searchPosts));
         }
     }
 

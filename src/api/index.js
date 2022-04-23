@@ -42,7 +42,7 @@ export const getPost = (mediaType, id) => api.get(`/post/${mediaType}/getpost/${
 format of the payload for getPosts:
     {
         search: "search string, such as story title or tag, etc."
-        searchBy: "AUTHOR"|"TITLE"|"TAG"|"NONE"
+        searchBy: "AUTHOR"|"TITLE"|"TAG"|"ID"|"NONE" (ID IS AUTHOR ID!!!)
     }
 AUTHOR: search by the username of the content creator
 TITLE: search by the name of the story

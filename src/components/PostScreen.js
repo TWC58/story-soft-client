@@ -30,11 +30,12 @@ function PostScreen() {
     const [currentSectionId, setCurrentSectionId] = useState("12324");
     const [currentDescription, setCurrentDescription] = useState(null);
     const [readyToSave, setReadyToSave] = useState(false); //when updated, we know we can make API call bc react respects order of state changes
-    // const [loadAttempted, setLoadAttempted] = useState(false);
+    const [loaded, setLoaded] = useState(false);
 
     let loadAttempted = false;
 
     useEffect(async () => {
+        if(loaded) setLoaded(false);
         if(readyToSave){
             store.currentPost.name = currentPostName;
             store.currentPost.summary = currentDescription;
@@ -53,10 +54,11 @@ function PostScreen() {
             loadAttempted = true;
             if (store.currentPost)
                 await store.recursiveSectionBuilder(store.currentPost.rootSection);
-        } else if (loadAttempted) {
+                setLoaded(true);
+            } else if (loadAttempted) {
             auth.setError("Post not found!");
         }
-    }, [readyToSave]);
+    }, [readyToSave, loaded]);
 
     const handlePostNameChange = (e) => {
         setCurrentPostName(e.target.value);

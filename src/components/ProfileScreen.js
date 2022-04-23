@@ -27,6 +27,8 @@ import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import Axios from 'axios';
 import { Image } from 'cloudinary-react';
+import { useEffect } from 'react';
+import { getPosts } from '../api';
 
 const Input = styled('input')({
     display: 'none',
@@ -38,9 +40,16 @@ export default function ProfileScreen() {
 
     const [editActive, setEditActive] = useState(false);
     const [bio, setBio] = useState(auth.user ? auth.user.bio : "You don't have a bio; enter one here!");
-    const [profileImage, setProfileImage] = useState(auth.user.profile_pic_url);// ? auth.user.profile_pic_url : "");
+    const [profileImage, setProfileImage] = useState(auth.user ? auth.user.profile_pic_url : "");// ? auth.user.profile_pic_url : "");
     const [username, setUsername] = useState(auth.user ? auth.user.username : "ExampleUsername");
+    //const [userPosts, setUserPosts] = useState(null);
     const theme = useTheme();
+
+    useEffect(() => {
+        //TODO load posts by current user, split into published/unpublished, then feed to mostpopular and unpublished components
+        auth.user ? store.getSearchPosts(auth.user._id, 'ID') : console.log("NO CURRENT USER");
+        console.log("POSTS FOR PROFILE:", store.searchPosts);
+    }, []);
 
     const examplePost = {
         title: 'Example Title',
@@ -143,10 +152,10 @@ export default function ProfileScreen() {
                 <Button onClick={handleEditProfile} variant='contained' sx={{ display: 'block', marginTop: '20px' }}>{editActive ? "Save" : "Edit Profile"}</Button>
             </div>
             <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
-                <MostPopular posts={sampleList} />
+                <MostPopular posts={auth.user ? store.searchPosts.filter(x => x.published) : []} />
             </div>
             <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
-                <NotPublished posts={sampleList} />
+                <NotPublished posts={auth.user ? store.searchPosts.filter(x => !x.published) : []} />
             </div>
         </div>
         // <Box sx={{backgroundImage: 'public/data/_117883014_gorilla_dianfosseygorillafund1.jpg', backgroundSize: 'contain', borderRadius: '50%', height: '200px', width: '1200px'}}>TEST</Box>

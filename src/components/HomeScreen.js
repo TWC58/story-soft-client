@@ -552,10 +552,12 @@ const HomeScreen = () => {
         </List>
 
     const examplePost = {
-        title: 'Example Title',
-        author: 'Example Author',
+        name: 'Example Title',
+        userData: {
+            username: 'Example Author',
+        },
         published: 'Example Published',
-        description: 'Example Description',
+        summary: 'Example Description',
         likes: '100',
         dislikes: '23',
         imageUrl: 'https://st2.depositphotos.com/3765753/5349/v/600/depositphotos_53491489-stock-illustration-example-rubber-stamp-vector-over.jpg'

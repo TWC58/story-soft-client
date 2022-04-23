@@ -4,8 +4,10 @@ import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 
+
 const MostPopular = ({ posts }) => {
     const theme = useTheme();
+    //console.log(posts); 
 
     return (
         <>
