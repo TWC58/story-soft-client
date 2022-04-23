@@ -85,6 +85,10 @@ function PostScreen() {
         setCurrentSectionName(newSection.name);
     }
 
+    const handleDeleteSection = async () => {
+        store.deleteSection(currentSectionId);
+    }
+
     const theme = useTheme();
 
     return (
@@ -141,7 +145,7 @@ function PostScreen() {
                             <Button sx={{ width: '100%', marginRight: 4 }} variant="contained" onClick={handleSave} >Save</Button>
                             <Button sx={{ width: '100%' }} variant="contained" >Publish</Button>
                         </Box>
-                        <Button color="error" variant="contained" className="workspace-button"  >Delete Section</Button>
+                        <Button onClick={handleDeleteSection} color="error" variant="contained" className="workspace-button"  >Delete Section</Button>
 
                     </Box>
 
