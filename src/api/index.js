@@ -66,6 +66,7 @@ export const getTags = (mediaType) => api.get(`/post/${mediaType}/getTags`);
 export const addSection = (parentSectionId) => api.post(`/post/addSection/${parentSectionId}`);
 export const deleteSection = (sectionId) => api.delete(`/post/deleteSection/${sectionId}`);
 export const getSection = (sectionId) => api.get(`/post/getSection/${sectionId}`);
+export const updateSection = (sectionId, payload) => api.put(`/post/updateSection/${sectionId}`, payload);
 //END SECTION ROUTES
 
 const apis = {
@@ -87,6 +88,7 @@ const apis = {
     addSection,
     deleteSection,
     getSection,
+    updateSection
 }
 
 export default apis

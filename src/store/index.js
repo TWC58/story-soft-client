@@ -679,6 +679,22 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    store.updateSection = async function (sectionId, sectionName) {
+        let sectionBody = {
+            "sectionName": sectionName
+        }
+        let response = await api.updateSection(sectionId, sectionBody);
+        if (response.status == 200) {
+            console.log("Successfully updated section");
+        }
+        else {
+            console.log("Something went wrong with updating section");
+        }
+        
+
+
+    }
+
     return (
         <GlobalStoreContext.Provider value={{
             store

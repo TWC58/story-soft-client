@@ -48,6 +48,7 @@ function PostScreen() {
             store.currentPost.name = currentPostName;
             store.currentPost.summary = currentDescription;
             await store.updatePost(store.currentPost);
+            await store.updateSection(currentSectionId, currentSectionName);
             setReadyToSave(false);
         }
         if (currentPostName === null && store.currentPost) {
@@ -73,6 +74,7 @@ function PostScreen() {
     }
 
     const handleSectionNameChange = (e) => {
+        console.log(e.target.value);
         setCurrentSectionName(e.target.value);
     }
 
