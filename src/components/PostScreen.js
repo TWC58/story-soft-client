@@ -1,7 +1,5 @@
 import { useContext, useState, useEffect } from 'react'
 import { useTheme } from '@mui/material/styles';
-import Top5ItemEdit from './Top5ItemEdit.js'
-import List from '@mui/material/List';
 import { IconButton, Typography } from '@mui/material'
 import { GlobalStoreContext } from '../store/index.js'
 import AuthContext from '../auth'
@@ -9,10 +7,7 @@ import { useHistory } from 'react-router-dom'
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-import { ListItem } from '@mui/material';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { MediaType } from '../store/index.js'
-import ComicWorkspace from './ComicWorkspace'
 import { PolotnoContainer, SidePanelWrap, WorkspaceWrap } from 'polotno';
 import { createStore } from 'polotno/model/store';
 import { Toolbar } from 'polotno/toolbar/toolbar';
@@ -43,8 +38,8 @@ function PostScreen() {
     let loadAttempted = false;
 
     useEffect(async () => {
-        if(loaded) setLoaded(false);
-        if(readyToSave){
+        if (loaded) setLoaded(false);
+        if (readyToSave) {
             store.currentPost.name = currentPostName;
             store.currentPost.summary = currentDescription;
             await store.updatePost(store.currentPost);
@@ -63,8 +58,8 @@ function PostScreen() {
             loadAttempted = true;
             if (store.currentPost)
                 await store.recursiveSectionBuilder(store.currentPost.rootSection);
-                setLoaded(true);
-            } else if (loadAttempted) {
+            setLoaded(true);
+        } else if (loadAttempted) {
             auth.setError("Post not found!");
         }
     }, [readyToSave, loaded]);
@@ -101,17 +96,165 @@ function PostScreen() {
         store.deleteSection(currentSectionId);
     }
 
+    const handlePublish = async () => { //update published and
+        console.log("PUBLISHING");
+        store.currentPost.published = new Date();
+        setReadyToSave(true);
+    }
+
+    const handleDeletePost = async () => {
+        console.log("DELETING POST");
+    }
+
+    const getPostTitle = () => {
+        if (store.currentPost.published) {
+            return (
+                <Typography
+                    sx={{ width: '95%', marginBottom: 2, fontSize: 36, fontWeight: 'bold' }}
+                    id="post-title-textfield"
+                    name="title">
+                    {currentPostName ? currentPostName : ""}
+                </Typography>
+            )
+        }
+        return (
+            <TextField
+                sx={{ width: '95%', marginBottom: 2 }}
+                label="Title"
+                variant='outlined'
+                id="post-title-textfield"
+                name="title"
+                inputProps={{ style: { fontWeight: 'bold', fontSize: '24pt' } }}
+                value={currentPostName ? currentPostName : ""}
+                onChange={handlePostNameChange}
+            />
+        )
+    }
+
+    const getSectionTitle = () => {
+        if (store.currentPost.published) {
+            return (
+                <Typography
+                    sx={{ width: '95%', marginBottom: 2, fontSize: 24, fontWeight: 'bold' }}
+                    id="post-title-textfield"
+                    name="title">
+                    {currentSectionName ? currentSectionName : ""}
+                </Typography>
+            )
+        }
+        return (
+            <TextField
+                sx={{ width: '95%', marginBottom: 3 }}
+                label="Section"
+                variant='outlined'
+                id="post-section-textfield"
+                name="section"
+                inputProps={{ style: { fontWeight: 'bold', fontSize: '16pt' } }}
+                value={currentSectionName ? currentSectionName : ""}
+                onChange={handleSectionNameChange}
+            />
+        )
+    }
+
+    const getDescription = () => {
+        if (store.currentPost.published) {
+            return (<>
+                <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                    <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Description</Typography>
+                </Box>
+                <Box sx={{ borderRadius: '5px', width: '90%', bgcolor: theme.palette.primary.light }}>
+                    <TextField
+                        sx={{ cursor: null, width: '100%', height: '100%', marginBottom: 0, fontSize: 16 }}
+                        multiline
+                        rows={8}
+                        id="post-content-field"
+                        name="section-content"
+                        type='text'
+                        readOnly={true}
+                        value={currentDescription ? currentDescription : ""}
+                    />
+                </Box>
+            </>)
+        }
+        return (<>
+            <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Description</Typography>
+            </Box>
+            <Box sx={{ borderRadius: '5px', width: '90%', bgcolor: theme.palette.primary.light }}>
+                <TextField
+                    sFx={{ width: '100%', height: '100%', marginBottom: 0 }}
+                    multiline
+                    rows={8}
+                    id="post-content-field"
+                    name="section-content"
+                    value={currentDescription ? currentDescription : ""}
+                    onChange={handleDescriptionChange}
+                />
+            </Box>
+        </>)
+    }
+
+    const getTools = () => {
+        return (<>
+            <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Tools</Typography>
+            </Box>
+
+            <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
+                {
+                    store.mediaType === MediaType.COMIC ?
+                        <SidePanelWrap>
+                            <SidePanel store={pStore} />
+                        </SidePanelWrap>
+                        :
+                        ""
+                }
+            </Box>
+        </>)
+    }
+
+    const getComments = () => {
+        return (<>
+            <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Comments</Typography>
+            </Box>
+
+            <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
+                
+            </Box>
+        </>)
+    }
+
+    const getLeftPanel = () => {
+
+    }
+
+    const getRightPanel = () => {
+
+    }
+
+    const getSectionContent = () => {
+
+    }
+
     const theme = useTheme();
 
+    //CHANGE TITLE, DESCRIPTION, SECTION TITLE, SECTION BUTTON TO UNEDITABLE
     return (
-        <div id="post-workspace">
+        < div id="post-workspace" >
             <div id="post-sections">
                 <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main }}>
                     <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Sections</Typography>
-                        <IconButton onClick={handleAddSection} sx={{}} aria-label="delete" size="small">
-                            <AddIcon fontSize="small" />
-                        </IconButton>
+                        {store.currentPost ? store.currentPost.published ?
+                            null
+                            :
+                            <IconButton onClick={handleAddSection} sx={{}} aria-label="delete" size="small">
+                                <AddIcon fontSize="small" />
+                            </IconButton>
+                            :
+                            null
+                        }
                     </Box>
                     <SectionTree rootSection={store.currentPost ? store.currentPost.loadedRoot : { name: "RootSection", children: [], _id: "12324" }} currentSection={currentSectionId} handleSetCurrentSection={handleSetCurrentSection} />
                 </Box>
@@ -121,26 +264,16 @@ function PostScreen() {
                 <div id="post-edit">
                     <Box sx={{ width: '100%', height: '97%' }}>
                         <Box sx={{ width: '100%', height: '85%', marginTop: '2%', display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-                            <TextField
-                                sx={{ width: '95%', marginBottom: 2 }}
-                                label="Title"
-                                variant='outlined'
-                                id="post-title-textfield"
-                                name="title"
-                                inputProps={{ style: { fontWeight: 'bold', fontSize: '24pt' } }}
-                                value={currentPostName ? currentPostName : ""}
-                                onChange={handlePostNameChange}
-                            />
-                            <TextField
-                                sx={{ width: '95%', marginBottom: 3 }}
-                                label="Section"
-                                variant='outlined'
-                                id="post-section-textfield"
-                                name="section"
-                                inputProps={{ style: { fontWeight: 'bold', fontSize: '16pt' } }}
-                                value={currentSectionName ? currentSectionName : ""}
-                                onChange={handleSectionNameChange}
-                            />
+                            <>{store.currentPost ?
+                                getPostTitle()
+                                :
+                                null
+                            }</>
+                            <>{store.currentPost ?
+                                getSectionTitle()
+                                :
+                                null
+                            }</>
                             {
                                 store.mediaType === MediaType.STORY ?
                                     <TextField
@@ -161,29 +294,33 @@ function PostScreen() {
                                     </WorkspaceWrap>
                             }
                             <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 2 }}>
-                                <Button sx={{ width: '100%', marginRight: 4 }} variant="contained" onClick={handleSave} >Save</Button>
-                                <Button sx={{ width: '100%' }} variant="contained" >Publish</Button>
+                                {store.currentPost ? store.currentPost.published ? null : <Button sx={{ width: '100%', marginRight: 4 }} variant="contained" onClick={handleSave} >Save</Button> : null}
+                                {store.currentPost ? store.currentPost.published ? null : <Button sx={{ width: '100%' }} variant="contained" onClick={handlePublish}>Publish</Button> : null}
                             </Box>
-                            <Button onClick={handleDeleteSection} color="error" variant="contained" className="workspace-button"  >Delete Section</Button>
+                            {store.currentPost ? store.currentPost.published ? auth.user ? store.currentPost.userData.userId === auth.user._id ?
+                                <Button sx={{ bgcolor: 'red' }} onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
+                                :
+                                null
+                                :
+                                null
+                                : <>
+                                    <Button sx={{ bgcolor: 'red' }} onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
+                                    <Button sx={{ bgcolor: 'red' }} onClick={handleDeleteSection} variant="contained" className="workspace-button"  >Delete Section</Button>
+                                </> :
+                                null
+                            }
                         </Box>
                     </Box>
                 </div>
                 <div id="post-tools">
                     <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-                        <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
-                            <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Tools</Typography>
-                        </Box>
-
-                        <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
-                            {
-                                store.mediaType === MediaType.COMIC ?
-                                    <SidePanelWrap>
-                                        <SidePanel store={pStore} />
-                                    </SidePanelWrap>
-                                    :
-                                    ""
-                            }
-                        </Box>
+                        {store.currentPost ? store.currentPost.published ?
+                            getComments()
+                            :
+                            getTools()
+                            :
+                            null
+                        }
 
                         {/* <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Draw</Typography>
@@ -196,25 +333,15 @@ function PostScreen() {
                     </Box>
 
                     <Box sx={{ borderRadius: '5px', width: '90%', height: '10%', bgcolor: theme.palette.primary.light }}></Box> */}
-
-                        <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
-                            <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Description</Typography>
-                        </Box>
-                        <Box sx={{ borderRadius: '5px', width: '90%', bgcolor: theme.palette.primary.light }}>
-                            <TextField
-                                sx={{ width: '100%', height: '100%', marginBottom: 0 }}
-                                multiline
-                                rows={8}
-                                id="post-content-field"
-                                name="section-content"
-                                value={currentDescription ? currentDescription : ""}
-                                onChange={handleDescriptionChange}
-                            />
-                        </Box>
+                        <>{store.currentPost ?
+                            getDescription()
+                            :
+                            null
+                        }</>
                     </Box>
                 </div>
             </PolotnoContainer>
-        </div>
+        </div >
     )
 }
 

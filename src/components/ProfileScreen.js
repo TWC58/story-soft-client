@@ -152,10 +152,10 @@ export default function ProfileScreen() {
                 <Button onClick={handleEditProfile} variant='contained' sx={{ display: 'block', marginTop: '20px' }}>{editActive ? "Save" : "Edit Profile"}</Button>
             </div>
             <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
-                <MostPopular posts={auth.user ? Array.from(store.searchPosts).filter(x => x.published) : []} />
+                <MostPopular posts={auth.user ? store.searchPosts ? Array.from(store.searchPosts).filter(x => x.published) : [] : []} />
             </div>
             <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
-                <NotPublished posts={auth.user ? Array.from(store.searchPosts).filter(x => !x.published) : []} />
+                <NotPublished posts={auth.user ? store.searchPosts ? Array.from(store.searchPosts).filter(x => !x.published) : [] : []} />
             </div>
         </div>
         // <Box sx={{backgroundImage: 'public/data/_117883014_gorilla_dianfosseygorillafund1.jpg', backgroundSize: 'contain', borderRadius: '50%', height: '200px', width: '1200px'}}>TEST</Box>

@@ -235,7 +235,7 @@ function GlobalStoreContextProvider(props) {
             if (err.response)
                 auth.setError(err.response.errorMessage);
         });
-
+        console.log(response.data.post);
         if (response?.data.success) {
             storeReducer({
                 type: GlobalStoreActionType.SET_CURRENT_POST,
