@@ -7,6 +7,8 @@ import PropTypes from 'prop-types';
 import { useTreeItem } from '@mui/lab/TreeItem';
 import clsx from 'clsx';
 import Typography from '@mui/material/Typography';
+import { useContext } from 'react';
+import { GlobalStoreContext } from '../store/index.js';
 
 const CustomContent = React.forwardRef(function CustomContent(props, ref) {
   const {
@@ -107,7 +109,10 @@ const CustomTreeItem = (props) => (
 
 export default function SectionTree(props) {
 
+  const { store } = useContext(GlobalStoreContext);
+
   const handleNodeSelect = (e, nodeId) => {
+    console.log("NODE: ", nodeId, " selected");
     props.handleSetCurrentSection(nodeId);
   }
 

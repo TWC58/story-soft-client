@@ -15,7 +15,8 @@ import {
     PostScreen,
     ModalAlert,
     ModalDeletePost,
-    ProfileScreenWithId
+    ProfileScreenWithId,
+    ModalDeleteSection
 } from './components';
 import ComicGen from "./components/comicGen";
 import { ThemeProvider } from '@mui/material/styles';
@@ -31,6 +32,7 @@ const ThemeWrapper = () => {
     return (
         <ThemeProvider theme={currentTheme}>
             <ModalDeletePost />
+            <ModalDeleteSection />
             <ModalAlert />
             <AppBanner />
             <Switch>

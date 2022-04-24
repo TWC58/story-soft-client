@@ -16,6 +16,7 @@ import { SidePanel } from 'polotno/side-panel';
 import { Workspace } from 'polotno/canvas/workspace';
 import SectionTree from './SectionTree'
 import AddIcon from '@mui/icons-material/Add';
+import { getSection } from '../api';
 
 /*
     This React component lets us edit a loaded list, which only
@@ -29,10 +30,10 @@ function PostScreen() {
     const [currentPostName, setCurrentPostName] = useState(null);
     const [currentSectionName, setCurrentSectionName] = useState(null);
     const [currentSectionId, setCurrentSectionId] = useState("12324");
+    const [currentSectionData, setCurrentSectionData] = useState("");
     const [currentDescription, setCurrentDescription] = useState(null);
     const [readyToSave, setReadyToSave] = useState(false); //when updated, we know we can make API call bc react respects order of state changes
     const [loaded, setLoaded] = useState(false);
-
     const pStore = createStore();
 
     let loadAttempted = false;
@@ -43,7 +44,10 @@ function PostScreen() {
             store.currentPost.name = currentPostName;
             store.currentPost.summary = currentDescription;
             await store.updatePost(store.currentPost);
-            await store.updateSection(currentSectionId, currentSectionName);
+            await store.updateSection(currentSectionId, {
+                name: currentSectionName,
+                data: currentSectionData
+            });
             setReadyToSave(false);
         }
         if (currentPostName === null && store.currentPost) {
@@ -63,7 +67,7 @@ function PostScreen() {
         } else if (loadAttempted) {
             auth.setError("Post not found!");
         }
-    }, [readyToSave, loaded]);
+    }, [readyToSave, loaded, currentSectionId]);
 
     const handlePostNameChange = (e) => {
         setCurrentPostName(e.target.value);
@@ -79,8 +83,9 @@ function PostScreen() {
     }
 
     const handleSetCurrentSection = (sectionId) => {
-        if (currentSectionId !== sectionId)
+        if (currentSectionId !== sectionId) {
             setCurrentSectionId(sectionId);
+        }
     }
 
     const handleDescriptionChange = (e) => {
@@ -94,7 +99,8 @@ function PostScreen() {
     }
 
     const handleDeleteSection = async () => {
-        store.deleteSection(currentSectionId);
+        console.log("DELETING SECTION: ", currentSectionId);
+        store.markSectionForDeletion(currentSectionId);
     }
 
     const handlePublish = async () => { //update published and

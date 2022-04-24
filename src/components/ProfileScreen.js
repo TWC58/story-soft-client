@@ -47,9 +47,9 @@ export default function ProfileScreen() {
 
     useEffect(() => {
         //TODO load posts by current user, split into published/unpublished, then feed to mostpopular and unpublished components
-        auth.user ? store.getSearchPosts(auth.user._id, 'ID') : console.log("NO CURRENT USER");
+        auth.user ? store.searchPosts ? console.log(store.searchPosts) : store.getSearchPosts(auth.user._id, 'ID') : console.log("NO CURRENT USER");
         console.log("POSTS FOR PROFILE:", store.searchPosts);
-    }, []);
+    }, [store.searchPosts]);
 
     const examplePost = {
         title: 'Example Title',

@@ -11,6 +11,7 @@ import Top5Item from './Top5Item'
 import WorkspaceScreen from './WorkspaceScreen'
 import ModalAlert from './ModalAlert'
 import ModalDeletePost from './ModalDeletePost'
+import ModalDeleteSection from './ModalDeleteSection'
 import ListItemsSummary from './ListItemsSummary'
 import ListCommentArea from './ListCommentArea'
 import Comment from './Comment'
@@ -44,5 +45,6 @@ export {
     ProfileScreen,
     Comment,
     PostScreen,
-    ProfileScreenWithId
+    ProfileScreenWithId,
+    ModalDeleteSection
 }

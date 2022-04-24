@@ -41,11 +41,14 @@ export const GlobalStoreActionType = {
     SET_FOLLOWING_POSTS: "SET_FOLLOWING_POSTS",
     MARK_POST_FOR_DELETION: "MARK_POST_FOR_DELETION",
     UNMARK_POST_FOR_DELETION: "UNMARK_POST_FOR_DELETION",
+    MARK_SECTION_FOR_DELETION: "MARK_SECTION_FOR_DELETION",
+    UNMARK_SECTION_FOR_DELETION: "UNMARK_SECTION_FOR_DELETION",
     SET_EDIT_ACTIVE: "SET_EDIT_ACTIVE",
     SET_POST_VIEW_MODE: "SET_POST_VIEW_MODE",
     SET_MEDIA: "SET_MEDIA",
     GET_USER_INFO: "GET_USER_INFO",
     SET_SEARCH_POSTS: "SET_SEARCH_POSTS",
+    SET_CURRENT_SECTION: "SET_CURRENT_SECTION"
 }
 
 // WITH THIS WE'RE MAKING OUR GLOBAL DATA STORE
@@ -56,9 +59,10 @@ function GlobalStoreContextProvider(props) {
         mediaType: MediaType.COMIC,
         explorePosts: [],
         followingPosts: [],
-        searchPosts: [],
+        searchPosts: null,
         currentPost: null,
         postMarkedForDeletion: null,
+        sectionMarkedForDeletion: null,
         postViewMode: null,
         profileInfo: null,
     });
@@ -68,7 +72,7 @@ function GlobalStoreContextProvider(props) {
     const { auth } = useContext(AuthContext);
 
     useEffect(() => {
-
+        console.log("updating...");
     }, [store]);
 
     // HERE'S THE DATA STORE'S REDUCER, IT MUST
@@ -78,6 +82,7 @@ function GlobalStoreContextProvider(props) {
         switch (type) {
             case GlobalStoreActionType.SET_CURRENT_POST: {
                 return setStore({
+                    ...store,
                     mediaType: store.mediaType,
                     explorePosts: store.explorePosts,
                     followingPosts: store.followingPosts,
@@ -90,6 +95,7 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.SET_MEDIA: {
                 console.log("SET MEDIA to " + payload.mediaType);
                 return setStore({
+                    ...store,
                     mediaType: payload.mediaType,
                     explorePosts: store.explorePosts,
                     followingPosts: store.followingPosts,
@@ -100,6 +106,7 @@ function GlobalStoreContextProvider(props) {
             }
             case GlobalStoreActionType.SET_EXPLORE_POSTS: {
                 return setStore({
+                    ...store,
                     mediaType: store.mediaType,
                     explorePosts: payload.explorePosts,
                     followingPosts: store.followingPosts,
@@ -110,6 +117,7 @@ function GlobalStoreContextProvider(props) {
             }
             case GlobalStoreActionType.SET_FOLLOWING_POSTS: {
                 return setStore({
+                    ...store,
                     mediaType: store.mediaType,
                     explorePosts: store.explorePosts,
                     followingPosts: payload.followingPosts,
@@ -119,7 +127,7 @@ function GlobalStoreContextProvider(props) {
                 });
             }
             case GlobalStoreActionType.SET_SEARCH_POSTS: {
-                console.log("SETTING SEARCH POSTS");
+                console.log("SETTING SEARCH POSTS", payload);
                 return setStore({
                     ...store,
                     searchPosts: payload.searchPosts
@@ -127,6 +135,7 @@ function GlobalStoreContextProvider(props) {
             }
             case GlobalStoreActionType.GET_USER_INFO: {
                 return setStore({
+                    ...store,
                     mediaType: store.mediaType,
                     explorePosts: store.explorePosts,
                     followingPosts: store.followingPosts,
@@ -153,6 +162,22 @@ function GlobalStoreContextProvider(props) {
                     currentPost: currentPost
                 });
             }
+            case GlobalStoreActionType.MARK_SECTION_FOR_DELETION: {
+                console.log("SETTING STORE TO DELETE SECTION: ", payload);
+                return setStore({
+                    ...store,
+                    sectionMarkedForDeletion: payload
+                });
+            }
+            case GlobalStoreActionType.UNMARK_SECTION_FOR_DELETION: {
+                console.log("UNMARKING SECTION:", store.sectionMarkedForDeletion);
+                var currentSection = store.sectionMarkedForDeletion;
+                if(payload.deletedSection) currentSection = null;
+                return setStore({
+                    ...store,
+                    sectionMarkedForDeletion: null
+                });
+            }
             default:
                 return store;
         }
@@ -163,6 +188,20 @@ function GlobalStoreContextProvider(props) {
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
     //SECTIONS
+
+    store.setCurrentSection = async function (sectionId) {
+        console.log("SETTING SECTION", sectionId);
+        let res = await api.getSection(sectionId).catch((err) => {
+            console.log(err);
+        });
+        console.log(res);
+        if(res.status === 200){
+            storeReducer({
+                type: GlobalStoreActionType.SET_CURRENT_SECTION,
+                payload: res.data.section
+            });
+        }
+    }
 
     store.addSection = async function (parentSectionId) {
         let response = await api.addSection(parentSectionId).catch((err) => {
@@ -277,14 +316,15 @@ function GlobalStoreContextProvider(props) {
             if (err.response)
                 auth.setError(err.response.errorMessage);
         });
-        //console.log(response.data.data);
-        if (response?.data.success) {
+        console.log("USER POSTS: ", response.data);
+        if (response.data.success) {
+            console.log("SETTING POSTS: ", response.data.data);
             storeReducer({
                 type: GlobalStoreActionType.SET_SEARCH_POSTS,
                 payload: {
                     searchPosts: response.data.data
                 }
-            }, console.log("STORE UPDATE COMPLETE:", store.searchPosts));
+            });
         }
     }
 
@@ -481,6 +521,14 @@ function GlobalStoreContextProvider(props) {
         });
     }
 
+    store.markSectionForDeletion = async function (id) {
+        console.log("SECTION BEING MARKED: ", id);
+        storeReducer({
+            type: GlobalStoreActionType.MARK_SECTION_FOR_DELETION,
+            payload: id
+        });
+    }
+
     store.deletePost = async function (postToDelete) {
         let response = await api.deletePost(store.mediaType, postToDelete);
         if (response.data.success) {
@@ -491,14 +539,32 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    /*store.deleteSection = async function (sectionToDelete) {
+        let response = await api.deleteSection(sectionToDelete);
+        if (response.data.success) {
+            
+        }
+    }*/
+
     store.deleteMarkedPost = function () {
         store.deletePost(store.postMarkedForDeletion);
+    }
+
+    store.deleteMarkedSection = function () {
+        store.deleteSection(store.sectionMarkedForDeletion);
     }
 
     store.unmarkPostForDeletion = function () {
         storeReducer({
             type: GlobalStoreActionType.UNMARK_POST_FOR_DELETION,
             payload: { deletedPost: null }
+        });
+    }
+
+    store.unmarkSectionForDeletion = function () {
+        storeReducer({
+            type: GlobalStoreActionType.UNMARK_SECTION_FOR_DELETION,
+            payload: { deletedSection: null }
         });
     }
 
@@ -698,25 +764,23 @@ function GlobalStoreContextProvider(props) {
                 if (response.status == 200) {
                     console.log("Successfully deleted section");
                     console.log(response.data);
+                    storeReducer({
+                        type: GlobalStoreActionType.UNMARK_SECTION_FOR_DELETION,
+                        payload: { deletedSection: response.data}
+                    });
                 }
             }
         }
     }
 
-    store.updateSection = async function (sectionId, sectionName) {
-        let sectionBody = {
-            "sectionName": sectionName
-        }
-        let response = await api.updateSection(sectionId, sectionBody);
+    store.updateSection = async function (sectionId, section) {
+        let response = await api.updateSection(sectionId, section);
         if (response.status == 200) {
             console.log("Successfully updated section");
         }
         else {
             console.log("Something went wrong with updating section");
         }
-
-
-
     }
 
     return (
