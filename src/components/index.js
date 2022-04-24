@@ -10,7 +10,7 @@ import Statusbar from './Statusbar'
 import Top5Item from './Top5Item'
 import WorkspaceScreen from './WorkspaceScreen'
 import ModalAlert from './ModalAlert'
-import ModalDelete from './ModalDelete'
+import ModalDeletePost from './ModalDeletePost'
 import ListItemsSummary from './ListItemsSummary'
 import ListCommentArea from './ListCommentArea'
 import Comment from './Comment'
@@ -38,7 +38,7 @@ export {
     Top5Item, 
     WorkspaceScreen,
     ModalAlert,
-    ModalDelete,
+    ModalDeletePost,
     ListItemsSummary,
     ListCommentArea,
     ProfileScreen,

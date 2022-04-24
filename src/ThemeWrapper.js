@@ -14,7 +14,7 @@ import {
     WorkspaceScreen,
     PostScreen,
     ModalAlert,
-    ModalDelete,
+    ModalDeletePost,
     ProfileScreenWithId
 } from './components';
 import ComicGen from "./components/comicGen";
@@ -30,7 +30,7 @@ const ThemeWrapper = () => {
 
     return (
         <ThemeProvider theme={currentTheme}>
-            <ModalDelete />
+            <ModalDeletePost />
             <ModalAlert />
             <AppBanner />
             <Switch>

@@ -7,18 +7,19 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { GlobalStoreContext } from '../store'
 import { useContext } from 'react';
+import { Redirect } from 'react-router';
 
-export default function ModalDelete() {
+export default function ModalDeletePost() {
   const [open, setOpen] = React.useState(false);
 
   const { store } = useContext(GlobalStoreContext)
 
   const handleClose = () => {
-    store.unmarkListForDeletion();
+    store.unmarkPostForDeletion();
   };
 
   const handleDelete = () => {
-      store.deleteMarkedList();
+    store.deleteMarkedPost();
   }
   return (
     <div>
@@ -29,17 +30,18 @@ export default function ModalDelete() {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {(store.listMarkedForDeletion) ? "Delete List: " + store.listMarkedForDeletion.name : ""}
+          {(store.postMarkedForDeletion) ? "Delete Post: "+store.currentPost.name : ""}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this list?
+            Are you sure you want to delete this post?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleDelete} autoFocus>Delete</Button>
         </DialogActions>
+        {store.postMarkedForDeletion ? null : <Redirect to="/" />}
       </Dialog>
     </div>
   );

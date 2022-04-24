@@ -54,6 +54,7 @@ function PostScreen() {
             setCurrentDescription(store.currentPost.summary);
         } else if (!store.currentPost && !loadAttempted) {
             const postId = window.location.pathname.substring("/post/".length);
+            console.log(postId);
             await store.getPost(postId);
             loadAttempted = true;
             if (store.currentPost)
@@ -104,6 +105,8 @@ function PostScreen() {
 
     const handleDeletePost = async () => {
         console.log("DELETING POST");
+        console.log(store.currentPost._id);
+        store.markPostForDeletion(store.currentPost._id);
     }
 
     const getPostTitle = () => {
@@ -239,7 +242,6 @@ function PostScreen() {
 
     const theme = useTheme();
 
-    //CHANGE TITLE, DESCRIPTION, SECTION TITLE, SECTION BUTTON TO UNEDITABLE
     return (
         < div id="post-workspace" >
             <div id="post-sections">

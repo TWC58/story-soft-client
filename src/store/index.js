@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import api from '../api'
 import AuthContext from '../auth'
+import { useEffect } from 'react';
 /*
     This is our global data store. Note that it uses the Flux design pattern,
     which makes use of things like actions and reducers. 
@@ -39,6 +40,7 @@ export const GlobalStoreActionType = {
     SET_EXPLORE_POSTS: "SET_EXPLORE_POSTS",
     SET_FOLLOWING_POSTS: "SET_FOLLOWING_POSTS",
     MARK_POST_FOR_DELETION: "MARK_POST_FOR_DELETION",
+    UNMARK_POST_FOR_DELETION: "UNMARK_POST_FOR_DELETION",
     SET_EDIT_ACTIVE: "SET_EDIT_ACTIVE",
     SET_POST_VIEW_MODE: "SET_POST_VIEW_MODE",
     SET_MEDIA: "SET_MEDIA",
@@ -64,6 +66,10 @@ function GlobalStoreContextProvider(props) {
 
     // SINCE WE'VE WRAPPED THE STORE IN THE AUTH CONTEXT WE CAN ACCESS THE USER HERE
     const { auth } = useContext(AuthContext);
+
+    useEffect(() => {
+
+    }, [store]);
 
     // HERE'S THE DATA STORE'S REDUCER, IT MUST
     // HANDLE EVERY TYPE OF STATE CHANGE
@@ -114,7 +120,8 @@ function GlobalStoreContextProvider(props) {
             }
             case GlobalStoreActionType.SET_SEARCH_POSTS: {
                 console.log("SETTING SEARCH POSTS");
-                return setStore({...store,
+                return setStore({
+                    ...store,
                     searchPosts: payload.searchPosts
                 });
             }
@@ -129,6 +136,23 @@ function GlobalStoreContextProvider(props) {
                     profileInfo: payload.profileInfo,
                 })
             }
+            case GlobalStoreActionType.MARK_POST_FOR_DELETION: {
+                //console.log(payload);
+                return setStore({
+                    ...store,
+                    postMarkedForDeletion: payload
+                });
+            }
+            case GlobalStoreActionType.UNMARK_POST_FOR_DELETION: {
+                console.log("UNMARKING POST");
+                var currentPost = store.currentPost;
+                if(payload.deletedPost) currentPost = null;
+                return setStore({
+                    ...store,
+                    postMarkedForDeletion: null,
+                    currentPost: currentPost
+                });
+            }
             default:
                 return store;
         }
@@ -140,7 +164,7 @@ function GlobalStoreContextProvider(props) {
 
     //SECTIONS
 
-    store.addSection = async function(parentSectionId) {
+    store.addSection = async function (parentSectionId) {
         let response = await api.addSection(parentSectionId).catch((err) => {
             console.log(err);
             if (err.response)
@@ -153,7 +177,7 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.recursiveSectionBuilder = async function(rootSectionId) {
+    store.recursiveSectionBuilder = async function (rootSectionId) {
         console.log("Recursive section builder from root call")
         let response = await api.getSection(rootSectionId);
 
@@ -191,7 +215,7 @@ function GlobalStoreContextProvider(props) {
                 mediaType: (store.mediaType === MediaType.STORY) ? MediaType.COMIC : MediaType.STORY
             }
         });
-        console.log("Handle media switch end: "  + store.mediaType);
+        console.log("Handle media switch end: " + store.mediaType);
     }
 
     store.goHome = () => {
@@ -217,7 +241,7 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.updatePost = async function(post) {
+    store.updatePost = async function (post) {
         let response = await api.updatePost(store.mediaType, post._id, post).catch((err) => {
             console.log(err);
             if (err.response)
@@ -229,13 +253,14 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.getPost = async function(postId) {
+    store.getPost = async function (postId) {
         let response = await api.getPost(store.mediaType, postId).catch((err) => {
             console.log(err);
             if (err.response)
                 auth.setError(err.response.errorMessage);
         });
-        console.log(response.data.post);
+        //console.log(response);
+        //console.log(response.data.post);
         if (response?.data.success) {
             storeReducer({
                 type: GlobalStoreActionType.SET_CURRENT_POST,
@@ -246,14 +271,14 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.getSearchPosts = async function(search, searchBy) {
+    store.getSearchPosts = async function (search, searchBy) {
         let response = await api.getPosts(store.mediaType, { search: search, searchBy: searchBy }).catch((err) => {
             console.log(err);
-            if(err.response)
+            if (err.response)
                 auth.setError(err.response.errorMessage);
         });
-        console.log(response.data.data);
-        if(response?.data.success){
+        //console.log(response.data.data);
+        if (response?.data.success) {
             storeReducer({
                 type: GlobalStoreActionType.SET_SEARCH_POSTS,
                 payload: {
@@ -316,7 +341,7 @@ function GlobalStoreContextProvider(props) {
                 return second.likes - first.likes;
             } else if (sortMode === ListSortMode.DISLIKES) {
                 return second.dislikes - first.dislikes;
-            } 
+            }
             return 1;
         });
 
@@ -330,7 +355,7 @@ function GlobalStoreContextProvider(props) {
 
     store.likeList = async function (list, like) {
         let lType = (store.listViewMode === ListViewMode.COMMUNITY_LISTS) ? "community" : "normal";
-        let response = await api.likeList(list._id, {like: like, listType: lType}).catch((err) => {
+        let response = await api.likeList(list._id, { like: like, listType: lType }).catch((err) => {
             console.log(err);
             if (err.response) {
                 auth.setError("Like failed!");
@@ -355,7 +380,7 @@ function GlobalStoreContextProvider(props) {
 
     store.unlikeList = async function (list, like) {
         let lType = (store.listViewMode === ListViewMode.COMMUNITY_LISTS) ? "community" : "normal";
-        let response = await api.unlikeList(list._id, {like: like, listType: lType}).catch((err) => {
+        let response = await api.unlikeList(list._id, { like: like, listType: lType }).catch((err) => {
             console.log(err);
             if (err.response) {
                 auth.setError("Unlike failed!");
@@ -402,7 +427,7 @@ function GlobalStoreContextProvider(props) {
             updateList(top5List);
         }
     }
-    
+
 
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
     store.closeCurrentList = function () {
@@ -410,7 +435,7 @@ function GlobalStoreContextProvider(props) {
             type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
             payload: {}
         });
-        
+
         // tps.clearAllTransactions();
         // history.push("/");//TODO bug when clicking logo from home screen
     }
@@ -424,7 +449,7 @@ function GlobalStoreContextProvider(props) {
             likes: 0,
             dislikes: 0,
             published: null,
-            views:  0
+            views: 0
         };
         const response = await api.createTop5List(payload);
         if (response.data.success) {
@@ -448,33 +473,32 @@ function GlobalStoreContextProvider(props) {
     // OF A LIST, WHICH INCLUDES USING A VERIFICATION MODAL. THE
     // FUNCTIONS ARE markListForDeletion, deleteList, deleteMarkedList,
     // showDeleteListModal, and hideDeleteListModal
-    store.markListForDeletion = async function (id) {
-        // GET THE LIST
-        let response = await api.getTop5ListById(id);
+    store.markPostForDeletion = async function (id) {
+        //console.log(id);
+        storeReducer({
+            type: GlobalStoreActionType.MARK_POST_FOR_DELETION,
+            payload: id
+        });
+    }
+
+    store.deletePost = async function (postToDelete) {
+        let response = await api.deletePost(store.mediaType, postToDelete);
         if (response.data.success) {
-            let top5List = response.data.top5List;
             storeReducer({
-                type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
-                payload: top5List
+                type: GlobalStoreActionType.UNMARK_POST_FOR_DELETION,
+                payload: { deletedPost: postToDelete }
             });
         }
     }
 
-    store.deleteList = async function (listToDelete) {
-        let response = await api.deleteTop5ListById(listToDelete._id);
-        if (response.data.success) {
-            store.reloadLists();
-        }
+    store.deleteMarkedPost = function () {
+        store.deletePost(store.postMarkedForDeletion);
     }
 
-    store.deleteMarkedList = function () {
-        store.deleteList(store.listMarkedForDeletion);
-    }
-
-    store.unmarkListForDeletion = function () {
+    store.unmarkPostForDeletion = function () {
         storeReducer({
-            type: GlobalStoreActionType.UNMARK_LIST_FOR_DELETION,
-            payload: null
+            type: GlobalStoreActionType.UNMARK_POST_FOR_DELETION,
+            payload: { deletedPost: null }
         });
     }
 
@@ -518,21 +542,21 @@ function GlobalStoreContextProvider(props) {
     store.initState = () => {
         let explorePosts = null; //TODO need to implement functionality to fetch these posts
         let followingPosts = null; //TODO need to implement functionality to fetch these posts
-        
+
         storeReducer({
             type: GlobalStoreActionType.SET_EXPLORE_POSTS,
             payload: {
                 explorePosts: explorePosts
             }
         });
-        
+
         storeReducer({
             type: GlobalStoreActionType.SET_FOLLOWING_POSTS,
             payload: {
                 followingPosts: followingPosts
             }
         });
-        
+
     }
 
     store.addMoveItemTransaction = function (start, end) {
@@ -620,11 +644,11 @@ function GlobalStoreContextProvider(props) {
         // tps.doTransaction();
     }
 
-    store.canUndo = function() {
+    store.canUndo = function () {
         // return tps.hasTransactionToUndo();
     }
 
-    store.canRedo = function() {
+    store.canRedo = function () {
         // return tps.hasTransactionToRedo();
     }
 
@@ -660,7 +684,7 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.deleteSection= async function (sectionId) {
+    store.deleteSection = async function (sectionId) {
         let response = await api.getSection(sectionId);
         if (response.status == 200) {
             let currentSection = response.data.section;
@@ -690,7 +714,7 @@ function GlobalStoreContextProvider(props) {
         else {
             console.log("Something went wrong with updating section");
         }
-        
+
 
 
     }
