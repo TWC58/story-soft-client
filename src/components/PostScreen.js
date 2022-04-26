@@ -15,6 +15,7 @@ import { ZoomButtons } from 'polotno/toolbar/zoom-buttons';
 import { SidePanel } from 'polotno/side-panel';
 import { Workspace } from 'polotno/canvas/workspace';
 import SectionTree from './SectionTree'
+import QEditor from './QEditor'
 import AddIcon from '@mui/icons-material/Add';
 import { getSection } from '../api';
 
@@ -43,6 +44,11 @@ function PostScreen() {
         if (readyToSave) {
             store.currentPost.name = currentPostName;
             store.currentPost.summary = currentDescription;
+
+            let loadedCurrentSection = store.findLoadedSection(currentSectionId);
+            loadedCurrentSection.name = currentSectionName;
+            loadedCurrentSection.data = currentSectionData;
+            
             await store.updatePost(store.currentPost);
             await store.updateSection(currentSectionId, {
                 name: currentSectionName,
@@ -55,6 +61,7 @@ function PostScreen() {
             setCurrentPostName(store.currentPost.name);
             setCurrentSectionName(store.currentPost.loadedRoot.name);
             setCurrentSectionId(store.currentPost.loadedRoot._id);
+            setCurrentSectionData(store.currentPost.loadedRoot.data);
             setCurrentDescription(store.currentPost.summary);
         } else if (!store.currentPost && !loadAttempted) {
             const postId = window.location.pathname.substring("/post/".length);
@@ -84,7 +91,11 @@ function PostScreen() {
 
     const handleSetCurrentSection = (sectionId) => {
         if (currentSectionId !== sectionId) {
+            const section = store.findLoadedSection(sectionId);
+
             setCurrentSectionId(sectionId);
+            setCurrentSectionData(section.data);
+            setCurrentSectionName(section.name);
         }
     }
 
@@ -96,6 +107,7 @@ function PostScreen() {
         let newSection = await store.addSection(currentSectionId);
         setCurrentSectionId(newSection._id);
         setCurrentSectionName(newSection.name);
+        setCurrentSectionData(newSection.data);
     }
 
     const handleDeleteSection = async () => {
@@ -113,6 +125,10 @@ function PostScreen() {
         console.log("DELETING POST");
         console.log(store.currentPost._id);
         store.markPostForDeletion(store.currentPost._id);
+    }
+
+    const handleSectionDataChange = (data) => {
+        setCurrentSectionData(data);
     }
 
     const getPostTitle = () => {
@@ -284,14 +300,7 @@ function PostScreen() {
                             }</>
                             {
                                 store.mediaType === MediaType.STORY ?
-                                    <TextField
-                                        sx={{ width: '95%', marginBottom: 3 }}
-                                        multiline
-                                        rows={15}
-                                        label="Section Content"
-                                        variant='outlined'
-                                        id="post-content-field"
-                                        name="section-content"
+                                    <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData}
                                     /> :
                                     // <ComicWorkspace />
                                     <WorkspaceWrap>

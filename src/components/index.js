@@ -2,7 +2,6 @@ import AppBanner from './AppBanner'
 import SearchToolbar from './SearchToolbar'
 import HomeScreen from './HomeScreen'
 import HomeWrapper from './HomeWrapper'
-import ListCard from './ListCard'
 import RegisterScreen from './RegisterScreen'
 import LoginScreen from './LoginScreen'
 import SplashScreen from './SplashScreen'
@@ -31,7 +30,6 @@ export {
     SearchToolbar, 
     HomeScreen,
     HomeWrapper,
-    ListCard, 
     RegisterScreen,
     LoginScreen,
     SplashScreen,

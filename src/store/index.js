@@ -56,7 +56,7 @@ export const GlobalStoreActionType = {
 function GlobalStoreContextProvider(props) {
     // THESE ARE ALL THE THINGS OUR DATA STORE WILL MANAGE
     const [store, setStore] = useState({
-        mediaType: MediaType.COMIC,
+        mediaType: MediaType.STORY,
         explorePosts: [],
         followingPosts: [],
         searchPosts: null,
@@ -188,6 +188,34 @@ function GlobalStoreContextProvider(props) {
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
     //SECTIONS
+
+    store.findLoadedSection = function(sectionId) {
+
+        if (store.currentPost.loadedRoot._id === sectionId)
+            return store.currentPost.loadedRoot;
+        
+        return store.findLoadedSectionHelper(store.currentPost.loadedRoot, sectionId);
+        
+    }
+
+    store.findLoadedSectionHelper = function(section, sectionId) {
+        if (!section)
+            return null;
+
+        console.log("HELPER looking for sectionId " + sectionId + ", currently on section " + section._id);
+
+        for (let childSection of section.loadedChildren) {
+            if (childSection._id === sectionId)
+                return childSection;
+
+            let result = store.findLoadedSectionHelper(childSection, sectionId);
+
+            if (result)
+                return result;
+        }
+
+        return null;
+    }
 
     store.setCurrentSection = async function (sectionId) {
         console.log("SETTING SECTION", sectionId);
@@ -568,43 +596,6 @@ function GlobalStoreContextProvider(props) {
         });
     }
 
-    // THE FOLLOWING 8 FUNCTIONS ARE FOR COORDINATING THE UPDATING
-    // OF A LIST, WHICH INCLUDES DEALING WITH THE TRANSACTION STACK. THE
-    // FUNCTIONS ARE setCurrentList, addMoveItemTransaction, addUpdateItemTransaction,
-    // moveItem, updateItem, updateCurrentList, undo, and redo
-    store.setCurrentList = async function (id) {
-
-        let response = await api.getTop5ListById(id).catch((err) => {
-            if (err.response) {
-                history.push("/");
-                auth.setError(err.response.errorMessage);
-            }
-            else {
-                history.push("/");
-                auth.setError("ACCESS DENIED: You do not own this list!");
-            }
-        });
-        if (typeof response !== 'undefined' && response.data.success) {
-            let top5List = response.data.top5List;
-            storeReducer({
-                type: GlobalStoreActionType.SET_CURRENT_LIST,
-                payload: top5List
-            });
-            history.push("/top5list/" + id);
-        } else {
-            // alert("IN ELSE");
-            history.push("/");
-            auth.setError("ACCESS DENIED: You do not own this list!");
-        }
-    }
-
-    store.clearCurrentList = () => {
-        storeReducer({
-            type: GlobalStoreActionType.SET_CURRENT_LIST,
-            payload: null
-        });
-    }
-
     store.initState = () => {
         let explorePosts = null; //TODO need to implement functionality to fetch these posts
         let followingPosts = null; //TODO need to implement functionality to fetch these posts
@@ -700,38 +691,6 @@ function GlobalStoreContextProvider(props) {
         if (response.data.success) {
             return comment;
         }
-    }
-
-    store.undo = function () {
-        // tps.undoTransaction();
-    }
-
-    store.redo = function () {
-        // tps.doTransaction();
-    }
-
-    store.canUndo = function () {
-        // return tps.hasTransactionToUndo();
-    }
-
-    store.canRedo = function () {
-        // return tps.hasTransactionToRedo();
-    }
-
-    // THIS FUNCTION ENABLES THE PROCESS OF EDITING A LIST NAME
-    store.setIsListNameEditActive = function () {
-        storeReducer({
-            type: GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE,
-            payload: null
-        });
-    }
-
-    // THIS FUNCTION ENABLES THE PROCESS OF EDITING AN ITEM
-    store.setIsItemEditActive = function (status) {
-        storeReducer({
-            type: GlobalStoreActionType.SET_ITEM_EDIT_ACTIVE,
-            payload: status
-        });
     }
 
     store.getUserInfo = async function (id) {

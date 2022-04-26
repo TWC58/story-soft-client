@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react'
 import { GlobalStoreContext, ListViewMode } from '../store'
-import ListCard from './ListCard.js'
 import { Fab, ListItem, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
 import List from '@mui/material/List';
@@ -574,14 +573,6 @@ const HomeScreen = () => {
             <Explore exploreTags={[sampleExploreListTags1, sampleExploreListTags2, sampleExploreListTags3]}/>
 
             <Following posts={sampleFollowingList}/>
-
-
-
-            {/* <div id="list-selector-list">
-                {
-                    listCard
-                }
-            </div> */}
 
         </div>)
 
