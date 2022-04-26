@@ -239,7 +239,10 @@ function GlobalStoreContextProvider(props) {
         });;
 
         if (response?.data.success) {
-            await store.recursiveSectionBuilder(store.currentPost.rootSection);
+            let parentSection = store.findLoadedSection(parentSectionId);
+            parentSection.children.push(response.data.section._id);
+            parentSection.loadedChildren.push(response.data.section);
+            response.data.section.loadedChildren = [];
             return response.data.section;//the new section created
         }
     }

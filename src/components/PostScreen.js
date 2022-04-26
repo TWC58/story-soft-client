@@ -299,16 +299,19 @@ function PostScreen() {
                                 null
                             }</>
                             {
-                                store.mediaType === MediaType.STORY ?
-                                    <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData}
-                                    /> :
-                                    // <ComicWorkspace />
-                                    <WorkspaceWrap>
-                                        {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
-                                        <Toolbar store={pStore} />
-                                        <Workspace store={pStore} components={{ PageControls: () => null }} style={{}} />
-                                        <ZoomButtons store={pStore} />
-                                    </WorkspaceWrap>
+                                (!store.currentPost?.published) ?
+                                    (store.mediaType === MediaType.STORY ?
+                                        <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData}
+                                        /> :
+                                        // <ComicWorkspace />
+                                        <WorkspaceWrap>
+                                            {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
+                                            <Toolbar store={pStore} />
+                                            <Workspace store={pStore} components={{ PageControls: () => null }} style={{}} />
+                                            <ZoomButtons store={pStore} />
+                                        </WorkspaceWrap>)
+                                :
+                                <div sx={{display: 'flex', flexDirection: 'row'}} dangerouslySetInnerHTML={{__html: currentSectionData}} />
                             }
                             <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 2 }}>
                                 {store.currentPost ? store.currentPost.published ? null : <Button sx={{ width: '100%', marginRight: 4 }} variant="contained" onClick={handleSave} >Save</Button> : null}
