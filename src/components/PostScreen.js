@@ -265,7 +265,7 @@ function PostScreen() {
     const theme = useTheme();
 
     return (
-        < div id="post-workspace" >
+        < div id="post-workspace" width="100%">
             <div id="post-sections">
                 <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main }}>
                     <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
@@ -284,7 +284,7 @@ function PostScreen() {
                 </Box>
 
             </div>
-            <PolotnoContainer>
+            <PolotnoContainer sx={{ width: '100%' , marginBottom: '20px'}}>
                 <div id="post-edit">
                     <Box sx={{ width: '100%', height: '97%' }}>
                         <Box sx={{ width: '100%', height: '85%', marginTop: '2%', display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
@@ -301,7 +301,7 @@ function PostScreen() {
                             {
                                 (!store.currentPost?.published) ?
                                     (store.mediaType === MediaType.STORY ?
-                                        <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData}
+                                        <QEditor sx={{maxWidth: '100px'}}handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData}
                                         /> :
                                         // <ComicWorkspace />
                                         <WorkspaceWrap>
@@ -324,8 +324,8 @@ function PostScreen() {
                                 :
                                 null
                                 : <>
-                                    <Button sx={{ bgcolor: 'red' }} onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
-                                    <Button sx={{ bgcolor: 'red' }} onClick={handleDeleteSection} variant="contained" className="workspace-button"  >Delete Section</Button>
+                                    <Button sx={{ bgcolor: 'red', marginTop: '3%' }} onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
+                                    <Button sx={{ bgcolor: 'red', marginTop: '3%' }} onClick={handleDeleteSection} variant="contained" className="workspace-button"  >Delete Section</Button>
                                 </> :
                                 null
                             }

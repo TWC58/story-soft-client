@@ -25,9 +25,8 @@ import { GlobalStoreContext } from './store/index'
 import { LoginSuccess, LoginFailure } from './components/google/loginSuccess';
 
 const ThemeWrapper = () => {
-    var currentTheme = null;
     const { store } = useContext(GlobalStoreContext);
-    store.mediaType === "STORY" ? currentTheme = storyTheme : currentTheme = comicTheme;
+    const currentTheme = store.mediaType === "STORY" ? storyTheme : comicTheme;
 
     return (
         <ThemeProvider theme={currentTheme}>
@@ -37,9 +36,6 @@ const ThemeWrapper = () => {
             <AppBanner />
             <Switch>
                 <Route path="/" exact component={HomeScreen} />
-                <Route path="/register/" exact component={RegisterScreen} />
-                <Route path="/login/" exact component={LoginScreen} />
-                <Route path="/top5list/:id" exact component={WorkspaceScreen} />
                 <Route path="/profile" exact component={ProfileScreen} />
                 <Route path="/profile/:id" exact component={ProfileScreenWithId} />
                 <Route path="/post/:id" exact component={PostScreen} />
