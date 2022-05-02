@@ -207,7 +207,7 @@ function PostScreen() {
             </Box>
             <Box sx={{ borderRadius: '5px', width: '90%', bgcolor: theme.palette.primary.light }}>
                 <TextField
-                    sFx={{ width: '100%', height: '100%', marginBottom: 0 }}
+                    sx={{ width: '100%', height: '100%', marginBottom: 0 }}
                     multiline
                     rows={8}
                     id="post-content-field"
@@ -301,8 +301,10 @@ function PostScreen() {
                             {
                                 (!store.currentPost?.published) ?
                                     (store.mediaType === MediaType.STORY ?
-                                        <QEditor sx={{maxWidth: '100px'}}handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData}
-                                        /> :
+                                        <Box sx={{ width: '95%', height: '100%' }}>
+                                        <QEditor sx={{maxWidth: '100%'}}handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData}
+                                        />
+                                        </Box> :
                                         // <ComicWorkspace />
                                         <WorkspaceWrap>
                                             {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
