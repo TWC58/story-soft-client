@@ -838,3 +838,9 @@ input {
   height: 100%;
 
 }
+
+.ql-editor {
+  overflow-y: auto;
+  min-height:340px;
+  max-height:340px;
+}

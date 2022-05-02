@@ -208,7 +208,7 @@ function PostScreen() {
             </Box>
             <Box sx={{ borderRadius: '5px', width: '90%', bgcolor: theme.palette.primary.light }}>
                 <TextField
-                    sFx={{ width: '100%', height: '100%', marginBottom: 0 }}
+                    sx={{ width: '100%', height: '100%', marginBottom: 0 }}
                     multiline
                     rows={8}
                     id="post-content-field"
