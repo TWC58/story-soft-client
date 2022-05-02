@@ -38,7 +38,7 @@ const ThemeWrapper = () => {
                 <Route path="/" exact component={HomeScreen} />
                 <Route path="/profile" exact component={ProfileScreen} />
                 <Route path="/profile/:id" exact component={ProfileScreenWithId} />
-                <Route path="/post/:id" exact component={PostScreen} />
+                <Route path="/post/:id" exact component={PostScreen} forceRedirect="true" />
                 <Route path="/login/success" exact component={LoginSuccess} />
                 <Route path='/login/failure' exact component={LoginFailure} />
                 <Route path="/comicgen" exact component={ComicGen} />

@@ -570,12 +570,12 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    /*store.deleteSection = async function (sectionToDelete) {
+    store.deleteSection = async function (sectionToDelete) {
         let response = await api.deleteSection(sectionToDelete);
         if (response.data.success) {
             
         }
-    }*/
+    }
 
     store.deleteMarkedPost = function () {
         store.deletePost(store.postMarkedForDeletion);
@@ -712,7 +712,7 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.deleteSection = async function (sectionId) {
+    /*store.deleteSection = async function (sectionId) {
         let response = await api.getSection(sectionId);
         if (response.status == 200) {
             let currentSection = response.data.section;
@@ -733,7 +733,7 @@ function GlobalStoreContextProvider(props) {
                 }
             }
         }
-    }
+    }*/
 
     store.updateSection = async function (sectionId, section) {
         let response = await api.updateSection(sectionId, section);

@@ -41,7 +41,7 @@ export default function ModalDeletePost() {
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleDelete} autoFocus>Delete</Button>
         </DialogActions>
-        {store.postMarkedForDeletion ? null : <Redirect to="/" />}
+        {store.postMarkedForDeletion ? null : store.currentPost ? null : <Redirect to="/" />}
       </Dialog>
     </div>
   );

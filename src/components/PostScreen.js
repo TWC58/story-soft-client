@@ -15,7 +15,8 @@ import { ZoomButtons } from 'polotno/toolbar/zoom-buttons';
 import { SidePanel } from 'polotno/side-panel';
 import { Workspace } from 'polotno/canvas/workspace';
 import SectionTree from './SectionTree'
-import QEditor from './QEditor'
+import QEditor from './QEditor';
+import QEditorReadOnly from './QEditorReadOnly.js';
 import AddIcon from '@mui/icons-material/Add';
 import { getSection } from '../api';
 
@@ -48,7 +49,7 @@ function PostScreen() {
             let loadedCurrentSection = store.findLoadedSection(currentSectionId);
             loadedCurrentSection.name = currentSectionName;
             loadedCurrentSection.data = currentSectionData;
-            
+
             await store.updatePost(store.currentPost);
             await store.updateSection(currentSectionId, {
                 name: currentSectionName,
@@ -74,7 +75,7 @@ function PostScreen() {
         } else if (loadAttempted) {
             auth.setError("Post not found!");
         }
-    }, [readyToSave, loaded, currentSectionId]);
+    }, [readyToSave, loaded, currentSectionId, currentPostName]);
 
     const handlePostNameChange = (e) => {
         setCurrentPostName(e.target.value);
@@ -91,8 +92,8 @@ function PostScreen() {
 
     const handleSetCurrentSection = (sectionId) => {
         if (currentSectionId !== sectionId) {
+            //if (!(store.currentPost?.published))
             const section = store.findLoadedSection(sectionId);
-
             setCurrentSectionId(sectionId);
             setCurrentSectionData(section.data);
             setCurrentSectionName(section.name);
@@ -245,7 +246,7 @@ function PostScreen() {
             </Box>
 
             <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
-                
+
             </Box>
         </>)
     }
@@ -267,7 +268,7 @@ function PostScreen() {
     return (
         < div id="post-workspace" width="100%">
             <div id="post-sections">
-                <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main }}>
+                <Box sx={{ width: '100%', height: '90%', bgcolor: theme.palette.primary.main }}>
                     <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Sections</Typography>
                         {store.currentPost ? store.currentPost.published ?
@@ -284,65 +285,74 @@ function PostScreen() {
                 </Box>
 
             </div>
-            <PolotnoContainer sx={{ width: '100%' , marginBottom: '20px'}}>
-                <div id="post-edit">
-                    <Box sx={{ width: '100%', height: '97%' }}>
-                        <Box sx={{ width: '100%', height: '85%', marginTop: '2%', display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-                            <>{store.currentPost ?
-                                getPostTitle()
-                                :
-                                null
-                            }</>
-                            <>{store.currentPost ?
-                                getSectionTitle()
-                                :
-                                null
-                            }</>
-                            {
-                                (!store.currentPost?.published) ?
-                                    (store.mediaType === MediaType.STORY ?
-                                        <QEditor sx={{maxWidth: '100px'}}handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData}
-                                        /> :
-                                        // <ComicWorkspace />
-                                        <WorkspaceWrap>
-                                            {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
-                                            <Toolbar store={pStore} />
-                                            <Workspace store={pStore} components={{ PageControls: () => null }} style={{}} />
-                                            <ZoomButtons store={pStore} />
-                                        </WorkspaceWrap>)
-                                :
-                                <div sx={{display: 'flex', flexDirection: 'row'}} dangerouslySetInnerHTML={{__html: currentSectionData}} />
-                            }
-                            <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 2 }}>
-                                {store.currentPost ? store.currentPost.published ? null : <Button sx={{ width: '100%', marginRight: 4 }} variant="contained" onClick={handleSave} >Save</Button> : null}
-                                {store.currentPost ? store.currentPost.published ? null : <Button sx={{ width: '100%' }} variant="contained" onClick={handlePublish}>Publish</Button> : null}
-                            </Box>
-                            {store.currentPost ? store.currentPost.published ? auth.user ? store.currentPost.userData.userId === auth.user._id ?
-                                <Button sx={{ bgcolor: 'red' }} onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
-                                :
-                                null
-                                :
-                                null
-                                : <>
-                                    <Button sx={{ bgcolor: 'red', marginTop: '3%' }} onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
-                                    <Button sx={{ bgcolor: 'red', marginTop: '3%' }} onClick={handleDeleteSection} variant="contained" className="workspace-button"  >Delete Section</Button>
-                                </> :
-                                null
-                            }
-                        </Box>
-                    </Box>
-                </div>
-                <div id="post-tools">
-                    <Box sx={{ width: '100%', height: '100%', bgcolor: theme.palette.primary.main, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-                        {store.currentPost ? store.currentPost.published ?
-                            getComments()
+
+            <div id="post-edit">
+
+                <Box sx={{ width: '100%', height: '85%', marginTop: '2%', display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+                    <>{store.currentPost ?
+                        getPostTitle()
+                        :
+                        null
+                    }</>
+                    <>{store.currentPost ?
+                        getSectionTitle()
+                        :
+                        null
+                    }</>
+                    {
+                        (!store.currentPost?.published) ?
+                            (store.mediaType === MediaType.STORY ?
+                                <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
+                                    <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData} />
+                                </Box> :
+                                // <ComicWorkspace />
+                                <WorkspaceWrap>
+                                    {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
+                                    <Toolbar store={pStore} />
+                                    <Workspace store={pStore} components={{ PageControls: () => null }} style={{}} />
+                                    <ZoomButtons store={pStore} />
+                                </WorkspaceWrap>)
                             :
+                            <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
+                                <QEditorReadOnly currentSectionData={currentSectionData} />
+                            </Box>
+
+                    }
+                    <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: 1, marginBottom: 1 }}>
+                        {store.currentPost ? store.currentPost.published ? null : <Button variant="contained" onClick={handleSave} >Save</Button> : null}
+                        {store.currentPost ? store.currentPost.published ? null : <Button variant="contained" onClick={handlePublish}>Publish</Button> : null}
+                    </Box>
+                    {store.currentPost ? store.currentPost.published ? auth.user ? store.currentPost.userData.userId === auth.user._id ?
+                        <Button sx={{ bgcolor: 'red' }} onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
+                        :
+                        null
+                        :
+                        null
+                        : <>
+                            <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 1 }}>
+                                <Button onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
+                                <Button onClick={handleDeleteSection} variant="contained" className="workspace-button"  >Delete Section</Button>
+                            </Box>
+                        </> :
+                        null
+                    }
+                </Box>
+
+            </div>
+            <div id="post-tools">
+                <Box sx={{ width: '100%', height: '90%', bgcolor: theme.palette.primary.main, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+                    {store.currentPost ? store.currentPost.published ?
+                        getComments()
+                        :
+                        store.mediaType == "COMIC" ?
                             getTools()
                             :
                             null
-                        }
+                        :
+                        null
+                    }
 
-                        {/* <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
+                    {/* <Box sx={{ fontFamily: 'Arial, sans-serif', margin: 0, display: 'flex' }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Draw</Typography>
                     </Box>
 
@@ -353,14 +363,14 @@ function PostScreen() {
                     </Box>
 
                     <Box sx={{ borderRadius: '5px', width: '90%', height: '10%', bgcolor: theme.palette.primary.light }}></Box> */}
-                        <>{store.currentPost ?
-                            getDescription()
-                            :
-                            null
-                        }</>
-                    </Box>
-                </div>
-            </PolotnoContainer>
+                    <>{store.currentPost ?
+                        getDescription()
+                        :
+                        null
+                    }</>
+                </Box>
+            </div>
+
         </div >
     )
 }

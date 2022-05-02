@@ -7,20 +7,12 @@ import 'react-quill/dist/quill.bubble.css';
 
 //require('react-quill/dist/quill.snow.css');
 
-export default function QEditor({ handleSectionDataChange, currentSectionData }) {
+export default function QEditorReadOnly({ handleSectionDataChange, currentSectionData }) {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext);
 
     const modules = {
-		toolbar: [
-	      [{ 'font': [] }],
-	      [{ 'size': ['small', false, 'large', 'huge'] }],
-	      ['bold', 'italic', 'underline'],
-	      [{'list': 'ordered'}, {'list': 'bullet'}],
-	      [{ 'align': [] }],
-	      [{ 'color': [] }, { 'background': [] }],
-	      ['clean']
-	    ]
+		toolbar: false
 	}
 
     const formats = [
@@ -36,9 +28,9 @@ export default function QEditor({ handleSectionDataChange, currentSectionData })
 
     return (
         <ReactQuill
+            readOnly={true}
             theme="snow"
             value={currentSectionData}
-            onChange={handleSectionDataChange}
             modules={modules}
             formats={formats}
             sx={{ height: '75%' }}

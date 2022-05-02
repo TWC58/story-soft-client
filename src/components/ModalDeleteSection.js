@@ -20,6 +20,7 @@ export default function ModalDeleteSection() {
 
   const handleDelete = () => {
     store.deleteMarkedSection();
+    window.location.reload(true)
   }
   return (
     <div>
@@ -41,7 +42,7 @@ export default function ModalDeleteSection() {
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleDelete} autoFocus>Delete</Button>
         </DialogActions>
-        {store.sectionMarkedForDeletion ? null : store.currentPost ? <Redirect to={`/post/${store.currentPost._id}`} /> : <Redirect to='/' />}
+        {store.sectionMarkedForDeletion ? null : store.currentPost ? null : <Redirect to='/' />}
       </Dialog>
     </div>
   );
