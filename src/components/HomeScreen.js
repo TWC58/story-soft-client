@@ -16,6 +16,7 @@ import Copyright from './Copyright.js'
 import useStyles from '../styling/styles'
 import Explore from './Explore';
 import Following from './Following';
+import SearchPosts from './SearchPosts';
 
 /*
     This React component lists all the top5 lists in the UI.
@@ -48,14 +49,18 @@ const HomeScreen = () => {
     const sampleExploreListTags2 = { name: 'Example Tag 2', posts: [examplePost, examplePost, examplePost]};
     const sampleExploreListTags3 = { name: 'Example Tag 3', posts: [examplePost, examplePost, examplePost]};
     const sampleFollowingList = [examplePost, examplePost, examplePost, examplePost, examplePost, examplePost, examplePost];
-
     return (
         <div id="post-selector">
             {/* <div id="homescreen-divider"></div> */}
+            {console.log("SEACH POSTS: " + store.searchPosts)}
             <Explore exploreTags={store.tagPostArrays ? store.tagPostArrays : []}/>
 
-            <Following posts={sampleFollowingList}/>
-
+            {
+                (store.searchPosts !== null) ? 
+                <SearchPosts/>
+                :
+                <Following posts={sampleFollowingList}/>
+            }
         </div>)
 
 

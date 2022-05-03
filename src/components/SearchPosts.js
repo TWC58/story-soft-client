@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 
-const Following = ({ posts }) => {
+const SearchPosts = () => {
     const { store } = useContext(GlobalStoreContext);
     const theme = useTheme();
 
@@ -14,9 +14,9 @@ const Following = ({ posts }) => {
         <>
         <div id="followingSection">
         <Box sx={{fontFamily: 'Arial, sans-serif', bgcolor: theme.palette.primary.main, borderRadius: 5, margin: 5, display: 'flex'}}>
-          <Typography sx={{ p: 1, flexGrow: 1}} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Following</Typography></Box>
+          <Typography sx={{ p: 1, flexGrow: 1}} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Search Results</Typography></Box>
         <List sx={{marginTop: 5, marginRight: 5, marginLeft: 5}} style={{flexDirection: 'row'}}>
-            {posts.map((post, index) => (
+            {store.searchPosts.map((post, index) => (
                 <ExploreCard key={ index } post={ post }/>
             ))}
         </List>
@@ -25,4 +25,4 @@ const Following = ({ posts }) => {
     )
 }
 
-export default Following;
+export default SearchPosts;

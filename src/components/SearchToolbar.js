@@ -123,8 +123,8 @@ export default function SearchToolbar() {
 
     function handleSearchEnter(event) {
         if (event.code === "Enter") {
-          if (event.taget.value)
-            store.searchPosts(event.target.value);
+          if (event.target.value)
+            store.searchForPosts(event.target.value);
         }
     }
 

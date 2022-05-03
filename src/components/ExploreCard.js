@@ -7,12 +7,52 @@ import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import { ListItem, Button } from '@mui/material';
-import { useContext } from 'react';
-import { GlobalStoreContext } from '../store'
+import { useContext, useEffect, useState } from 'react';
+import { GlobalStoreContext , LikeType} from '../store'
+import AuthContext from '../auth'
 
 export const ExploreCard = ({ post }) => {
     const theme = useTheme();
     const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
+
+    const handleViewClick = (e) => {
+        store.pushToHistory(`/post/${post._id}`);
+    }
+
+    async function handleThumbUp() {
+        const success = await store.likePost(post._id, LikeType.LIKE);
+        if (success) {
+            if (auth.userHasLike(post._id)){
+                post.likes--;
+            } else {
+                post.likes++;
+            }
+
+            if (auth.userHasDislike(post._id)) {
+                post.dislikes--;
+            }
+
+            auth.getLoggedIn();
+        }
+    }
+
+    async function handleThumbDown() {
+        const success = await store.likePost(post._id, LikeType.DISLIKE);
+        if (success) {
+            if (auth.userHasDislike(post._id)){
+                post.dislikes--;
+            } else {
+                post.dislikes++;
+            }
+
+            if (auth.userHasLike(post._id)) {
+                post.likes--;
+            }
+            
+            auth.getLoggedIn();
+        }
+    }
 
     return (
         <>
@@ -25,16 +65,16 @@ export const ExploreCard = ({ post }) => {
                     <Box sx={{ height: '95%' }}>
                         <div id="like-area">
                             <span>
-                                <IconButton>
-                                    <ThumbUpOffAltIcon sx={{ pt: 2 }} />
+                                <IconButton onClick={handleThumbUp}>
+                                    <ThumbUpOffAltIcon sx={{fontSize:'24pt'}} disabled={!auth.user || !auth.loggedIn || !post.published} color={(auth.user && auth.userHasLike(post._id)) ? "secondary" : "default"} />
                                 </IconButton>
                             </span>
                             <span className="like-display">
                                 {post.likes}
                             </span>
                             <span>
-                                <IconButton>
-                                    <ThumbDownOffAltIcon sx={{ pt: 2 }} />
+                                <IconButton onClick={handleThumbDown}>
+                                    <ThumbDownOffAltIcon sx={{fontSize:'24pt'}} disabled={!auth.user || !auth.loggedIn || !post.published} color={(auth.user && auth.userHasDislike(post._id)) ? "secondary" : "default"} />
                                 </IconButton>
                             </span>
                             <span className="like-display">
@@ -42,9 +82,9 @@ export const ExploreCard = ({ post }) => {
                             </span>
                             <span>
                                 {post.published ?
-                                    <Button onClick={e => { window.location.href = `/post/${post._id}`}}>View</Button>
+                                    <Button onClick={handleViewClick}>View</Button>
                                 :
-                                    <Button onClick={e => { window.location.href = `/post/${post._id}`}}>Edit</Button>
+                                    <Button onClick={handleViewClick}>Edit</Button>
                                 }
                             </span>
                         </div>

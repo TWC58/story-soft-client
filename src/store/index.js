@@ -39,6 +39,11 @@ export const MediaType = {
     STORY: "STORY"
 }
 
+export const LikeType = {
+    LIKE: "LIKE",
+    DISLIKE: "DISLIKE"
+}
+
 // THESE ARE ALL THE TYPES OF UPDATES TO OUR GLOBAL
 // DATA STORE STATE THAT CAN BE PROCESSED
 export const GlobalStoreActionType = {
@@ -210,7 +215,11 @@ function GlobalStoreContextProvider(props) {
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
-    store.searchPosts = async function(search) {
+    store.pushToHistory = function(route) {
+        history.push(route);
+    }
+
+    store.searchForPosts = async function(search) {
         let res = await api.getPosts(store.mediaType, {
             "search" : search,
             "searchBy" : store.searchBy
@@ -380,6 +389,12 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.goHome = () => {
+        storeReducer({
+            type: GlobalStoreActionType.SET_CURRENT_POST,
+            payload: {
+                currentPost: null
+            }
+        });
         history.push("/");
     }
 
@@ -515,29 +530,19 @@ function GlobalStoreContextProvider(props) {
         });
     }
 
-    store.likeList = async function (list, like) {
-        let lType = (store.listViewMode === ListViewMode.COMMUNITY_LISTS) ? "community" : "normal";
-        let response = await api.likeList(list._id, { like: like, listType: lType }).catch((err) => {
+    store.likePost = async function (postId, like) {
+        let response = await api.likePost(store.mediaType, postId, { like: like }).catch((err) => {
             console.log(err);
             if (err.response) {
                 auth.setError("Like failed!");
                 return;
             }
         });
-        if (response.data && response.data.success) {
-            if (auth.user.likes) {//delete any existing like from the user's like list
-                auth.user.likes.forEach((like, index) => {
-                    if (like.listId === list._id) {
-                        auth.user.likes.splice(index, 1);
-                    }
-                })
-            }
-            if (!auth.user.likes) {
-                auth.user.likes = [];
-            }
-            auth.user.likes.push(response.data.like);
-            return response.data.top5List;
+        if (response.status === 200) {
+            return true;
         }
+
+        return false;
     }
 
     store.unlikeList = async function (list, like) {

@@ -251,7 +251,7 @@ function AuthContextProvider(props) {
     auth.userHasLike = (listId) => {
         if (auth.user.likes) {
             for (let i = 0; i < auth.user.likes.length; i++) {
-                if (auth.user.likes[i].listId === listId && auth.user.likes[i].like) 
+                if (auth.user.likes[i] === listId) 
                     return true;
             }
         } 
@@ -260,9 +260,9 @@ function AuthContextProvider(props) {
     }
 
     auth.userHasDislike = (listId) => {
-        if (auth.user.likes) {
-            for (let i = 0; i < auth.user.likes.length; i++) {
-                if (auth.user.likes[i].listId === listId && !auth.user.likes[i].like)
+        if (auth.user.dislikes) {
+            for (let i = 0; i < auth.user.dislikes.length; i++) {
+                if (auth.user.dislikes[i] === listId)
                     return true;
             }
         } 
