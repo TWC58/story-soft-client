@@ -18,9 +18,9 @@ export default function ModalDeleteSection() {
     store.unmarkSectionForDeletion();
   };
 
-  const handleDelete = () => {
-    store.deleteMarkedSection();
-    window.location.reload(true)
+  const handleDelete = async () => {
+    await store.deleteMarkedSection();
+    window.location.reload(true);
   }
   return (
     <div>

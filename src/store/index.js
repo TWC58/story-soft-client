@@ -571,9 +571,15 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.deleteSection = async function (sectionToDelete) {
-        let response = await api.deleteSection(sectionToDelete);
-        if (response.data.success) {
-            
+        console.log(sectionToDelete);
+        let response = await api.deleteSection(sectionToDelete).catch((err) => {
+            console.log(err);
+        });
+        if (response?.data.success) {
+            return storeReducer({
+                type: GlobalStoreActionType.UNMARK_SECTION_FOR_DELETION,
+                payload: { deletedSection: sectionToDelete }
+            });
         }
     }
 
@@ -581,8 +587,8 @@ function GlobalStoreContextProvider(props) {
         store.deletePost(store.postMarkedForDeletion);
     }
 
-    store.deleteMarkedSection = function () {
-        store.deleteSection(store.sectionMarkedForDeletion);
+    store.deleteMarkedSection = async function () {
+        return store.deleteSection(store.sectionMarkedForDeletion);
     }
 
     store.unmarkPostForDeletion = function () {

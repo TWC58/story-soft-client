@@ -330,8 +330,8 @@ function PostScreen() {
                         null
                         : <>
                             <Box sx={{ display: 'flex', flexDirection: 'row', marginBottom: 1 }}>
-                                <Button onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
-                                <Button onClick={handleDeleteSection} variant="contained" className="workspace-button"  >Delete Section</Button>
+                                <Button onClick={handleDeletePost} type="button" variant="contained" className="workspace-button"  >Delete Post</Button>
+                                <Button onClick={handleDeleteSection} type="button" variant="contained" className="workspace-button"  >Delete Section</Button>
                             </Box>
                         </> :
                         null
