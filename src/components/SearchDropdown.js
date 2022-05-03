@@ -5,18 +5,20 @@ import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import { useTheme } from '@mui/material/styles';
+import { useContext } from 'react'
+import { GlobalStoreContext, SearchBy } from '../store'
 
 const options = [
   'Title',
   'Author',
-  'Genre',
   'Tag',
 ];
 
 export default function SearchDropdown() {
+  const { store } = useContext(GlobalStoreContext);
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
   const open = Boolean(anchorEl);
   const handleClickListItem = (event) => {
     setAnchorEl(event.currentTarget);
@@ -25,6 +27,16 @@ export default function SearchDropdown() {
   const handleMenuItemClick = (event, index) => {
     setSelectedIndex(index);
     setAnchorEl(null);
+
+    console.log("SEARCH SWAP TO INDEX " + index);
+
+    if (index === 0) {
+      store.setSearchBy(SearchBy.TITLE);
+    } else if (index === 1) {
+      store.setSearchBy(SearchBy.AUTHOR);
+    } else if (index === 2) {
+      store.setSearchBy(SearchBy.TAG);
+    }
   };
 
   const handleClose = () => {
@@ -66,7 +78,6 @@ export default function SearchDropdown() {
         {options.map((option, index) => (
           <MenuItem
             key={option}
-            disabled={index === 5}
             selected={index === selectedIndex}
             onClick={(event) => handleMenuItemClick(event, index)}
           >

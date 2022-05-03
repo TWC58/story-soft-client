@@ -13,9 +13,12 @@ const ExploreTag = ({ tag, posts }) => {
         <Box sx={{fontFamily: 'Arial, sans-serif', bgcolor: theme.palette.primary.main, borderRadius: 5}}>
           <Box sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold' }}>{tag}</Box>
         </Box>
-          {posts.map((post, index) => (
+          {(posts) ? 
+          posts.map((post, index) => (
             <ExploreCard key={index} post={post}/>
-          ))}
+          ))
+        :
+        ""}
       </>
     )
 };

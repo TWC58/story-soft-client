@@ -28,6 +28,12 @@ export const ListSortMode = {
     DISLIKES: "DISLIKES"
 }
 
+export const SearchBy = {
+    TITLE: "TITLE",
+    AUTHOR: "AUTHOR",
+    TAG: "TAG"
+}
+
 export const MediaType = {
     COMIC: "COMIC",
     STORY: "STORY"
@@ -48,7 +54,9 @@ export const GlobalStoreActionType = {
     SET_MEDIA: "SET_MEDIA",
     GET_USER_INFO: "GET_USER_INFO",
     SET_SEARCH_POSTS: "SET_SEARCH_POSTS",
-    SET_CURRENT_SECTION: "SET_CURRENT_SECTION"
+    SET_CURRENT_SECTION: "SET_CURRENT_SECTION",
+    SET_FRONT_PAGE_DATA: "SET_FRONT_PAGE_DATA",
+    SET_SEARCH_BY: "SET_SEARCH_BY"
 }
 
 // WITH THIS WE'RE MAKING OUR GLOBAL DATA STORE
@@ -65,6 +73,8 @@ function GlobalStoreContextProvider(props) {
         sectionMarkedForDeletion: null,
         postViewMode: null,
         profileInfo: null,
+        tagPostArrays: null,
+        searchBy: SearchBy.TITLE
     });
     const history = useHistory();
 
@@ -178,6 +188,19 @@ function GlobalStoreContextProvider(props) {
                     sectionMarkedForDeletion: null
                 });
             }
+            case GlobalStoreActionType.SET_FRONT_PAGE_DATA: {
+                return setStore({
+                    ...store,
+                    tagPostArrays: payload.tagPostArrays
+
+                });
+            }
+            case GlobalStoreActionType.SET_SEARCH_BY: {
+                return setStore({
+                    ...store,
+                    searchBy: payload.searchBy
+                });
+            }
             default:
                 return store;
         }
@@ -186,6 +209,74 @@ function GlobalStoreContextProvider(props) {
     // THESE ARE THE FUNCTIONS THAT WILL UPDATE OUR STORE AND
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
+
+    store.searchPosts = async function(search) {
+        let res = await api.getPosts(store.mediaType, {
+            "search" : search,
+            "searchBy" : store.searchBy
+        }).catch((err) => {
+            console.log(err);
+        });
+
+        if (res.status === 200) {
+            storeReducer({
+                type: GlobalStoreActionType.SET_SEARCH_POSTS,
+                payload: {
+                    searchPosts: res.data.data
+                }
+            });
+        }
+    }
+
+    store.setSearchBy = function(searchBy) {
+        storeReducer({
+            type: GlobalStoreActionType.SET_SEARCH_BY,
+            payload: {
+                searchBy: searchBy
+            }
+        });
+    }
+
+    store.loadFrontPageData = async function() {
+        let tagsRes = await api.getTags(store.mediaType).catch((err) => {
+            console.log(err);
+        });
+
+        if (tagsRes.status === 200){
+            //now we have the tags and need to create the list of posts for each
+            const tags = tagsRes.data.tags;
+
+            //this will hold the list of objects in the format the Explore page expects
+            let tagPostArrays = [];
+
+            for (let tag of tags) {
+                //go through each tag and use an api call to search for posts by tag
+                let postsByTagRes = await api.getPosts(store.mediaType, {
+                    "search" : tag.name,
+                    "searchBy" : "TAG"
+                }).catch((err) => {
+                    console.log(err);
+                });
+
+                //if success, store these posts with their name tag
+                if (postsByTagRes.status === 200) {
+                    console.log("POSTS FOR TAG " + tag.name + " " + JSON.stringify(postsByTagRes.data.data));
+                    tagPostArrays.push({
+                        name : tag.name,
+                        posts : postsByTagRes.data.data
+                    })
+                }
+            }
+
+            //save the final product to the store
+            storeReducer({
+                type: GlobalStoreActionType.SET_FRONT_PAGE_DATA,
+                payload: {
+                    tagPostArrays: tagPostArrays
+                }
+            });
+        }
+    }
 
     //SECTIONS
 

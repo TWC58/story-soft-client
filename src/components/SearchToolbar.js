@@ -123,13 +123,8 @@ export default function SearchToolbar() {
 
     function handleSearchEnter(event) {
         if (event.code === "Enter") {
-            if (store.listViewMode = ListViewMode.USER_LISTS) {
-              store.loadListsByUsername(event.target.value);
-            } else if (store.listViewMode !== null) {
-              store.searchLists(event.target.value);
-            } else {
-              alert("You must select a list tab before searching!");
-            }
+          if (event.taget.value)
+            store.searchPosts(event.target.value);
         }
     }
 
