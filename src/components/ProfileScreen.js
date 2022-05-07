@@ -47,9 +47,9 @@ export default function ProfileScreen() {
 
     useEffect(() => {
         //TODO load posts by current user, split into published/unpublished, then feed to mostpopular and unpublished components
-        auth.user ? store.searchPosts ? console.log(store.searchPosts) : store.getSearchPosts(auth.user._id, 'ID') : console.log("NO CURRENT USER");
+        auth.user ? store.userPosts ? console.log("USER POSTS: ", store.userPosts) : store.getUserPosts(auth.user._id, 'ID') : console.log("NO CURRENT USER");
         console.log("POSTS FOR PROFILE:", store.searchPosts);
-    }, [store.searchPosts]);
+    });
 
     const examplePost = {
         title: 'Example Title',
@@ -152,10 +152,10 @@ export default function ProfileScreen() {
                 <Button onClick={handleEditProfile} variant='contained' sx={{ display: 'block', marginTop: '20px' }}>{editActive ? "Save" : "Edit Profile"}</Button>
             </div>
             <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
-                <MostPopular posts={auth.user ? store.searchPosts ? Array.from(store.searchPosts).filter(x => x.published) : [] : []} />
+                <MostPopular posts={auth.user ? store.userPosts ? Array.from(store.userPosts).filter(x => x.published) : [] : []} />
             </div>
             <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
-                <NotPublished posts={auth.user ? store.searchPosts ? Array.from(store.searchPosts).filter(x => !x.published) : [] : []} />
+                <NotPublished posts={auth.user ? store.userPosts ? Array.from(store.userPosts).filter(x => !x.published) : [] : []} />
             </div>
         </div>
         // <Box sx={{backgroundImage: 'public/data/_117883014_gorilla_dianfosseygorillafund1.jpg', backgroundSize: 'contain', borderRadius: '50%', height: '200px', width: '1200px'}}>TEST</Box>

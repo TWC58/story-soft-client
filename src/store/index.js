@@ -61,7 +61,10 @@ export const GlobalStoreActionType = {
     SET_SEARCH_POSTS: "SET_SEARCH_POSTS",
     SET_CURRENT_SECTION: "SET_CURRENT_SECTION",
     SET_FRONT_PAGE_DATA: "SET_FRONT_PAGE_DATA",
-    SET_SEARCH_BY: "SET_SEARCH_BY"
+    SET_SEARCH_BY: "SET_SEARCH_BY",
+    ADD_FOLLOWER: 'ADD_FOLLOWER',
+    REMOVE_FOLLOWER: 'REMOVE_FOLLOWER',
+    SET_USER_POSTS: 'SET_USER_POSTS',
 }
 
 // WITH THIS WE'RE MAKING OUR GLOBAL DATA STORE
@@ -73,6 +76,7 @@ function GlobalStoreContextProvider(props) {
         explorePosts: [],
         followingPosts: [],
         searchPosts: null,
+        userPosts: null,
         currentPost: null,
         postMarkedForDeletion: null,
         sectionMarkedForDeletion: null,
@@ -206,10 +210,45 @@ function GlobalStoreContextProvider(props) {
                     searchBy: payload.searchBy
                 });
             }
+            case GlobalStoreActionType.ADD_FOLLOWER: { //TODO ADD TO auth.user.following
+                console.log(payload);                
+                return setStore({
+                    ...store,
+                    profileInfo: { ...store.profileInfo, followers: store.profileInfo.followers.concat([payload.follower]) }
+                });
+            }
+            case GlobalStoreActionType.REMOVE_FOLLOWER: { //TODO REMOVE FROM auth.user.following
+                return setStore({
+                    ...store,
+                    profileInfo: { ...store.profileInfo, followers: removeItemAll(store.profileInfo.followers, payload.unfollower) }
+                });
+            }
+            case GlobalStoreActionType.SET_USER_POSTS: {
+                console.log("SETTING USER POSTS", payload);
+                return setStore({
+                    ...store,
+                    userPosts: payload.userPosts
+                });
+            }
             default:
                 return store;
         }
     }
+
+    //HELPER FOR REMOVE FOLLOWERS
+
+    function removeItemAll(arr, value) {
+        var i = 0;
+        while (i < arr.length) {
+          if (arr[i] === value) {
+            arr.splice(i, 1);
+          } else {
+            ++i;
+          }
+        }
+        if(arr.length) return arr;
+        return new Array();
+      }
 
     // THESE ARE THE FUNCTIONS THAT WILL UPDATE OUR STORE AND
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
@@ -286,6 +325,33 @@ function GlobalStoreContextProvider(props) {
             });
         }
     }
+
+    //FOLLOWING/UNFOLLOWING
+    store.followUser = async (follower, followed) => {
+        let response = await api.followUser({ follower: follower, followed: followed }).catch((err) => {
+            console.log("Error following user");
+        });
+        if(response.status === 200) {
+            auth.addFollowed({ follower: follower, followed: followed })
+            storeReducer({
+                type: GlobalStoreActionType.ADD_FOLLOWER,
+                payload: { follower: follower, followed: followed }
+            });
+        }
+    };
+
+    store.unfollowUser = async (unfollower, unfollowed) => {
+        let response = await api.unfollowUser({ unfollower: unfollower, unfollowed: unfollowed }).catch((err) => {
+            console.log("Error unfollowing user");
+        });
+        if(response.status === 200) {
+            auth.removeFollowed({ unfollower: unfollower, unfollowed: unfollowed });
+            storeReducer({
+                type: GlobalStoreActionType.REMOVE_FOLLOWER,
+                payload: { unfollower: unfollower, unfollowed: unfollowed }
+            });
+        }
+    };
 
     //SECTIONS
 
@@ -460,6 +526,24 @@ function GlobalStoreContextProvider(props) {
                 type: GlobalStoreActionType.SET_SEARCH_POSTS,
                 payload: {
                     searchPosts: response.data.data
+                }
+            });
+        }
+    }
+
+    store.getUserPosts = async function (search, searchBy) {
+        let response = await api.getPosts(store.mediaType, { search: search, searchBy: searchBy }).catch((err) => {
+            console.log(err);
+            if (err.response)
+                auth.setError(err.response.errorMessage);
+        });
+        console.log("USER POSTS: ", response.data);
+        if (response.data.success) {
+            console.log("SETTING POSTS: ", response.data.data);
+            storeReducer({
+                type: GlobalStoreActionType.SET_USER_POSTS,
+                payload: {
+                    userPosts: response.data.data
                 }
             });
         }

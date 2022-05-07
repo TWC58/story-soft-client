@@ -38,29 +38,28 @@ export default function ProfileScreenWithId() {
     const { store } = useContext(GlobalStoreContext);
 
     const profileId = window.location.href.substring(30);
-    
 
     useEffect(() => {
-        if (!store.profileInfo)
+        if (!store.profileInfo || store.profileInfo._id != profileId) {
             store.getUserInfo(profileId);
+        }
+        store.profileInfo ? store.userPosts ? console.log("USER POSTS: ", store.userPosts) : store.getUserPosts(profileId, 'ID') : console.log("NO CURRENT USER");
     })
-    
+
     console.log(store.profileInfo);
 
     const theme = useTheme();
 
-    const examplePost = {
-        title: 'Example Title',
-        author: 'Example Author',
-        published: 'Example Published',
-        description: 'Example Description',
-        likes: '100',
-        dislikes: '23',
-        imageUrl: 'https://st2.depositphotos.com/3765753/5349/v/600/depositphotos_53491489-stock-illustration-example-rubber-stamp-vector-over.jpg'
-    }
-    const sampleList = [examplePost, examplePost, examplePost, examplePost, examplePost, examplePost, examplePost];
 
+    const handleFollow = async () => {
+        console.log('following');
+        store.followUser(auth.user._id, store.profileInfo._id);
+    };
 
+    const handleUnfollow = async () => {
+        console.log('unfollowing');
+        store.unfollowUser(auth.user._id, store.profileInfo._id);
+    };
 
     return (
         <div className="flex-row" style={{ maxHeight: '90%', maxWidth: '100%', topMargin: '5%', bottomMargin: '5%' }}>
@@ -72,19 +71,26 @@ export default function ProfileScreenWithId() {
                     />
                 </div>
                 {
-                <Typography variant='h5' sx={{ marginTop: '20px' }}><strong>{store.profileInfo ? store.profileInfo.username : "Username"}</strong></Typography>
+                    <Typography variant='h5' sx={{ marginTop: '20px' }}><strong>{store.profileInfo ? store.profileInfo.username : "Username"}</strong></Typography>
                 }
                 <Typography variant='h7' sx={{ display: 'block', marginTop: '20px' }}><strong>0</strong> Followers</Typography>
                 {
-                        <Typography className="profile-bio" sx={{ display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px' }}>{store.profileInfo ? store.profileInfo.bio : "Example bio"}</Typography>
+                    <Typography className="profile-bio" sx={{ display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px' }}>{store.profileInfo ? store.profileInfo.bio : "Example bio"}</Typography>
                 }
-                <Button variant='contained' sx={{ display: 'block', marginTop: '20px' }}>Follow</Button>
+                {auth.user?.following && store.profileInfo ?
+                    Array.from(auth.user.following).includes(store.profileInfo._id) ? //if user is following already
+                        <Button variant='contained' sx={{ display: 'block', marginTop: '20px' }} onClick={handleUnfollow}>Unfollow</Button>
+                        :
+                        <Button variant='contained' sx={{ display: 'block', marginTop: '20px' }} onClick={handleFollow}>Follow</Button>
+                    :
+                    null
+                }
             </div>
             <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
-                <MostPopular posts={sampleList} />
+                {store.userPosts ? <MostPopular posts={Array.from(store.userPosts).filter(post => post.published).sort((a, b) => { return b.likes - a.likes})} /> : <h1>NO POSTS YET</h1> }
             </div>
             <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
-                <MostRecent posts={sampleList} />
+                {store.userPosts ? <MostRecent posts={Array.from(store.userPosts).filter(post => post.published).sort((a, b) => { return new Date(b.published) - new Date(a.published) })} /> : <h1>NO POSTS YET</h1> }
             </div>
         </div>
         // <Box sx={{backgroundImage: 'public/data/_117883014_gorilla_dianfosseygorillafund1.jpg', backgroundSize: 'contain', borderRadius: '50%', height: '200px', width: '1200px'}}>TEST</Box>

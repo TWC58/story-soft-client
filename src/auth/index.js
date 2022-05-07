@@ -11,7 +11,9 @@ export const AuthActionType = {
     LOGOUT: "LOGOUT",
     GET_LOGGED_IN: "GET_LOGGED_IN",
     REGISTER_USER: "REGISTER_USER",
-    ERROR: "ERROR"
+    ERROR: "ERROR",
+    ADD_FOLLOWED: "ADD_FOLLOWED",
+    REMOVE_FOLLOWED: "REMOVE_FOLLOWED",
 }
 
 const testUser = {
@@ -35,7 +37,7 @@ function AuthContextProvider(props) {
         loggedIn: false,
         error: null
     });
-    const history = useHistory();  
+    const history = useHistory();
 
     useEffect(() => {
         if (!auth.loggedIn)
@@ -82,9 +84,49 @@ function AuthContextProvider(props) {
                     error: payload.error
                 })
             }
+            case AuthActionType.ADD_FOLLOWED: {
+
+                return setAuth({
+                    ...auth,
+                    user: { ...auth.user, following: auth.user.following.concat([payload.followed]) }
+                });
+            }
+            case AuthActionType.REMOVE_FOLLOWED: {
+                return setAuth({
+                    ...auth,
+                    user: { ...auth.user, following: removeItemAll(auth.user.following, payload.unfollowed) }
+                });
+            }
             default:
                 return auth;
         }
+    }
+
+    function removeItemAll(arr, value) {
+        var i = 0;
+        while (i < arr.length) {
+            if (arr[i] === value) {
+                arr.splice(i, 1);
+            } else {
+                ++i;
+            }
+        }
+        if(arr.length) return arr;
+        return new Array();
+    }
+
+    auth.addFollowed = async (payload) => {
+        return authReducer({
+            type: AuthActionType.ADD_FOLLOWED,
+            payload: payload
+        });
+    }
+
+    auth.removeFollowed = async (payload) => {
+        return authReducer({
+            type: AuthActionType.REMOVE_FOLLOWED,
+            payload: payload
+        });
     }
 
     auth.updateUser = async (user) => {
@@ -156,7 +198,7 @@ function AuthContextProvider(props) {
         }
     }
 
-    auth.registerUser = async function(userData, store) {
+    auth.registerUser = async function (userData, store) {
         const response = await api.registerUser(userData).catch((err) => {
             authReducer({
                 type: AuthActionType.LOGOUT,
@@ -166,7 +208,7 @@ function AuthContextProvider(props) {
                 }
             })
             return err.response;
-        });      
+        });
         if (response.status === 200) {
             authReducer({
                 type: AuthActionType.REGISTER_USER,
@@ -178,7 +220,7 @@ function AuthContextProvider(props) {
         }
     }
 
-    auth.login = async function(userCreds, store) {
+    auth.login = async function (userCreds, store) {
         const response = await api.loginUser(userCreds).catch((err) => {
             authReducer({
                 type: AuthActionType.LOGOUT,
@@ -187,8 +229,8 @@ function AuthContextProvider(props) {
                     error: "ERROR: Credentials entered do not match any user."
                 }
             })
-        });      
-        
+        });
+
         if (typeof response !== 'undefined' && response.status === 200) {
             authReducer({
                 type: AuthActionType.LOGIN,
@@ -209,7 +251,7 @@ function AuthContextProvider(props) {
         }
     }
 
-    auth.logout = async function() {
+    auth.logout = async function () {
         const response = await api.logout();
 
         if (response.status === 200) {
@@ -223,7 +265,7 @@ function AuthContextProvider(props) {
         }
     }
 
-    auth.googleLogin = async function() {
+    auth.googleLogin = async function () {
         const response = await api.googleLogin();
         if (response.status === 200) {
             auth.getLoggedIn();
@@ -251,11 +293,11 @@ function AuthContextProvider(props) {
     auth.userHasLike = (listId) => {
         if (auth.user.likes) {
             for (let i = 0; i < auth.user.likes.length; i++) {
-                if (auth.user.likes[i] === listId) 
+                if (auth.user.likes[i] === listId)
                     return true;
             }
-        } 
-        
+        }
+
         return false;
     }
 
@@ -265,8 +307,8 @@ function AuthContextProvider(props) {
                 if (auth.user.dislikes[i] === listId)
                     return true;
             }
-        } 
-        
+        }
+
         return false;
     }
 

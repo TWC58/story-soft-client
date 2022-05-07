@@ -64,7 +64,7 @@ function PostScreen() {
             setCurrentSectionId(store.currentPost.loadedRoot._id);
             setCurrentSectionData(store.currentPost.loadedRoot.data);
             setCurrentDescription(store.currentPost.summary);
-        } else if (!store.currentPost && !loadAttempted) {
+        } else if ((!store.currentPost && !loadAttempted) ||window.location.pathname.substring("/post/".length) !=  store.currentPost._id) {
             const postId = window.location.pathname.substring("/post/".length);
             console.log(postId);
             await store.getPost(postId);
@@ -132,7 +132,7 @@ function PostScreen() {
         setCurrentSectionData(data);
     }
 
-    const getPostTitle = () => {
+    var getPostTitle = () => {
         if (store.currentPost.published) {
             return (
                 <Typography

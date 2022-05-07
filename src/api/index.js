@@ -33,6 +33,10 @@ export const loginUser = (payload) => api.post(`/login/`, payload)
 export const logout = () => api.post(`/auth/logout`, {withCredentials: true});
 export const updateUser = (user) => api.post('/auth/updateUser', user);
 
+//FOLLOW?UNFOLLOW USER API CALLS
+export const followUser = (payload) => api.post(`/auth/followUser`, payload);
+export const unfollowUser = (payload) => api.post(`/auth/unfollowUser`, payload)
+
 //POST ROUTES
 //pass in the mediaType string to pick the type of post being created, use MediaType options in Store index.js
 export const createPost = (mediaType) => api.post(`/post/${mediaType}/createpost`);
@@ -88,7 +92,9 @@ const apis = {
     addSection,
     deleteSection,
     getSection,
-    updateSection
+    updateSection,
+    followUser,
+    unfollowUser,
 }
 
 export default apis
