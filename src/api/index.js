@@ -73,6 +73,12 @@ export const getSection = (sectionId) => api.get(`/post/getSection/${sectionId}`
 export const updateSection = (sectionId, payload) => api.put(`/post/updateSection/${sectionId}`, payload);
 //END SECTION ROUTES
 
+//COMMENT ROUTES
+export const createComment = (sectionId, payload) => api.post(`/post/createComment/${sectionId}`, payload)
+export const replyComment = (commentId, payload) => api.post(`/post/replyComment/${commentId}`, payload)
+export const getComment = (commentId) => api.get(`/post/getComment/${commentId}`);
+//END COMMENT ROUTES
+
 const apis = {
     getUserInfo,
 
@@ -95,6 +101,9 @@ const apis = {
     updateSection,
     followUser,
     unfollowUser,
+    createComment,
+    replyComment,
+    getComment,
 }
 
 export default apis

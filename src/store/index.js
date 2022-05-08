@@ -65,6 +65,7 @@ export const GlobalStoreActionType = {
     ADD_FOLLOWER: 'ADD_FOLLOWER',
     REMOVE_FOLLOWER: 'REMOVE_FOLLOWER',
     SET_USER_POSTS: 'SET_USER_POSTS',
+    SET_COMMENT_LIST: "SET_COMMENT_LIST",
 }
 
 // WITH THIS WE'RE MAKING OUR GLOBAL DATA STORE
@@ -83,7 +84,8 @@ function GlobalStoreContextProvider(props) {
         postViewMode: null,
         profileInfo: null,
         tagPostArrays: null,
-        searchBy: SearchBy.TITLE
+        searchBy: SearchBy.TITLE,
+        comments: null,
     });
     const history = useHistory();
 
@@ -228,6 +230,12 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     ...store,
                     userPosts: payload.userPosts
+                });
+            }
+            case GlobalStoreActionType.SET_COMMENT_LIST: {
+                return setStore({
+                    ...store,
+                    comments: payload.comments
                 });
             }
             default:
@@ -930,6 +938,48 @@ function GlobalStoreContextProvider(props) {
             console.log("Something went wrong with updating section");
         }
     }
+    store.createComment = async function (sectionId, commentContent) {
+        let response = await api.createComment(sectionId, commentContent);
+        if (response.status == 200) {
+            console.log("Successfully created comment");
+        }
+        else {
+            console.log("Something went wrong with creating comment");
+        }
+    }
+
+    // store.getComment = async function (commentId) {
+    //     let response = await api.getComment(commentId);
+    //     if (response.status == 200) {
+    //         console.log(response.data.comment);
+    //     }
+    // }
+    store.replyComment = async function (commentId, replyContent) {
+        let response = await api.replyComment(commentId, replyContent);
+        if (response.status == 200) {
+            console.log("Successfully replied comment");
+        }
+        else {
+            console.log("Something went wrong with replying to comment");
+        }
+    }
+    
+    store.setCommentList = async function (commentIdList) {
+        let comments = [];
+        for (let commentId of commentIdList) {
+            let response = await api.getComment(commentId);
+            if (response.status === 200) {
+                comments.push(response.data.comment);
+            }
+        }
+        storeReducer({
+            type: GlobalStoreActionType.SET_COMMENT_LIST,
+            payload: {
+                comments: comments
+            }
+        });
+    }
+
 
     return (
         <GlobalStoreContext.Provider value={{

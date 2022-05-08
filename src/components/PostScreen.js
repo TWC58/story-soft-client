@@ -19,6 +19,8 @@ import QEditor from './QEditor';
 import QEditorReadOnly from './QEditorReadOnly.js';
 import AddIcon from '@mui/icons-material/Add';
 import { getSection } from '../api';
+import List from '@mui/material/List';
+import Comment from './Comment';
 
 /*
     This React component lets us edit a loaded list, which only
@@ -34,6 +36,7 @@ function PostScreen() {
     const [currentSectionId, setCurrentSectionId] = useState("12324");
     const [currentSectionData, setCurrentSectionData] = useState("");
     const [currentDescription, setCurrentDescription] = useState(null);
+    const [currentCommentInput, setCurrentCommentInput] = useState(null);
     const [readyToSave, setReadyToSave] = useState(false); //when updated, we know we can make API call bc react respects order of state changes
     const [loaded, setLoaded] = useState(false);
     const pStore = createStore();
@@ -59,6 +62,7 @@ function PostScreen() {
         }
         if (currentPostName === null && store.currentPost) {
             await store.recursiveSectionBuilder(store.currentPost.rootSection);
+            await store.setCommentList(store.currentPost.loadedRoot.comments);
             setCurrentPostName(store.currentPost.name);
             setCurrentSectionName(store.currentPost.loadedRoot.name);
             setCurrentSectionId(store.currentPost.loadedRoot._id);
@@ -97,6 +101,8 @@ function PostScreen() {
             setCurrentSectionId(sectionId);
             setCurrentSectionData(section.data);
             setCurrentSectionName(section.name);
+            store.setCommentList(section.comments);
+
         }
     }
 
@@ -130,6 +136,18 @@ function PostScreen() {
 
     const handleSectionDataChange = (data) => {
         setCurrentSectionData(data);
+    }
+
+    const handleCommentInputChange = (e) => {
+        setCurrentCommentInput(e.target.value);
+    }
+
+    const handleCreateComment = async () => {
+        let commentContent = {
+            "username": auth.user.username,
+            "message": currentCommentInput
+        }
+        store.createComment(currentSectionId, commentContent);
     }
 
     var getPostTitle = () => {
@@ -245,8 +263,33 @@ function PostScreen() {
                 <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Comments</Typography>
             </Box>
 
-            <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
+            <Box sx={{ borderRadius: '5px', width: '90%', height: '45%', bgcolor: theme.palette.primary.light }}>
+                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                    <TextField
+                        multiline
+                        sx={{ width: '90%', marginBottom: 0, marginTop: 1, marginRight: 0.5, marginLeft: 0.5 }}
+                        size='small'
+                        maxRows={1}
+                        variant='outlined'
+                        id="post-comment-textfield"
+                        name="comment-textfield"
+                        placeholder="Join the discussion (Max Char Limit 120)"
+                        inputProps={{ maxLength: 120, style: { fontSize: '10pt' } }}
+                        value={currentCommentInput}
+                        onChange={handleCommentInputChange}
+                    />
+                    <Button onClick={handleCreateComment} sx={{ marginBottom: 0, marginTop: 2 }} variant="contained">Post</Button>
+                </Box>
+                <Box sx={{ height: '100%' }}>
+                    <List style={{ maxHeight: '78%', overflow: 'auto' }}>
+                        {store.comments !== null ? store.comments.map((comment) => (
+                            <Comment comment={comment} />
+                        )) 
+                        : 
+                        ""}
 
+                    </List>
+                </Box>
             </Box>
         </>)
     }
