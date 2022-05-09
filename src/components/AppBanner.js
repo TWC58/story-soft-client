@@ -184,7 +184,7 @@ export default function AppBanner() {
                         </IconButton>
                         <SearchToolbar />
                         <Box sx={{ flexGrow: 1 }}>{editToolbar}</Box>
-                        {
+                        {   (!store.currentPost) ?
                             <Button sx={{paddingRight: '5%'}} variant='contained' onClick={handleMediaSwitch}>
                             {
                                 store.mediaType === MediaType.STORY ?
@@ -192,6 +192,8 @@ export default function AppBanner() {
                                 "Goto Story"
                             }
                             </Button> 
+                            :
+                            ""
                         }
                         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                             {newPostButton}
