@@ -17,6 +17,7 @@ import useStyles from '../styling/styles'
 import Explore from './Explore';
 import Following from './Following';
 import SearchPosts from './SearchPosts';
+import AuthContext from '../auth';
 
 /*
     This React component lists all the top5 lists in the UI.
@@ -25,10 +26,12 @@ import SearchPosts from './SearchPosts';
 */
 const HomeScreen = () => {
     const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
     const classes = useStyles();
 
     useEffect(() => {
-        if (store.tagPostArrays === null) {
+        if (store.tagPostArrays === null || store.followingPosts === null) {
+            console.log("Loading front page")
             store.loadFrontPageData();
         }
     }, []);
@@ -52,14 +55,14 @@ const HomeScreen = () => {
     return (
         <div id="post-selector">
             {/* <div id="homescreen-divider"></div> */}
-            {console.log("SEACH POSTS: " + store.searchPosts)}
+            {console.log("SEARCH POSTS: " + store.searchPosts)}
             <Explore exploreTags={store.tagPostArrays ? store.tagPostArrays : []}/>
 
             {
                 (store.searchPosts !== null) ? 
                 <SearchPosts/>
                 :
-                <Following posts={sampleFollowingList}/>
+                store.followingPosts ? <Following posts={store.followingPosts}/> : <Following posts={[]}/> 
             }
         </div>)
 

@@ -75,7 +75,7 @@ function GlobalStoreContextProvider(props) {
     const [store, setStore] = useState({
         mediaType: MediaType.STORY,
         explorePosts: [],
-        followingPosts: [],
+        followingPosts: null,
         searchPosts: null,
         userPosts: null,
         currentPost: null,
@@ -202,8 +202,8 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.SET_FRONT_PAGE_DATA: {
                 return setStore({
                     ...store,
-                    tagPostArrays: payload.tagPostArrays
-
+                    tagPostArrays: payload.tagPostArrays,
+                    followingPosts: payload.followingPosts
                 });
             }
             case GlobalStoreActionType.SET_SEARCH_BY: {
@@ -294,6 +294,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.loadFrontPageData = async function() {
+        //LOAD EXPLORE
         let tagsRes = await api.getTags(store.mediaType).catch((err) => {
             console.log(err);
         });
@@ -323,12 +324,33 @@ function GlobalStoreContextProvider(props) {
                     })
                 }
             }
-
+            //LOAD FOLLOWING
+            var followingPosts = null;
+            console.log("AUTH: ",auth)
+            if (auth.user){
+                followingPosts = new Array()
+                //load posts of each user followed
+                for(let followedUser of auth.user.following) {
+                    console.log("GETTING USER POSTS OF: ", followedUser)
+                    let response = await api.getPosts(store.mediaType, { search: followedUser, searchBy: "ID" }).catch((err) => {
+                        console.log(err);
+                    });
+                    console.log("USER POSTS: ", response.data.data);
+                    if (response.data.success) {
+                        followingPosts = followingPosts.concat(Array.from(response.data.data));
+                        console.log(followingPosts)
+                    }
+                }
+                followingPosts = followingPosts.filter(post => post.published).sort((a, b) => { return new Date(b.published) - new Date(a.published) });
+            }
+            
+            console.log(followingPosts)
             //save the final product to the store
             storeReducer({
                 type: GlobalStoreActionType.SET_FRONT_PAGE_DATA,
                 payload: {
-                    tagPostArrays: tagPostArrays
+                    tagPostArrays: tagPostArrays,
+                    followingPosts: followingPosts
                 }
             });
         }

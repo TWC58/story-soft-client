@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from 'react'
 import { useTheme } from '@mui/material/styles';
 import { IconButton, Typography } from '@mui/material'
-import { GlobalStoreContext } from '../store/index.js'
+import { GlobalStoreContext, LikeType } from '../store/index.js'
 import AuthContext from '../auth'
 import { useHistory } from 'react-router-dom'
 import Button from '@mui/material/Button';
@@ -21,6 +21,10 @@ import AddIcon from '@mui/icons-material/Add';
 import { getSection } from '../api';
 import List from '@mui/material/List';
 import Comment from './Comment';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 
 /*
     This React component lets us edit a loaded list, which only
@@ -68,7 +72,7 @@ function PostScreen() {
             setCurrentSectionId(store.currentPost.loadedRoot._id);
             setCurrentSectionData(store.currentPost.loadedRoot.data);
             setCurrentDescription(store.currentPost.summary);
-        } else if ((!store.currentPost && !loadAttempted) ||window.location.pathname.substring("/post/".length) !=  store.currentPost._id) {
+        } else if ((!store.currentPost && !loadAttempted) || window.location.pathname.substring("/post/".length) != store.currentPost._id) {
             const postId = window.location.pathname.substring("/post/".length);
             console.log(postId);
             await store.getPost(postId);
@@ -147,7 +151,6 @@ function PostScreen() {
             "username": auth.user.username,
             "message": currentCommentInput
         }
-        store.createComment(currentSectionId, commentContent);
     }
 
     var getPostTitle = () => {
@@ -198,6 +201,21 @@ function PostScreen() {
                 onChange={handleSectionNameChange}
             />
         )
+    }
+
+    const getPostAuthor = () => {
+        if (store.currentPost.published) {
+            return (
+                <Typography
+                    sx={{ width: '95%', marginBottom: 2, fontSize: 16, fontWeight: 'bold' }}
+                    id="post-author-textfield"
+                    name="title"
+                    onClick={handleGoToUser}>
+                    {store.currentPost.userData ? store.currentPost.userData.username : ""}
+                </Typography>
+            )
+        }
+        return "";
     }
 
     const getDescription = () => {
@@ -284,9 +302,9 @@ function PostScreen() {
                     <List style={{ maxHeight: '78%', overflow: 'auto' }}>
                         {store.comments !== null ? store.comments.map((comment) => (
                             <Comment comment={comment} />
-                        )) 
-                        : 
-                        ""}
+                        ))
+                            :
+                            ""}
 
                     </List>
                 </Box>
@@ -304,6 +322,72 @@ function PostScreen() {
 
     const getSectionContent = () => {
 
+    }
+
+    const handleGoToUser = (e) => {
+        store.pushToHistory(`/profile/${store.currentPost.userData.userId}`);
+    }
+
+    const getLikeArea = () => {
+        if (store.currentPost.published) {
+            return (
+                <div id="like-area">
+                    <span>
+                        <IconButton onClick={handleThumbUp} disabled={!auth.user || !auth.loggedIn || !store.currentPost.published}>
+                            <ThumbUpOffAltIcon sx={{ fontSize: '24pt' }}  color={(auth.user && auth.userHasLike(store.currentPost._id)) ? "secondary" : "default"} />
+                        </IconButton>
+                    </span>
+                    <span className="like-display">
+                        {store.currentPost.likes}
+                    </span>
+                    <span>
+                        <IconButton onClick={handleThumbDown} disabled={!auth.user || !auth.loggedIn || !store.currentPost.published}>
+                            <ThumbDownOffAltIcon sx={{ fontSize: '24pt' }} color={(auth.user && auth.userHasDislike(store.currentPost._id)) ? "secondary" : "default"} />
+                        </IconButton>
+                    </span>
+                    <span className="like-display">
+                        {store.currentPost.dislikes}
+                    </span>
+                </div>
+            );
+        }
+        return "";
+    }
+
+    async function handleThumbUp() {
+        const postId = store.currentPost._id;
+        const success = await store.likePost(postId, LikeType.LIKE);
+        if (success) {
+            if (auth.userHasLike(postId)) {
+                store.currentPost.likes--;
+            } else {
+                store.currentPost.likes++;
+            }
+
+            if (auth.userHasDislike(postId)) {
+                store.currentPost.dislikes--;
+            }
+
+            auth.getLoggedIn();
+        }
+    }
+
+    async function handleThumbDown() {
+        const postId = store.currentPost._id;
+        const success = await store.likePost(postId, LikeType.DISLIKE);
+        if (success) {
+            if (auth.userHasDislike(postId)) {
+                store.currentPost.dislikes--;
+            } else {
+                store.currentPost.dislikes++;
+            }
+
+            if (auth.userHasLike(postId)) {
+                store.currentPost.likes--;
+            }
+
+            auth.getLoggedIn();
+        }
     }
 
     const theme = useTheme();
@@ -339,6 +423,16 @@ function PostScreen() {
                     }</>
                     <>{store.currentPost ?
                         getSectionTitle()
+                        :
+                        null
+                    }</>
+                    <>{store.currentPost ?
+                        getPostAuthor()
+                        :
+                        null
+                    }</>
+                    <>{store.currentPost ?
+                        getLikeArea()
                         :
                         null
                     }</>

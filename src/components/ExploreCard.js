@@ -69,16 +69,16 @@ export const ExploreCard = ({ post }) => {
                     <Box sx={{ height: '95%' }}>
                         <div id="like-area">
                             <span>
-                                <IconButton onClick={handleThumbUp}>
-                                    <ThumbUpOffAltIcon sx={{fontSize:'24pt'}} disabled={!auth.user || !auth.loggedIn || !post.published} color={(auth.user && auth.userHasLike(post._id)) ? "secondary" : "default"} />
+                                <IconButton onClick={handleThumbUp} disabled={!auth.user || !auth.loggedIn || !post.published}>
+                                    <ThumbUpOffAltIcon sx={{fontSize:'24pt'}} color={(auth.user && auth.userHasLike(post._id)) ? "secondary" : "default"} />
                                 </IconButton>
                             </span>
                             <span className="like-display">
                                 {post.likes}
                             </span>
                             <span>
-                                <IconButton onClick={handleThumbDown}>
-                                    <ThumbDownOffAltIcon sx={{fontSize:'24pt'}} disabled={!auth.user || !auth.loggedIn || !post.published} color={(auth.user && auth.userHasDislike(post._id)) ? "secondary" : "default"} />
+                                <IconButton onClick={handleThumbDown} disabled={!auth.user || !auth.loggedIn || !post.published}>
+                                    <ThumbDownOffAltIcon sx={{fontSize:'24pt'}} color={(auth.user && auth.userHasDislike(post._id)) ? "secondary" : "default"} />
                                 </IconButton>
                             </span>
                             <span className="like-display">

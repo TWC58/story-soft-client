@@ -1,6 +1,7 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useHistory } from 'react-router-dom'
 import api from '../api'
+import { GlobalStoreContext } from '../store'
 
 const AuthContext = createContext();
 console.log("create AuthContext: " + AuthContext);
@@ -30,6 +31,8 @@ const testUser = {
 }
 
 function AuthContextProvider(props) {
+
+    const { store } = useContext(GlobalStoreContext);
 
     const [auth, setAuth] = useState({
         // user: null,
@@ -195,7 +198,9 @@ function AuthContextProvider(props) {
                     user: response.data
                 }
             });
+            //store.loadFrontPageData();
         }
+        
     }
 
     auth.registerUser = async function (userData, store) {
