@@ -198,7 +198,7 @@ function AuthContextProvider(props) {
                     user: response.data
                 }
             });
-            //store.loadFrontPageData();
+  
         }
         
     }

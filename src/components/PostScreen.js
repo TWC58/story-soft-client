@@ -106,7 +106,6 @@ function PostScreen() {
             setCurrentSectionData(section.data);
             setCurrentSectionName(section.name);
             store.setCommentList(section.comments);
-
         }
     }
 
@@ -147,9 +146,12 @@ function PostScreen() {
     }
 
     const handleCreateComment = async () => {
-        let commentContent = {
-            "username": auth.user.username,
-            "message": currentCommentInput
+        if (currentCommentInput){
+            let commentContent = {
+                "username": auth.user.username,
+                "message": currentCommentInput
+            }
+            store.createComment(currentSectionId, commentContent);
         }
     }
 
@@ -301,10 +303,10 @@ function PostScreen() {
                 <Box sx={{ height: '100%' }}>
                     <List style={{ maxHeight: '78%', overflow: 'auto' }}>
                         {store.comments !== null ? store.comments.map((comment) => (
-                            <Comment comment={comment} />
-                        ))
-                            :
-                            ""}
+                            <Comment comment={comment} sectionId={currentSectionId} />
+                        )) 
+                        : 
+                        ""}
 
                     </List>
                 </Box>
