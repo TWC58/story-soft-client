@@ -942,6 +942,11 @@ function GlobalStoreContextProvider(props) {
         let response = await api.createComment(sectionId, commentContent);
         if (response.status == 200) {
             console.log("Successfully created comment");
+            let response = await api.getSection(sectionId);
+            if (response.status == 200) {
+                let updatedSectionCommentIds = response.data.section.comments;
+                store.setCommentList(updatedSectionCommentIds);
+            }
         }
         else {
             console.log("Something went wrong with creating comment");
@@ -954,10 +959,15 @@ function GlobalStoreContextProvider(props) {
     //         console.log(response.data.comment);
     //     }
     // }
-    store.replyComment = async function (commentId, replyContent) {
+    store.replyComment = async function (commentId, replyContent, sectionId) {
         let response = await api.replyComment(commentId, replyContent);
         if (response.status == 200) {
             console.log("Successfully replied comment");
+            let response = await api.getSection(sectionId);
+            if (response.status == 200) {
+                let updatedSectionCommentIds = response.data.section.comments;
+                store.setCommentList(updatedSectionCommentIds);
+            }
         }
         else {
             console.log("Something went wrong with replying to comment");

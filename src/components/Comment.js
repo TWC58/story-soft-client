@@ -14,7 +14,7 @@ export default function Comment(props) {
 
     const [currentReplyInput, setCurrentReplyInput] = useState(null);
 
-    const { comment } = props;
+    const { comment, sectionId } = props;
 
     const handleReplyInputChange = (e) => {
         setCurrentReplyInput(e.target.value);
@@ -25,7 +25,7 @@ export default function Comment(props) {
             "username": auth.user.username,
             "message": currentReplyInput
         }
-        store.replyComment(comment._id, replyContent);
+        store.replyComment(comment._id, replyContent, sectionId);
     }
     return (
         <ListItem>
