@@ -85,7 +85,7 @@ function GlobalStoreContextProvider(props) {
         profileInfo: null,
         tagPostArrays: null,
         searchBy: SearchBy.TITLE,
-        comments: null,
+        comments: null
     });
     const history = useHistory();
 
@@ -116,13 +116,19 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.SET_MEDIA: {
                 console.log("SET MEDIA to " + payload.mediaType);
                 return setStore({
-                    ...store,
                     mediaType: payload.mediaType,
-                    explorePosts: store.explorePosts,
-                    followingPosts: store.followingPosts,
+                    explorePosts: [],
+                    followingPosts: [],
+                    searchPosts: null,
+                    userPosts: null,
                     currentPost: null,
                     postMarkedForDeletion: null,
-                    postViewMode: null
+                    sectionMarkedForDeletion: null,
+                    postViewMode: null,
+                    profileInfo: null,
+                    tagPostArrays: null,
+                    searchBy: SearchBy.TITLE,
+                    comments: null
                 });
             }
             case GlobalStoreActionType.SET_EXPLORE_POSTS: {
@@ -791,6 +797,24 @@ function GlobalStoreContextProvider(props) {
             type: GlobalStoreActionType.UNMARK_SECTION_FOR_DELETION,
             payload: { deletedSection: null }
         });
+    }
+
+    store.reinitState = () => {
+        setStore({
+            mediaType: MediaType.STORY,
+            explorePosts: [],
+            followingPosts: [],
+            searchPosts: null,
+            userPosts: null,
+            currentPost: null,
+            postMarkedForDeletion: null,
+            sectionMarkedForDeletion: null,
+            postViewMode: null,
+            profileInfo: null,
+            tagPostArrays: null,
+            searchBy: SearchBy.TITLE,
+            comments: null
+        })
     }
 
     store.initState = () => {
