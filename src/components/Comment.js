@@ -33,7 +33,7 @@ export default function Comment(props) {
         <ListItem>
             <Box sx={{ fontFamily: 'Arial, sans-serif', width: '100%' }}>
                 <Typography style={{ fontSize: 15, fontWeight: 'bold' }}>{comment.username}</Typography>
-                <Typography style={{ fontSize: 12, color: '#3d3d3d' }}>{comment.createdAt}</Typography>
+                <Typography style={{ fontSize: 12, color: '#3d3d3d' }}>{(new Date(comment.createdAt)).toDateString()}</Typography>
                 <Typography style={{ fontSize: 13, marginBottom: 2 }}>{comment.message}</Typography>
                 {auth.user?
                 store.currentPost.userData.userId === auth.user._id && comment.reply.message === null
