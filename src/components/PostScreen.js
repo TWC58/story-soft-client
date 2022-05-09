@@ -146,12 +146,14 @@ function PostScreen() {
     }
 
     const handleCreateComment = async () => {
-        if (currentCommentInput){
-            let commentContent = {
-                "username": auth.user.username,
-                "message": currentCommentInput
+        if (auth.user) {
+            if (currentCommentInput) {
+                let commentContent = {
+                    "username": auth.user.username,
+                    "message": currentCommentInput
+                }
+                store.createComment(currentSectionId, commentContent);
             }
-            store.createComment(currentSectionId, commentContent);
         }
     }
 
@@ -304,9 +306,9 @@ function PostScreen() {
                     <List style={{ maxHeight: '78%', overflow: 'auto' }}>
                         {store.comments !== null ? store.comments.map((comment) => (
                             <Comment comment={comment} sectionId={currentSectionId} />
-                        )) 
-                        : 
-                        ""}
+                        ))
+                            :
+                            ""}
 
                     </List>
                 </Box>
@@ -336,7 +338,7 @@ function PostScreen() {
                 <div id="like-area">
                     <span>
                         <IconButton onClick={handleThumbUp} disabled={!auth.user || !auth.loggedIn || !store.currentPost.published}>
-                            <ThumbUpOffAltIcon sx={{ fontSize: '24pt' }}  color={(auth.user && auth.userHasLike(store.currentPost._id)) ? "secondary" : "default"} />
+                            <ThumbUpOffAltIcon sx={{ fontSize: '24pt' }} color={(auth.user && auth.userHasLike(store.currentPost._id)) ? "secondary" : "default"} />
                         </IconButton>
                     </span>
                     <span className="like-display">

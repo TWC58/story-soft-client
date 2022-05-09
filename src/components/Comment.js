@@ -21,11 +21,13 @@ export default function Comment(props) {
         console.log(currentReplyInput);
     }
     const handleReplyToComment = async () => {
-        let replyContent = {
+        if(auth.user){
+            let replyContent = {
             "username": auth.user.username,
             "message": currentReplyInput
-        }
+            }
         store.replyComment(comment._id, replyContent, sectionId);
+        }
     }
     return (
         <ListItem>
@@ -33,7 +35,8 @@ export default function Comment(props) {
                 <Typography style={{ fontSize: 15, fontWeight: 'bold' }}>{comment.username}</Typography>
                 <Typography style={{ fontSize: 12, color: '#3d3d3d' }}>{comment.createdAt}</Typography>
                 <Typography style={{ fontSize: 13, marginBottom: 2 }}>{comment.message}</Typography>
-                {store.currentPost.userData.userId === auth.user._id && comment.reply.message === null
+                {auth.user?
+                store.currentPost.userData.userId === auth.user._id && comment.reply.message === null
                     ?
                     <TextField
                         multiline
@@ -56,11 +59,12 @@ export default function Comment(props) {
                         <Box sx={{ paddingLeft: 2 }}>
                             <Typography style={{ fontSize: 13, fontWeight: 'bold' }}>{comment.reply.username} (Author)</Typography>
                             <Typography style={{ fontSize: 12.5 }}>{comment.reply.message}</Typography>
-                        </Box>}
+                        </Box>: null}
             </Box>
-            {store.currentPost.userData.userId === auth.user._id && comment.reply.message == null
+            {auth.user?
+            store.currentPost.userData.userId === auth.user._id && comment.reply.message == null
                 ? <Button onClick={handleReplyToComment}>Reply</Button>
-                : null}
+                : null: null}
         </ListItem>
     )
 }
