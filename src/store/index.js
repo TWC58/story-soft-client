@@ -75,7 +75,7 @@ function GlobalStoreContextProvider(props) {
     const [store, setStore] = useState({
         mediaType: MediaType.STORY,
         explorePosts: [],
-        followingPosts: [],
+        followingPosts: null,
         searchPosts: null,
         userPosts: null,
         currentPost: null,
@@ -208,8 +208,8 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.SET_FRONT_PAGE_DATA: {
                 return setStore({
                     ...store,
-                    tagPostArrays: payload.tagPostArrays
-
+                    tagPostArrays: payload.tagPostArrays,
+                    followingPosts: payload.followingPosts
                 });
             }
             case GlobalStoreActionType.SET_SEARCH_BY: {
@@ -300,6 +300,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.loadFrontPageData = async function() {
+        //LOAD EXPLORE
         let tagsRes = await api.getTags(store.mediaType).catch((err) => {
             console.log(err);
         });
@@ -329,12 +330,33 @@ function GlobalStoreContextProvider(props) {
                     })
                 }
             }
-
+            //LOAD FOLLOWING
+            var followingPosts = null;
+            console.log("AUTH: ",auth)
+            if (auth.user){
+                followingPosts = new Array()
+                //load posts of each user followed
+                for(let followedUser of auth.user.following) {
+                    console.log("GETTING USER POSTS OF: ", followedUser)
+                    let response = await api.getPosts(store.mediaType, { search: followedUser, searchBy: "ID" }).catch((err) => {
+                        console.log(err);
+                    });
+                    console.log("USER POSTS: ", response.data.data);
+                    if (response.data.success) {
+                        followingPosts = followingPosts.concat(Array.from(response.data.data));
+                        console.log(followingPosts)
+                    }
+                }
+                followingPosts = followingPosts.filter(post => post.published).sort((a, b) => { return new Date(b.published) - new Date(a.published) });
+            }
+            
+            console.log(followingPosts)
             //save the final product to the store
             storeReducer({
                 type: GlobalStoreActionType.SET_FRONT_PAGE_DATA,
                 payload: {
-                    tagPostArrays: tagPostArrays
+                    tagPostArrays: tagPostArrays,
+                    followingPosts: followingPosts
                 }
             });
         }
@@ -966,6 +988,11 @@ function GlobalStoreContextProvider(props) {
         let response = await api.createComment(sectionId, commentContent);
         if (response.status == 200) {
             console.log("Successfully created comment");
+            let response = await api.getSection(sectionId);
+            if (response.status == 200) {
+                let updatedSectionCommentIds = response.data.section.comments;
+                store.setCommentList(updatedSectionCommentIds);
+            }
         }
         else {
             console.log("Something went wrong with creating comment");
@@ -978,10 +1005,15 @@ function GlobalStoreContextProvider(props) {
     //         console.log(response.data.comment);
     //     }
     // }
-    store.replyComment = async function (commentId, replyContent) {
+    store.replyComment = async function (commentId, replyContent, sectionId) {
         let response = await api.replyComment(commentId, replyContent);
         if (response.status == 200) {
             console.log("Successfully replied comment");
+            let response = await api.getSection(sectionId);
+            if (response.status == 200) {
+                let updatedSectionCommentIds = response.data.section.comments;
+                store.setCommentList(updatedSectionCommentIds);
+            }
         }
         else {
             console.log("Something went wrong with replying to comment");
