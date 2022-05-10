@@ -37,7 +37,7 @@ export default function ProfileScreenWithId() {
     const { auth } = useContext(AuthContext);
     const { store } = useContext(GlobalStoreContext);
 
-    const profileId = window.location.href.substring(30);
+    const profileId = window.location.pathname.substring("/profile/".length);
 
     useEffect(() => {
         if (!store.profileInfo || store.profileInfo._id != profileId) {
