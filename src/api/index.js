@@ -17,7 +17,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'
 axios.defaults.withCredentials = true;
 const api = axios.create({
     baseURL: BACKEND_URL,
-    headers: {'Access-Control-Allow-Origin': 'https://story-soft-client.herokuapp.com'},
+    headers: {'Access-Control-Allow-Origin': 'https://story-soft.herokuapp.com'},
 });
 
 // THESE ARE ALL THE REQUESTS WE`LL BE MAKING, ALL REQUESTS HAVE A
