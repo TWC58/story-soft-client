@@ -34,7 +34,7 @@ const HomeScreen = () => {
             console.log("Loading front page")
             store.loadFrontPageData();
         }
-    }, []);
+    });
 
     const examplePost = {
         name: 'Example Title',
