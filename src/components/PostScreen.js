@@ -43,9 +43,12 @@ function PostScreen() {
     const [currentCommentInput, setCurrentCommentInput] = useState(null);
     const [readyToSave, setReadyToSave] = useState(false); //when updated, we know we can make API call bc react respects order of state changes
     const [loaded, setLoaded] = useState(false);
-    const pStore = createStore();
+    const[pStore, setPStore] = useState(createStore());
+    console.log("pStore created");
+    let comicSectionData = {};
 
     let loadAttempted = false;
+    let isComicLoaded = true;
 
     useEffect(async () => {
         if (loaded) setLoaded(false);
@@ -65,6 +68,7 @@ function PostScreen() {
             setReadyToSave(false);
         }
         if (currentPostName === null && store.currentPost) {
+            isComicLoaded = false;
             await store.recursiveSectionBuilder(store.currentPost.rootSection);
             await store.setCommentList(store.currentPost.loadedRoot.comments);
             setCurrentPostName(store.currentPost.name);
@@ -72,6 +76,13 @@ function PostScreen() {
             setCurrentSectionId(store.currentPost.loadedRoot._id);
             setCurrentSectionData(store.currentPost.loadedRoot.data);
             setCurrentDescription(store.currentPost.summary);
+
+            if (store.mediaType === MediaType.COMIC && store.currentPost.loadedRoot.data) {
+                console.log("LOADING ROOT COMIC DATA: " + JSON.stringify(store.currentPost.loadedRoot.data));
+                pStore.loadJSON(store.currentPost.loadedRoot.data);
+                await pStore.waitLoading();
+            }
+                
         } else if ((!store.currentPost && !loadAttempted) || window.location.pathname.substring("/post/".length) != store.currentPost._id) {
             const postId = window.location.pathname.substring("/post/".length);
             console.log(postId);
@@ -83,7 +94,23 @@ function PostScreen() {
         } else if (loadAttempted) {
             auth.setError("Post not found!");
         }
+
+        if (store.mediaType === MediaType.COMIC && currentSectionData != "" && JSON.stringify(currentSectionData) != JSON.stringify(pStore.toJSON())) {
+            console.log("Use effect comic load: " + currentSectionData);
+            pStore.loadJSON(currentSectionData === "" || !currentSectionData ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : currentSectionData);
+            await pStore.waitLoading();
+            isComicLoaded = true;
+        }
     }, [readyToSave, loaded, currentSectionId, currentPostName]);
+
+    //comic saving
+    pStore?.on('change', () => {
+        if (JSON.stringify(pStore.toJSON()) != JSON.stringify({"width":1080,"height":1080,"fonts":[],"pages":[]}) && JSON.stringify(pStore.toJSON()) != JSON.stringify(currentSectionData)) {
+            console.log("onChange save comic, new value: " + JSON.stringify(pStore.toJSON()) + " old value: " + JSON.stringify(currentSectionData));
+            // comicSectionData = pStore.toJSON();
+            setCurrentSectionData(pStore.toJSON());
+        }
+    });
 
     const handlePostNameChange = (e) => {
         setCurrentPostName(e.target.value);
@@ -100,6 +127,7 @@ function PostScreen() {
 
     const handleSetCurrentSection = (sectionId) => {
         if (currentSectionId !== sectionId) {
+            isComicLoaded = false;
             //if (!(store.currentPost?.published))
             const section = store.findLoadedSection(sectionId);
             setCurrentSectionId(sectionId);
@@ -268,7 +296,7 @@ function PostScreen() {
 
             <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
                 {
-                    store.mediaType === MediaType.COMIC ?
+                    (store.mediaType === MediaType.COMIC) && pStore ?
                         <SidePanelWrap>
                             <SidePanel store={pStore} />
                         </SidePanelWrap>
@@ -446,13 +474,17 @@ function PostScreen() {
                                 <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
                                     <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData} />
                                 </Box> :
+                                (pStore) ?
                                 // <ComicWorkspace />
                                 <WorkspaceWrap>
                                     {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
                                     <Toolbar store={pStore} />
                                     <Workspace store={pStore} components={{ PageControls: () => null }} style={{}} />
                                     <ZoomButtons store={pStore} />
-                                </WorkspaceWrap>)
+                                </WorkspaceWrap>
+                                :
+                                "")
+                                
                             :
                             <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
                                 <QEditorReadOnly currentSectionData={currentSectionData} />
