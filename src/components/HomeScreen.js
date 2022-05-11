@@ -30,7 +30,7 @@ const HomeScreen = () => {
     const classes = useStyles();
 
     useEffect(() => {
-        if (store.tagPostArrays === null || store.followingPosts === null) {
+        if (store.tagPostArrays === null || (store.followingPosts === null && auth.loggedIn)) {
             console.log("Loading front page")
             store.loadFrontPageData();
         }
@@ -62,7 +62,7 @@ const HomeScreen = () => {
                 (store.searchPosts !== null) ? 
                 <SearchPosts/>
                 :
-                store.followingPosts ? <Following posts={store.followingPosts}/> : <Following posts={[]}/> 
+                <Following posts={store.followingPosts}/>
             }
         </div>)
 
