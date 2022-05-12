@@ -4,6 +4,7 @@ import { React, useContext } from 'react'
 import { Route, Switch } from 'react-router-dom'
 
 import { GlobalStoreContextProvider } from './store'
+import AuthContext from './auth';
 import {
     AppBanner,
     HomeScreen,
@@ -16,7 +17,8 @@ import {
     ModalAlert,
     ModalDeletePost,
     ProfileScreenWithId,
-    ModalDeleteSection
+    ModalDeleteSection,
+    ModalDeleteUser,
 } from './components';
 import ComicGen from "./components/comicGen";
 import { ThemeProvider } from '@mui/material/styles';
@@ -26,12 +28,14 @@ import { LoginSuccess, LoginFailure } from './components/google/loginSuccess';
 
 const ThemeWrapper = () => {
     const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
     const currentTheme = store.mediaType === "STORY" ? storyTheme : comicTheme;
 
     return (
         <ThemeProvider theme={currentTheme}>
             <ModalDeletePost />
             <ModalDeleteSection />
+            <ModalDeleteUser />
             <ModalAlert />
             <AppBanner />
             <Switch>

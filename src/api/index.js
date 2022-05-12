@@ -33,6 +33,7 @@ export const registerUser = (payload) => api.post(`/register/`, payload)
 export const loginUser = (payload) => api.post(`/login/`, payload)
 export const logout = () => api.post(`/auth/logout`, {withCredentials: true});
 export const updateUser = (user) => api.post('/auth/updateUser', user);
+export const deleteUser = () => api.delete('auth/deleteUser');
 
 //FOLLOW?UNFOLLOW USER API CALLS
 export const followUser = (payload) => api.post(`/auth/followUser`, payload);
@@ -88,7 +89,7 @@ const apis = {
     loginUser,
     logout,
     updateUser,//store-soft
-
+    deleteUser,
     createPost,
     updatePost,
     getPost,

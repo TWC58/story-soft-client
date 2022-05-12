@@ -138,7 +138,7 @@ export default function AppBanner() {
     };
 
     function getAccountMenu(loggedIn) {
-        if (auth.loggedIn) {
+        if (auth.loggedIn && auth.user) {
             //need to show user initials
             return <img
                 style={{ borderRadius: '50%', height: '50px', width: '50px' }}

@@ -47,8 +47,12 @@ export default function ProfileScreen() {
 
     useEffect(() => {
         //TODO load posts by current user, split into published/unpublished, then feed to mostpopular and unpublished components
-        auth.user ? store.userPosts ? console.log("USER POSTS: ", store.userPosts) : store.getUserPosts(auth.user._id, 'ID') : console.log("NO CURRENT USER");
-        console.log("POSTS FOR PROFILE:", store.searchPosts);
+        auth.user ?
+            store.userPosts ?
+                console.log("USER POSTS: ", store.userPosts)
+                :
+                store.getUserPosts(auth.user._id, 'ID')
+            : console.log("NO CURRENT USER")
     });
 
     const examplePost = {
@@ -67,10 +71,15 @@ export default function ProfileScreen() {
             handleSave();
         setEditActive(!editActive);
     }
+    
+    const handleDeleteProfile = () => {
+        console.log("delete profile modal open triggered")
+        auth.markUserForDeletion();
+    }
 
     const handleSave = () => {
         //update the users info on the server with the entered info
-        if(profileImage == "") setProfileImage(auth.user.profile_pic_url);
+        if (profileImage == "") setProfileImage(auth.user.profile_pic_url);
         auth.updateUser({
             id: auth.user._id,
             username: username,
@@ -92,12 +101,12 @@ export default function ProfileScreen() {
 
     const handleImageChange = async (e) => { //TODO with cloudinary
         const img = e.target.files[0];
-        console.log(img);    
+        console.log(img);
         const formData = new FormData();
-        formData.append("api_key",'');
+        formData.append("api_key", '');
         formData.append("file", img);
         formData.append("upload_preset", "story-soft");
-        Axios.post("https://api.cloudinary.com/v1_1/dkyezrwib/image/upload", formData, { withCredentials: false}).then((response) => {
+        Axios.post("https://api.cloudinary.com/v1_1/dkyezrwib/image/upload", formData, { withCredentials: false }).then((response) => {
             console.log(response);
             if (response.status === 200) setProfileImage(response.data.url);
         });
@@ -109,7 +118,7 @@ export default function ProfileScreen() {
 
     return (
         <div className="flex-row" style={{ maxHeight: '90%', maxWidth: '100%', topMargin: '5%', bottomMargin: '5%' }}>
-            <div style={{ textAlign: 'center', alignContent: 'center', width: '25%', paddingTop: '5%' }}>
+            <div className="flex-container" style={{ textAlign: 'center', alignContent: 'center', width: '25%', paddingTop: '5%' }}>
                 <div className="image-overlay-container">
                     <img
                         style={{ borderRadius: '50%', height: '300px', width: '300px' }}
@@ -119,7 +128,7 @@ export default function ProfileScreen() {
                         editActive ?
                             <label htmlFor="contained-button-file">
                                 <Input onChange={handleImageChange} accept="image/*" id="contained-button-file" multiple type="file" />
-                                <Button variant="contained" component="span">
+                                <Button variant="contained" component="span" sx={{ p: 1 }}>
                                     Upload Image
                                 </Button>
                             </label>
@@ -149,8 +158,14 @@ export default function ProfileScreen() {
                         <Button onClick={handleDiscard} variant='contained' sx={{ display: 'block', marginTop: '20px' }}>Discard</Button>
                         : ""
                 }
+                
                 <Button onClick={handleEditProfile} variant='contained' sx={{ display: 'block', marginTop: '20px' }}>{editActive ? "Save" : "Edit Profile"}</Button>
+                { 
+                    editActive ? <Button onClick={handleDeleteProfile} type="button" variant="contained" className="workspace-button"  >Delete Account</Button> 
+                    : ""
+                }
             </div>
+
             <div style={{ textAlign: 'center', alignContent: 'center', width: '37.5%', maxHeight: '100%', overflowY: 'scroll' }}>
                 <MostPopular posts={auth.user ? store.userPosts ? Array.from(store.userPosts).filter(x => x.published) : [] : []} />
             </div>

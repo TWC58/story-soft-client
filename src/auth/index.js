@@ -15,6 +15,9 @@ export const AuthActionType = {
     ERROR: "ERROR",
     ADD_FOLLOWED: "ADD_FOLLOWED",
     REMOVE_FOLLOWED: "REMOVE_FOLLOWED",
+    MARK_USER_FOR_DELETION: "MARK_USER_FOR_DELETION",
+    UNMARK_USER_FOR_DELETION: "UNMARK_USER_FOR_DELETION",
+    DELETE_USER: "DELETE_USER",
 }
 
 const testUser = {
@@ -38,7 +41,8 @@ function AuthContextProvider(props) {
         // user: null,
         user: null,
         loggedIn: false,
-        error: null
+        error: null,
+        userMarkedForDeletion: false,
     });
     const history = useHistory();
 
@@ -100,6 +104,26 @@ function AuthContextProvider(props) {
                     user: { ...auth.user, following: removeItemAll(auth.user.following, payload.unfollowed) }
                 });
             }
+            case AuthActionType.MARK_USER_FOR_DELETION: {
+                return setAuth({
+                    ...auth,
+                    userMarkedForDeletion: true,
+                });
+            }
+            case AuthActionType.UNMARK_USER_FOR_DELETION: {
+                return setAuth({
+                    ...auth,
+                    userMarkedForDeletion: false,
+                });
+            }
+            case AuthActionType.DELETE_USER: {
+                return setAuth({
+                    ...auth,
+                    isLoggedIn: false,
+                    user: null,
+                    userMarkedForDeletion: false,
+                });
+            }
             default:
                 return auth;
         }
@@ -114,8 +138,31 @@ function AuthContextProvider(props) {
                 ++i;
             }
         }
-        if(arr.length) return arr;
+        if (arr.length) return arr;
         return new Array();
+    }
+
+    auth.markUserForDeletion = async () => {
+        return authReducer({
+            type: AuthActionType.MARK_USER_FOR_DELETION,
+        });
+    }
+
+    auth.unmarkUserForDeletion = async () => {
+        return authReducer({
+            type: AuthActionType.UNMARK_USER_FOR_DELETION,
+        });
+    }
+
+    auth.deleteMarkedUser = async () => {
+        let res = await api.deleteUser().catch((err) => {
+            console.log(err);
+        })
+        if(res.status == 200){
+            return authReducer({
+                type: AuthActionType.DELETE_USER,
+            });
+        }
     }
 
     auth.addFollowed = async (payload) => {
@@ -198,9 +245,9 @@ function AuthContextProvider(props) {
                     user: response.data
                 }
             });
-  
+
         }
-        
+
     }
 
     auth.registerUser = async function (userData, store) {

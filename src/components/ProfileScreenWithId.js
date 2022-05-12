@@ -73,7 +73,7 @@ export default function ProfileScreenWithId() {
                 {
                     <Typography variant='h5' sx={{ marginTop: '20px' }}><strong>{store.profileInfo ? store.profileInfo.username : "Username"}</strong></Typography>
                 }
-                <Typography variant='h7' sx={{ display: 'block', marginTop: '20px' }}><strong>0</strong> Followers</Typography>
+                <Typography variant='h7' sx={{ display: 'block', marginTop: '20px' }}><strong>{store.profileInfo?.followers?.length}</strong> Followers</Typography>
                 {
                     <Typography className="profile-bio" sx={{ display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px' }}>{store.profileInfo ? store.profileInfo.bio : "Example bio"}</Typography>
                 }

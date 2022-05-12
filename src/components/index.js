@@ -11,6 +11,7 @@ import WorkspaceScreen from './WorkspaceScreen'
 import ModalAlert from './ModalAlert'
 import ModalDeletePost from './ModalDeletePost'
 import ModalDeleteSection from './ModalDeleteSection'
+import ModalDeleteUser from './ModalDeleteUser'
 import ListItemsSummary from './ListItemsSummary'
 import ListCommentArea from './ListCommentArea'
 import Comment from './Comment'
@@ -44,5 +45,6 @@ export {
     Comment,
     PostScreen,
     ProfileScreenWithId,
-    ModalDeleteSection
+    ModalDeleteSection,
+    ModalDeleteUser,
 }
