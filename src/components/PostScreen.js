@@ -25,7 +25,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
-
+import { DownloadButton } from 'polotno/toolbar/download-button';
 /*
     This React component lets us edit a loaded list, which only
     happens when we are on the proper route.
@@ -48,7 +48,7 @@ function PostScreen() {
     let comicSectionData = {};
 
     let loadAttempted = false;
-    let isComicLoaded = true;
+    let isComicLoaded = false;
 
     useEffect(async () => {
         if (loaded) setLoaded(false);
@@ -60,10 +60,12 @@ function PostScreen() {
             loadedCurrentSection.name = currentSectionName;
             loadedCurrentSection.data = currentSectionData;
 
+            let comicBase64 = (store.mediaType === MediaType.COMIC) ? pStore.toDataURL() : null;
+
             await store.updatePost(store.currentPost);
             await store.updateSection(currentSectionId, {
                 name: currentSectionName,
-                data: currentSectionData
+                data: (comicBase64 && store.currentPost.published) ? comicBase64 : currentSectionData
             });
             setReadyToSave(false);
         }
@@ -77,7 +79,7 @@ function PostScreen() {
             setCurrentSectionData(store.currentPost.loadedRoot.data);
             setCurrentDescription(store.currentPost.summary);
 
-            if (store.mediaType === MediaType.COMIC && store.currentPost.loadedRoot.data) {
+            if (!store.currentPost?.published && store.mediaType === MediaType.COMIC && store.currentPost.loadedRoot.data) {
                 console.log("LOADING ROOT COMIC DATA: " + JSON.stringify(store.currentPost.loadedRoot.data));
                 pStore.loadJSON(store.currentPost.loadedRoot.data);
                 await pStore.waitLoading();
@@ -95,11 +97,14 @@ function PostScreen() {
             auth.setError("Post not found!");
         }
 
-        if (store.mediaType === MediaType.COMIC && currentSectionData != "" && JSON.stringify(currentSectionData) != JSON.stringify(pStore.toJSON())) {
+        if (!store.currentPost?.published && store.mediaType === MediaType.COMIC && currentSectionData != "" && JSON.stringify(currentSectionData) != JSON.stringify(pStore.toJSON())) {
             console.log("Use effect comic load: " + currentSectionData);
-            pStore.loadJSON(currentSectionData === "" || !currentSectionData ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : currentSectionData);
-            await pStore.waitLoading();
-            isComicLoaded = true;
+            if (currentSectionData != "" && currentSectionData) {
+                pStore.loadJSON(currentSectionData);
+                await pStore.waitLoading();
+                isComicLoaded = true;
+            }
+            
         }
     }, [readyToSave, loaded, currentSectionId, currentPostName]);
 
@@ -122,6 +127,7 @@ function PostScreen() {
     }
 
     const handleSave = async () => {
+        console.log(pStore.toDataURL());
         setReadyToSave(true); //wait for this to call useEffect and save
     }
 
@@ -297,7 +303,7 @@ function PostScreen() {
             <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
                 {
                     (store.mediaType === MediaType.COMIC) && pStore ?
-                        <SidePanelWrap>
+                        <SidePanelWrap >
                             <SidePanel store={pStore} />
                         </SidePanelWrap>
                         :
@@ -469,26 +475,55 @@ function PostScreen() {
                         null
                     }</>
                     {
-                        (!store.currentPost?.published) ?
+                        (!store.currentPost?.published || readyToSave && store.mediaType === MediaType.COMIC) ?
                             (store.mediaType === MediaType.STORY ?
-                                <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
+                                <Box className="bp4-dark" sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
                                     <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData} />
                                 </Box> :
                                 (pStore) ?
                                 // <ComicWorkspace />
-                                <WorkspaceWrap>
-                                    {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
-                                    <Toolbar store={pStore} />
-                                    <Workspace store={pStore} components={{ PageControls: () => null }} style={{}} />
-                                    <ZoomButtons store={pStore} />
-                                </WorkspaceWrap>
+                                    <PolotnoContainer style={{ height: '100vh', width: '1000px', minHeight: '500px' }}>
+                                        <WorkspaceWrap>
+                                            <Toolbar
+                                            store={pStore}
+                                            components={{
+                                                ActionControls: ({ store }) => {
+                                                return (
+                                                    <div>
+                                                    <DownloadButton store={store} />
+                                                    <Button
+                                                        intent="primary"
+                                                        onClick={() => {
+                                                        alert('Saving');
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </Button>
+                                                    </div>
+                                                );
+                                                },
+                                            }}
+                                            />
+                                            <Workspace 
+                                                store={pStore} 
+                                                components={{ PageControls: () => null }} 
+                                                style={{}} 
+                                                backgroundColor="white"
+                                                pageBorderColor="black" // border around page
+                                                activePageBorderColor="orange"
+                                            />
+                                            <ZoomButtons store={pStore} />
+                                        </WorkspaceWrap>
+                                    </PolotnoContainer>
                                 :
                                 "")
                                 
-                            :
+                            : (store.mediaType === MediaType.STORY) ?
                             <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
                                 <QEditorReadOnly currentSectionData={currentSectionData} />
                             </Box>
+                                :
+                                <img src={currentSectionData}/>
 
                     }
                     <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: 1, marginBottom: 1 }}>
