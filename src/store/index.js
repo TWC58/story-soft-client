@@ -182,7 +182,7 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.UNMARK_POST_FOR_DELETION: {
                 console.log("UNMARKING POST");
                 var currentPost = store.currentPost;
-                if(payload.deletedPost) currentPost = null;
+                if (payload.deletedPost) currentPost = null;
                 return setStore({
                     ...store,
                     postMarkedForDeletion: null,
@@ -199,7 +199,7 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.UNMARK_SECTION_FOR_DELETION: {
                 console.log("UNMARKING SECTION:", store.sectionMarkedForDeletion);
                 var currentSection = store.sectionMarkedForDeletion;
-                if(payload.deletedSection) currentSection = null;
+                if (payload.deletedSection) currentSection = null;
                 return setStore({
                     ...store,
                     sectionMarkedForDeletion: null
@@ -219,7 +219,7 @@ function GlobalStoreContextProvider(props) {
                 });
             }
             case GlobalStoreActionType.ADD_FOLLOWER: { //TODO ADD TO auth.user.following
-                console.log(payload);                
+                console.log(payload);
                 return setStore({
                     ...store,
                     profileInfo: { ...store.profileInfo, followers: store.profileInfo.followers.concat([payload.follower]) }
@@ -254,28 +254,28 @@ function GlobalStoreContextProvider(props) {
     function removeItemAll(arr, value) {
         var i = 0;
         while (i < arr.length) {
-          if (arr[i] === value) {
-            arr.splice(i, 1);
-          } else {
-            ++i;
-          }
+            if (arr[i] === value) {
+                arr.splice(i, 1);
+            } else {
+                ++i;
+            }
         }
-        if(arr.length) return arr;
+        if (arr.length) return arr;
         return new Array();
-      }
+    }
 
     // THESE ARE THE FUNCTIONS THAT WILL UPDATE OUR STORE AND
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
-    store.pushToHistory = function(route) {
+    store.pushToHistory = function (route) {
         history.push(route);
     }
 
-    store.searchForPosts = async function(search) {
+    store.searchForPosts = async function (search) {
         let res = await api.getPosts(store.mediaType, {
-            "search" : search,
-            "searchBy" : store.searchBy
+            "search": search,
+            "searchBy": store.searchBy
         }).catch((err) => {
             console.log(err);
         });
@@ -290,7 +290,7 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.setSearchBy = function(searchBy) {
+    store.setSearchBy = function (searchBy) {
         storeReducer({
             type: GlobalStoreActionType.SET_SEARCH_BY,
             payload: {
@@ -299,13 +299,13 @@ function GlobalStoreContextProvider(props) {
         });
     }
 
-    store.loadFrontPageData = async function() {
+    store.loadFrontPageData = async function () {
         //LOAD EXPLORE
         let tagsRes = await api.getTags(store.mediaType).catch((err) => {
             console.log(err);
         });
 
-        if (tagsRes.status === 200){
+        if (tagsRes.status === 200) {
             //now we have the tags and need to create the list of posts for each
             const tags = tagsRes.data.tags;
 
@@ -315,8 +315,8 @@ function GlobalStoreContextProvider(props) {
             for (let tag of tags) {
                 //go through each tag and use an api call to search for posts by tag
                 let postsByTagRes = await api.getPosts(store.mediaType, {
-                    "search" : tag.name,
-                    "searchBy" : "TAG"
+                    "search": tag.name,
+                    "searchBy": "TAG"
                 }).catch((err) => {
                     console.log(err);
                 });
@@ -325,18 +325,18 @@ function GlobalStoreContextProvider(props) {
                 if (postsByTagRes.status === 200) {
                     console.log("POSTS FOR TAG " + tag.name + " " + JSON.stringify(postsByTagRes.data.data));
                     tagPostArrays.push({
-                        name : tag.name,
-                        posts : postsByTagRes.data.data
+                        name: tag.name,
+                        posts: postsByTagRes.data.data
                     })
                 }
             }
             //LOAD FOLLOWING
             var followingPosts = null;
-            console.log("AUTH: ",auth)
-            if (auth.user){
+            console.log("AUTH: ", auth)
+            if (auth.user) {
                 followingPosts = new Array()
                 //load posts of each user followed
-                for(let followedUser of auth.user.following) {
+                for (let followedUser of auth.user.following) {
                     console.log("GETTING USER POSTS OF: ", followedUser)
                     let response = await api.getPosts(store.mediaType, { search: followedUser, searchBy: "ID" }).catch((err) => {
                         console.log(err);
@@ -349,7 +349,7 @@ function GlobalStoreContextProvider(props) {
                 }
                 followingPosts = followingPosts.filter(post => post.published).sort((a, b) => { return new Date(b.published) - new Date(a.published) });
             }
-            
+
             console.log(followingPosts)
             //save the final product to the store
             storeReducer({
@@ -367,7 +367,7 @@ function GlobalStoreContextProvider(props) {
         let response = await api.followUser({ follower: follower, followed: followed }).catch((err) => {
             console.log("Error following user");
         });
-        if(response.status === 200) {
+        if (response.status === 200) {
             auth.addFollowed({ follower: follower, followed: followed })
             storeReducer({
                 type: GlobalStoreActionType.ADD_FOLLOWER,
@@ -380,7 +380,7 @@ function GlobalStoreContextProvider(props) {
         let response = await api.unfollowUser({ unfollower: unfollower, unfollowed: unfollowed }).catch((err) => {
             console.log("Error unfollowing user");
         });
-        if(response.status === 200) {
+        if (response.status === 200) {
             auth.removeFollowed({ unfollower: unfollower, unfollowed: unfollowed });
             storeReducer({
                 type: GlobalStoreActionType.REMOVE_FOLLOWER,
@@ -391,24 +391,25 @@ function GlobalStoreContextProvider(props) {
 
     //SECTIONS
 
-    store.findLoadedSection = function(sectionId) {
+    store.findLoadedSection = function (sectionId) {
 
         if (store.currentPost.loadedRoot._id === sectionId)
             return store.currentPost.loadedRoot;
-        
+
         return store.findLoadedSectionHelper(store.currentPost.loadedRoot, sectionId);
-        
+
     }
 
-    store.findLoadedSectionHelper = function(section, sectionId) {
+    store.findLoadedSectionHelper = function (section, sectionId) {
         if (!section)
             return null;
 
         console.log("HELPER looking for sectionId " + sectionId + ", currently on section " + section._id);
 
         for (let childSection of section.loadedChildren) {
-            if (childSection._id === sectionId)
+            if (childSection._id === sectionId) {
                 return childSection;
+            }
 
             let result = store.findLoadedSectionHelper(childSection, sectionId);
 
@@ -425,7 +426,7 @@ function GlobalStoreContextProvider(props) {
             console.log(err);
         });
         console.log(res);
-        if(res.status === 200){
+        if (res.status === 200) {
             storeReducer({
                 type: GlobalStoreActionType.SET_CURRENT_SECTION,
                 payload: res.data.section
@@ -779,6 +780,7 @@ function GlobalStoreContextProvider(props) {
     store.deletePost = async function (postToDelete) {
         let response = await api.deletePost(store.mediaType, postToDelete);
         if (response.data.success) {
+            store.userPosts = store.userPosts.filter(post => post._id !== postToDelete)
             storeReducer({
                 type: GlobalStoreActionType.UNMARK_POST_FOR_DELETION,
                 payload: { deletedPost: postToDelete }
@@ -992,6 +994,7 @@ function GlobalStoreContextProvider(props) {
             if (response.status == 200) {
                 let updatedSectionCommentIds = response.data.section.comments;
                 store.setCommentList(updatedSectionCommentIds);
+                store.recursiveSectionBuilder(store.currentPost.loadedRoot._id);
             }
         }
         else {
@@ -1019,7 +1022,7 @@ function GlobalStoreContextProvider(props) {
             console.log("Something went wrong with replying to comment");
         }
     }
-    
+
     store.setCommentList = async function (commentIdList) {
         let comments = [];
         for (let commentId of commentIdList) {
@@ -1031,7 +1034,7 @@ function GlobalStoreContextProvider(props) {
         storeReducer({
             type: GlobalStoreActionType.SET_COMMENT_LIST,
             payload: {
-                comments: comments
+                comments: comments.reverse()
             }
         });
     }

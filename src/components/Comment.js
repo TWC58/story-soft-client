@@ -18,7 +18,6 @@ export default function Comment(props) {
 
     const handleReplyInputChange = (e) => {
         setCurrentReplyInput(e.target.value);
-        console.log(currentReplyInput);
     }
     const handleReplyToComment = async () => {
         if(auth.user){
@@ -27,6 +26,7 @@ export default function Comment(props) {
             "message": currentReplyInput
             }
         store.replyComment(comment._id, replyContent, sectionId);
+        setCurrentReplyInput(null);
         }
     }
     return (

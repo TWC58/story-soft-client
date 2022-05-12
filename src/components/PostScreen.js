@@ -49,6 +49,11 @@ function PostScreen() {
 
     useEffect(async () => {
         if (loaded) setLoaded(false);
+        
+        if (auth.user){
+            store.getUserPosts(auth.user._id, 'ID');
+        }
+
         if (readyToSave) {
             store.currentPost.name = currentPostName;
             store.currentPost.summary = currentDescription;
@@ -153,6 +158,7 @@ function PostScreen() {
                     "message": currentCommentInput
                 }
                 store.createComment(currentSectionId, commentContent);
+                // setCurrentCommentInput(null);
             }
         }
     }
@@ -295,12 +301,13 @@ function PostScreen() {
                         variant='outlined'
                         id="post-comment-textfield"
                         name="comment-textfield"
-                        placeholder="Join the discussion (Max Char Limit 120)"
+                        placeholder={auth.user ? "Join the discussion (Max Char Limit 120)" : "Must be logged in to comment!"}
                         inputProps={{ maxLength: 120, style: { fontSize: '10pt' } }}
                         value={currentCommentInput}
                         onChange={handleCommentInputChange}
+                        disabled={!auth.user}
                     />
-                    <Button onClick={handleCreateComment} sx={{ marginBottom: 0, marginTop: 2 }} variant="contained">Post</Button>
+                    <Button onClick={handleCreateComment} sx={{ marginBottom: 0, marginTop: 2 }} variant="contained" disabled={!auth.user}>Post</Button>
                 </Box>
                 <Box sx={{ height: '100%' }}>
                     <List style={{ maxHeight: '78%', overflow: 'auto' }}>
