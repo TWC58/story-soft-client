@@ -18,6 +18,7 @@ export const AuthActionType = {
     MARK_USER_FOR_DELETION: "MARK_USER_FOR_DELETION",
     UNMARK_USER_FOR_DELETION: "UNMARK_USER_FOR_DELETION",
     DELETE_USER: "DELETE_USER",
+    SET_USER_POSTS: "SET_USER_POSTS",
 }
 
 const testUser = {
@@ -43,6 +44,7 @@ function AuthContextProvider(props) {
         loggedIn: false,
         error: null,
         userMarkedForDeletion: false,
+        userPosts: null,
     });
     const history = useHistory();
 
@@ -123,6 +125,12 @@ function AuthContextProvider(props) {
                     user: null,
                     userMarkedForDeletion: false,
                 });
+            }
+            case AuthActionType.SET_USER_POSTS: {
+                return setAuth({
+                    ...auth,
+                    userPosts: payload,
+                })
             }
             default:
                 return auth;

@@ -79,7 +79,7 @@ export default function AppBanner() {
 
     const menuId = 'primary-search-account-menu';
     const loggedOutMenu = (
-        <Menu
+        <Menu sx={{flex: '1', flexDirection: 'row'}}
             anchorEl={anchorEl}
             anchorOrigin={{
                 vertical: 'top',
@@ -106,7 +106,7 @@ export default function AppBanner() {
         </Menu>
     );
     const loggedInMenu =
-        <Menu sx={{display: 'inline', flex: '1', flexDirection: 'column'}}
+        <Menu sx={{flex: '1', flexDirection: 'row'}}
             anchorEl={anchorEl}
             anchorOrigin={{
                 vertical: 'top',
@@ -121,7 +121,7 @@ export default function AppBanner() {
             open={isMenuOpen}
             onClose={handleMenuClose}
         >
-            <MenuItem onClick={handleProfile}>Profile</MenuItem>
+            <MenuItem onClick={handleProfile}>Profile</MenuItem><br></br>
             <MenuItem onClick={handleLogout}><GoogleLogout /></MenuItem>
         </Menu>
 
@@ -145,7 +145,7 @@ export default function AppBanner() {
                 src={auth.user.profile_pic_url}
             />;
         }
-        return <AccountCircle sx={{ color: '#FF6D00', fontSize: 48 }} />;
+        return <AccountCircle style={{ marginLeft: 5 }} sx={{ color: '#FF6D00', fontSize: 48 }} />;
     }
 
     function handleLogoClick() {
@@ -185,17 +185,17 @@ export default function AppBanner() {
                         <SearchToolbar />
                         <Box sx={{ flexGrow: 1 }}>{editToolbar}</Box>
                         {   (!store.currentPost) ?
-                            <Button sx={{paddingRight: '5%'}} variant='contained' onClick={handleMediaSwitch}>
+                            <Button style={{ margin: 10 }} sx={{paddingRight: '5%'}} variant='contained' onClick={handleMediaSwitch}>
                             {
                                 store.mediaType === MediaType.STORY ?
-                                "Goto Comic" : 
-                                "Goto Story"
+                                "Go to Comic" : 
+                                "Go to Story"
                             }
                             </Button> 
                             :
                             ""
                         }
-                        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                        <Box style={{ marginRight: 20 }} sx={{ display: { xs: 'none', md: 'flex' } }}>
                             {newPostButton}
                             <IconButton
                                 size="large"

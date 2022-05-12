@@ -47,12 +47,7 @@ export default function ProfileScreen() {
 
     useEffect(() => {
         //TODO load posts by current user, split into published/unpublished, then feed to mostpopular and unpublished components
-        auth.user ?
-            store.userPosts ?
-                console.log("USER POSTS: ", store.userPosts)
-                :
-                store.getUserPosts(auth.user._id, 'ID')
-            : console.log("NO CURRENT USER")
+        auth.user?._id ? store.postsBelongToCurrent ? console.log("POSTS ALREADY BELONG TO CURRENT USER") : store.getUserPosts(auth.user._id, 'ID') : console.log("NO USER");
     });
 
     const examplePost = {
@@ -121,6 +116,7 @@ export default function ProfileScreen() {
             <div className="flex-container" style={{ textAlign: 'center', alignContent: 'center', width: '25%', paddingTop: '5%' }}>
                 <div className="image-overlay-container">
                     <img
+                        sx={{p: 3}}
                         style={{ borderRadius: '50%', height: '300px', width: '300px' }}
                         src={profileImage === "" && auth.user ? auth.user.profile_pic_url : profileImage}
                     />
@@ -128,7 +124,7 @@ export default function ProfileScreen() {
                         editActive ?
                             <label htmlFor="contained-button-file">
                                 <Input onChange={handleImageChange} accept="image/*" id="contained-button-file" multiple type="file" />
-                                <Button variant="contained" component="span" sx={{ p: 1 }}>
+                                <Button variant="contained" component="span" sx={{ color: 'red' }}>
                                     Upload Image
                                 </Button>
                             </label>
@@ -137,31 +133,31 @@ export default function ProfileScreen() {
                 </div>
                 {
                     editActive ?
-                        <TextField required id="username" label="Username" defaultValue={auth.user ? auth.user.username : username} onChange={handleUsernameChange} />
+                        <TextField required id="username" label="Username" sx={{margin: 2}} defaultValue={auth.user ? auth.user.username : username} onChange={handleUsernameChange} />
                         :
                         <Typography variant='h5' sx={{ marginTop: '20px' }}><strong>{auth.user ? auth.user.username : username}</strong></Typography>
                 }
-                <Typography variant='h7' sx={{ display: 'block', marginTop: '20px' }}><strong>{auth.user ? auth.user.followers.length : 0}</strong> Followers</Typography>
+                <Typography variant='h7' sx={{ display: 'block', margin: 1 }}><strong>{auth.user ? auth.user.followers.length : 0}</strong> Followers</Typography>
                 {
                     editActive ?
                         <TextareaAutosize
                             maxRows={4}
                             defaultValue={auth.user ? auth.user.bio : bio}
-                            style={{ width: 200, display: 'block' }}
+                            style={{ width: 250, display: 'block' }}
                             className="profile-bio"
                             onChange={handleBioChange}
                         /> :
-                        <Typography className="profile-bio" sx={{ display: 'block', marginTop: '20px', margin: 'auto', marginBottom: '20px' }}>{auth.user ? auth.user.bio : bio}</Typography>
+                        <Typography className="profile-bio" sx={{ display: 'block', margin: 'auto' }}>{auth.user ? auth.user.bio : bio}</Typography>
                 }
                 {
                     editActive ?
-                        <Button onClick={handleDiscard} variant='contained' sx={{ display: 'block', marginTop: '20px' }}>Discard</Button>
+                        <Button onClick={handleDiscard} variant='contained' style={{ margin: 10 }} sx={{ display: 'block' }}>Discard</Button>
                         : ""
                 }
                 
-                <Button onClick={handleEditProfile} variant='contained' sx={{ display: 'block', marginTop: '20px' }}>{editActive ? "Save" : "Edit Profile"}</Button>
+                <Button onClick={handleEditProfile} variant='contained' style={{ margin: 10 }} sx={{ display: 'block', marginTop: '20px' }}>{editActive ? "Save" : "Edit Profile"}</Button>
                 { 
-                    editActive ? <Button onClick={handleDeleteProfile} type="button" variant="contained" className="workspace-button"  >Delete Account</Button> 
+                    editActive ? <><br></br><Button style={{ backgroundColor: 'red' }} onClick={handleDeleteProfile} type="button" variant="contained" className="workspace-button"  >Delete Account</Button></> 
                     : ""
                 }
             </div>

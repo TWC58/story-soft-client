@@ -48,7 +48,7 @@ export default function SearchDropdown() {
       <List
         component="nav"
         aria-label="Device settings"
-        sx={{ bgcolor: theme.palette.primary.dark }}
+        sx={{ bgcolor: theme.palette.primary.dark, p: 1 }}
       >
         <ListItem
           button
@@ -74,16 +74,17 @@ export default function SearchDropdown() {
           'aria-labelledby': 'lock-button',
           role: 'listbox',
         }}
+        style={{ padding: 1 }}
       >
-        {options.map((option, index) => (
+        {options.map((option, index) => (<>
           <MenuItem
             key={option}
             selected={index === selectedIndex}
             onClick={(event) => handleMenuItemClick(event, index)}
           >
             {option}
-          </MenuItem>
-        ))}
+          </MenuItem><br></br>
+        </>))}
       </Menu>
     </div>
   );

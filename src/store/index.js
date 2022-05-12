@@ -78,6 +78,7 @@ function GlobalStoreContextProvider(props) {
         followingPosts: null,
         searchPosts: null,
         userPosts: null,
+        postsBelongToCurrent: null,
         currentPost: null,
         postMarkedForDeletion: null,
         sectionMarkedForDeletion: null,
@@ -209,7 +210,7 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     ...store,
                     tagPostArrays: payload.tagPostArrays,
-                    followingPosts: payload.followingPosts
+                    followingPosts: payload.followingPosts,
                 });
             }
             case GlobalStoreActionType.SET_SEARCH_BY: {
@@ -235,7 +236,8 @@ function GlobalStoreContextProvider(props) {
                 console.log("SETTING USER POSTS", payload);
                 return setStore({
                     ...store,
-                    userPosts: payload.userPosts
+                    userPosts: payload.userPosts,
+                    postsBelongToCurrent: payload.postsBelongToCurrent,
                 });
             }
             case GlobalStoreActionType.SET_COMMENT_LIST: {
@@ -575,12 +577,14 @@ function GlobalStoreContextProvider(props) {
                 auth.setError(err.response.errorMessage);
         });
         console.log("USER POSTS: ", response.data);
+        const btc = auth.user?._id == search //posts belong to current user
         if (response.data.success) {
             console.log("SETTING POSTS: ", response.data.data);
             storeReducer({
                 type: GlobalStoreActionType.SET_USER_POSTS,
                 payload: {
-                    userPosts: response.data.data
+                    userPosts: response.data.data,
+                    postsBelongToCurrent: btc,
                 }
             });
         }
