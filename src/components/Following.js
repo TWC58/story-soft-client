@@ -14,7 +14,7 @@ const Following = ({ posts }) => {
         posts == null ?
             <>
                 <div id="followingSection">
-                    <Box sx={{ fontFamily: 'Arial, sans-serif', bgcolor: theme.palette.primary.main, borderRadius: 5, margin: 5, display: 'flex' }}>
+                    <Box sx={{ fontFamily: 'Arial, sans-serif', bgcolor: theme.palette.primary.main, borderRadius: 5, margin: 5, display: 'flex', boxShadow: 3 }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Following</Typography>
                     </Box>
                     <h3 align="center">Please log in to view posts from users you follow.</h3>
@@ -23,7 +23,7 @@ const Following = ({ posts }) => {
             :
             <>
                 <div id="followingSection">
-                    <Box sx={{ fontFamily: 'Arial, sans-serif', bgcolor: theme.palette.primary.main, borderRadius: 5, margin: 5, display: 'flex' }}>
+                    <Box sx={{ fontFamily: 'Arial, sans-serif', bgcolor: theme.palette.primary.main, borderRadius: 5, margin: 5, display: 'flex', boxShadow: 3 }}>
                         <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Following</Typography>
                     </Box>
                     <List sx={{ marginTop: 5, marginRight: 5, marginLeft: 5 }} style={{ flexDirection: 'row' }}>

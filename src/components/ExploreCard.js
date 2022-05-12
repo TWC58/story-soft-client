@@ -61,9 +61,9 @@ export const ExploreCard = ({ post }) => {
     return (
         <>  { post ?
             <ListItem sx={{ bgcolor: theme.palette.primary, borderRadius: 0, display: 'flex', width: '100%', position: 'relative' }}>
-                <Box sx={{ fontFamily: 'Arial, sans-serif', backgroundColor: theme.palette.primary.light, borderRadius: 5, width: '100%', display: 'inline', p: 1 }} style={{ cursor: 'pointer' }}>
+                <Box sx={{ fontFamily: 'Arial, sans-serif', backgroundColor: theme.palette.primary.light, borderRadius: 5, width: '100%', display: 'inline', p: 1, boxShadow: 3 }}>
                     { post.name ? <Box sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '16pt', fontWeight: 'bold' }}>{post.name}</Box> : null }
-                    { post.userData?.username ? <Box sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '12pt' }} onClick={handleGoToUser}>{post.userData.username}</Box> : null }
+                    { post.userData?.username ? <Box sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '12pt', cursor: 'pointer' }} onClick={handleGoToUser}>{post.userData.username}</Box> : null }
                     { post.published ? <Box sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '8pt' }}>{(new Date(post.published)).toDateString()}</Box> : null }
                     { post. summary ? <Box sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '11pt' }}>{post.summary}</Box> : null }
                     <Box sx={{ height: '95%' }}>

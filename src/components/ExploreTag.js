@@ -16,7 +16,7 @@ const ExploreTag = ({ tag, posts }) => {
  
     return (
       <>
-        <Box sx={{fontFamily: 'Arial, sans-serif', bgcolor: theme.palette.primary.main, borderRadius: 5, justifyContent: 'center', alignItems: 'center'}}>
+        <Box sx={{fontFamily: 'Arial, sans-serif', bgcolor: theme.palette.primary.main, borderRadius: 5, justifyContent: 'center', alignItems: 'center', boxShadow: 3 }}>
           <Typography sx={{ p: 1, flexGrow: 1}} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">{formatTag(tag)}</Typography>
         </Box>
           {(posts) ? 
