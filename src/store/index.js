@@ -412,11 +412,35 @@ function GlobalStoreContextProvider(props) {
 
             let result = store.findLoadedSectionHelper(childSection, sectionId);
 
-            if (result)
+            if (result) {
+                console.log("HELPER found result, returning from " + section._id);
                 return result;
+            }
         }
 
         return null;
+    }
+
+    //takes a function and passes each section to it
+    store.forEachSection = async function(f) {
+
+        if (!store.currentPost)
+            return;
+
+        await f(store.currentPost.loadedRoot);
+        
+        await store.forEachSectionHelper(store.currentPost.loadedRoot, f);
+    }
+
+    store.forEachSectionHelper = async function(section, f) {
+        if (!section)
+            return;
+
+        for (let childSection of section.loadedChildren) {
+            await f(childSection);
+
+            await store.forEachSectionHelper(childSection, f);
+        }
     }
 
     store.setCurrentSection = async function (sectionId) {

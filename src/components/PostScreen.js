@@ -51,6 +51,7 @@ function PostScreen() {
     let isComicLoaded = false;
 
     useEffect(async () => {
+        console.log("CURRENT SECTION DATA: " + JSON.stringify(currentSectionData));
         if (loaded) setLoaded(false);
         if (readyToSave) {
             store.currentPost.name = currentPostName;
@@ -60,14 +61,25 @@ function PostScreen() {
             loadedCurrentSection.name = currentSectionName;
             loadedCurrentSection.data = currentSectionData;
 
-            let comicBase64 = (store.mediaType === MediaType.COMIC) ? pStore.toDataURL() : null;
+            if (store.currentPost.published && store.mediaType === MediaType.COMIC) {
+                await publishComic();
+            }
 
             await store.updatePost(store.currentPost);
-            await store.updateSection(currentSectionId, {
-                name: currentSectionName,
-                data: (comicBase64 && store.currentPost.published) ? comicBase64 : currentSectionData
-            });
-            setReadyToSave(false);
+            if (store.mediaType !== MediaType.COMIC || !store.currentPost?.published)
+                await store.updateSection(currentSectionId, {
+                    name: currentSectionName,
+                    data: currentSectionData
+                });
+            
+
+            if (store.mediaType === MediaType.COMIC && store.currentPost?.published)
+                window.location.reload(true);
+            else
+                setReadyToSave(false);
+                
+            // if (store.mediaType === MediaType.COMIC && store.currentPost?.published)
+            //     handleSetCurrentSection(currentSectionId);
         }
         if (currentPostName === null && store.currentPost) {
             isComicLoaded = false;
@@ -87,7 +99,7 @@ function PostScreen() {
                 
         } else if ((!store.currentPost && !loadAttempted) || window.location.pathname.substring("/post/".length) != store.currentPost._id) {
             const postId = window.location.pathname.substring("/post/".length);
-            console.log(postId);
+            console.log("Attempting to load post with ID: " + postId);
             await store.getPost(postId);
             loadAttempted = true;
             if (store.currentPost)
@@ -110,12 +122,36 @@ function PostScreen() {
 
     //comic saving
     pStore?.on('change', () => {
-        if (JSON.stringify(pStore.toJSON()) != JSON.stringify({"width":1080,"height":1080,"fonts":[],"pages":[]}) && JSON.stringify(pStore.toJSON()) != JSON.stringify(currentSectionData)) {
+        if (!readyToSave || JSON.stringify(pStore.toJSON()) != JSON.stringify({"width":1080,"height":1080,"fonts":[],"pages":[]}) && JSON.stringify(pStore.toJSON()) != JSON.stringify(currentSectionData)) {
             console.log("onChange save comic, new value: " + JSON.stringify(pStore.toJSON()) + " old value: " + JSON.stringify(currentSectionData));
             // comicSectionData = pStore.toJSON();
             setCurrentSectionData(pStore.toJSON());
         }
     });
+
+    const publishComic = async () => {
+        await store.forEachSection(async (section) => {
+            console.log("Handling publish for section: " + section._id);
+            if (section._id === currentSectionId) {
+                pStore.loadJSON(currentSectionData);
+            } else if (section.data !== "") {
+                pStore.loadJSON(section.data);    
+            } else {
+                return;
+            }
+            // pStore.loadJSON((section._id === currentSectionId) ? currentSectionData : ((section.data === "") ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : section.data));
+            await pStore.waitLoading();
+
+            let comicBase64 = await pStore.toDataURL();
+
+            await store.updateSection(section._id, {
+                name: (section._id === currentSectionId) ? currentSectionName : section.name,
+                data: comicBase64
+            });
+        })
+
+        await store.recursiveSectionBuilder(store.currentPost.rootSection);
+    }
 
     const handlePostNameChange = (e) => {
         setCurrentPostName(e.target.value);
@@ -132,15 +168,15 @@ function PostScreen() {
     }
 
     const handleSetCurrentSection = (sectionId) => {
-        if (currentSectionId !== sectionId) {
+        // if (currentSectionId !== sectionId) {
             isComicLoaded = false;
             //if (!(store.currentPost?.published))
             const section = store.findLoadedSection(sectionId);
+            setCurrentSectionData((store.mediaType === MediaType.COMIC && section.data === "") ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : section.data);
             setCurrentSectionId(sectionId);
-            setCurrentSectionData(section.data);
             setCurrentSectionName(section.name);
             store.setCommentList(section.comments);
-        }
+        // }
     }
 
     const handleDescriptionChange = (e) => {
@@ -149,9 +185,9 @@ function PostScreen() {
 
     const handleAddSection = async () => {
         let newSection = await store.addSection(currentSectionId);
+        setCurrentSectionData((store.mediaType === MediaType.COMIC) ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : newSection.data);
         setCurrentSectionId(newSection._id);
         setCurrentSectionName(newSection.name);
-        setCurrentSectionData(newSection.data);
     }
 
     const handleDeleteSection = async () => {
