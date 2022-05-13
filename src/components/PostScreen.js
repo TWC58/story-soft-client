@@ -41,6 +41,7 @@ function PostScreen() {
     const [currentSectionData, setCurrentSectionData] = useState("");
     const [currentDescription, setCurrentDescription] = useState(null);
     const [currentCommentInput, setCurrentCommentInput] = useState(null);
+    const [currentTag, setCurrentTag] = useState("");
     const [readyToSave, setReadyToSave] = useState(false); //when updated, we know we can make API call bc react respects order of state changes
     const [loaded, setLoaded] = useState(false);
     const[pStore, setPStore] = useState(createStore());
@@ -61,6 +62,7 @@ function PostScreen() {
         if (readyToSave) {
             store.currentPost.name = currentPostName;
             store.currentPost.summary = currentDescription;
+            store.currentPost.tags[0] = currentTag;
 
             let loadedCurrentSection = store.findLoadedSection(currentSectionId);
             loadedCurrentSection.name = currentSectionName;
@@ -95,6 +97,7 @@ function PostScreen() {
             setCurrentSectionId(store.currentPost.loadedRoot._id);
             setCurrentSectionData(store.currentPost.loadedRoot.data);
             setCurrentDescription(store.currentPost.summary);
+            setCurrentTag(store.currentPost.tags.length > 0 ? store.currentPost.tags[0] : "");
 
             if (!store.currentPost?.published && store.mediaType === MediaType.COMIC && store.currentPost.loadedRoot.data) {
                 console.log("LOADING ROOT COMIC DATA: " + JSON.stringify(store.currentPost.loadedRoot.data));
@@ -185,6 +188,10 @@ function PostScreen() {
 
     const handleDescriptionChange = (e) => {
         setCurrentDescription(e.target.value);
+    }
+
+    const handleTagChange = (e) => {
+        setCurrentTag(e.target.value.toLowerCase());
     }
 
     const handleAddSection = async () => {
@@ -333,6 +340,26 @@ function PostScreen() {
                 />
             </Box>
         </>)
+    }
+
+    const getTagTextField = () => {
+        return (!store.currentPost?.published) ?
+            <div>
+                <Box sx={{ fontFamily: 'Arial, sans-serif', marginTop: '50px', display: 'flex' }}>
+                    <Typography sx={{ p: 1, flexGrow: 1 }} style={{ fontSize: '20pt', fontWeight: 'bold', justifyContent: 'center' }} align="center">Tag</Typography>
+                </Box>
+                <Box sx={{ borderRadius: '5px', width: '100%', bgcolor: theme.palette.primary.light }}>
+                    <TextField
+                        sx={{ width: '100%', height: '100%', marginBottom: 0 }}
+                        id="post-tag-field"
+                        name="post-tag"
+                        value={currentTag ? currentTag : ""}
+                        onChange={handleTagChange}
+                    />
+                </Box>
+            </div>
+        :
+        "";
     }
 
     const getTools = () => {
@@ -618,6 +645,9 @@ function PostScreen() {
                         :
                         null
                     }</>
+                    {
+                        getTagTextField()
+                    }
                 </Box>
             </div>
 

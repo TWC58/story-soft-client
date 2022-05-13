@@ -73,7 +73,7 @@ export const GlobalStoreActionType = {
 function GlobalStoreContextProvider(props) {
     // THESE ARE ALL THE THINGS OUR DATA STORE WILL MANAGE
     const [store, setStore] = useState({
-        mediaType: MediaType.STORY,
+        mediaType: MediaType.COMIC,
         explorePosts: [],
         followingPosts: null,
         searchPosts: null,
