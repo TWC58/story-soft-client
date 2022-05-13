@@ -168,7 +168,7 @@ function PostScreen() {
     }
 
     const handleSetCurrentSection = (sectionId) => {
-        // if (currentSectionId !== sectionId) {
+        if (currentSectionId !== sectionId) {
             isComicLoaded = false;
             //if (!(store.currentPost?.published))
             const section = store.findLoadedSection(sectionId);
@@ -176,7 +176,7 @@ function PostScreen() {
             setCurrentSectionId(sectionId);
             setCurrentSectionName(section.name);
             store.setCommentList(section.comments);
-        // }
+        }
     }
 
     const handleDescriptionChange = (e) => {
