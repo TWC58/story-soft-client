@@ -61,5 +61,5 @@
   "main": "index.js",
   "author": "",
   "license": "ISC",
-  "proxy": "http://localhost:5000"
+  "proxy": "https://story-soft.herokuapp.com"
 }

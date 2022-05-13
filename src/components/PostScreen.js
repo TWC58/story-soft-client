@@ -25,7 +25,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
-
+import { DownloadButton } from 'polotno/toolbar/download-button';
 /*
     This React component lets us edit a loaded list, which only
     happens when we are on the proper route.
@@ -43,11 +43,15 @@ function PostScreen() {
     const [currentCommentInput, setCurrentCommentInput] = useState(null);
     const [readyToSave, setReadyToSave] = useState(false); //when updated, we know we can make API call bc react respects order of state changes
     const [loaded, setLoaded] = useState(false);
-    const pStore = createStore();
+    const[pStore, setPStore] = useState(createStore());
+    console.log("pStore created");
+    let comicSectionData = {};
 
     let loadAttempted = false;
+    let isComicLoaded = false;
 
     useEffect(async () => {
+        console.log("CURRENT SECTION DATA: " + JSON.stringify(currentSectionData));
         if (loaded) setLoaded(false);
         
         if (auth.user){
@@ -62,14 +66,28 @@ function PostScreen() {
             loadedCurrentSection.name = currentSectionName;
             loadedCurrentSection.data = currentSectionData;
 
+            if (store.currentPost.published && store.mediaType === MediaType.COMIC) {
+                await publishComic();
+            }
+
             await store.updatePost(store.currentPost);
-            await store.updateSection(currentSectionId, {
-                name: currentSectionName,
-                data: currentSectionData
-            });
-            setReadyToSave(false);
+            if (store.mediaType !== MediaType.COMIC || !store.currentPost?.published)
+                await store.updateSection(currentSectionId, {
+                    name: currentSectionName,
+                    data: currentSectionData
+                });
+            
+
+            if (store.mediaType === MediaType.COMIC && store.currentPost?.published)
+                window.location.reload(true);
+            else
+                setReadyToSave(false);
+                
+            // if (store.mediaType === MediaType.COMIC && store.currentPost?.published)
+            //     handleSetCurrentSection(currentSectionId);
         }
         if (currentPostName === null && store.currentPost) {
+            isComicLoaded = false;
             await store.recursiveSectionBuilder(store.currentPost.rootSection);
             await store.setCommentList(store.currentPost.loadedRoot.comments);
             setCurrentPostName(store.currentPost.name);
@@ -77,9 +95,16 @@ function PostScreen() {
             setCurrentSectionId(store.currentPost.loadedRoot._id);
             setCurrentSectionData(store.currentPost.loadedRoot.data);
             setCurrentDescription(store.currentPost.summary);
+
+            if (!store.currentPost?.published && store.mediaType === MediaType.COMIC && store.currentPost.loadedRoot.data) {
+                console.log("LOADING ROOT COMIC DATA: " + JSON.stringify(store.currentPost.loadedRoot.data));
+                pStore.loadJSON(store.currentPost.loadedRoot.data);
+                await pStore.waitLoading();
+            }
+                
         } else if ((!store.currentPost && !loadAttempted) || window.location.pathname.substring("/post/".length) != store.currentPost._id) {
             const postId = window.location.pathname.substring("/post/".length);
-            console.log(postId);
+            console.log("Attempting to load post with ID: " + postId);
             await store.getPost(postId);
             loadAttempted = true;
             if (store.currentPost)
@@ -88,7 +113,50 @@ function PostScreen() {
         } else if (loadAttempted) {
             auth.setError("Post not found!");
         }
+
+        if (!store.currentPost?.published && store.mediaType === MediaType.COMIC && currentSectionData != "" && JSON.stringify(currentSectionData) != JSON.stringify(pStore.toJSON())) {
+            console.log("Use effect comic load: " + currentSectionData);
+            if (currentSectionData != "" && currentSectionData) {
+                pStore.loadJSON(currentSectionData);
+                await pStore.waitLoading();
+                isComicLoaded = true;
+            }
+            
+        }
     }, [readyToSave, loaded, currentSectionId, currentPostName]);
+
+    //comic saving
+    pStore?.on('change', () => {
+        if (!readyToSave || JSON.stringify(pStore.toJSON()) != JSON.stringify({"width":1080,"height":1080,"fonts":[],"pages":[]}) && JSON.stringify(pStore.toJSON()) != JSON.stringify(currentSectionData)) {
+            console.log("onChange save comic, new value: " + JSON.stringify(pStore.toJSON()) + " old value: " + JSON.stringify(currentSectionData));
+            // comicSectionData = pStore.toJSON();
+            setCurrentSectionData(pStore.toJSON());
+        }
+    });
+
+    const publishComic = async () => {
+        await store.forEachSection(async (section) => {
+            console.log("Handling publish for section: " + section._id);
+            if (section._id === currentSectionId) {
+                pStore.loadJSON(currentSectionData);
+            } else if (section.data !== "") {
+                pStore.loadJSON(section.data);    
+            } else {
+                return;
+            }
+            // pStore.loadJSON((section._id === currentSectionId) ? currentSectionData : ((section.data === "") ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : section.data));
+            await pStore.waitLoading();
+
+            let comicBase64 = await pStore.toDataURL();
+
+            await store.updateSection(section._id, {
+                name: (section._id === currentSectionId) ? currentSectionName : section.name,
+                data: comicBase64
+            });
+        })
+
+        await store.recursiveSectionBuilder(store.currentPost.rootSection);
+    }
 
     const handlePostNameChange = (e) => {
         setCurrentPostName(e.target.value);
@@ -105,10 +173,11 @@ function PostScreen() {
 
     const handleSetCurrentSection = (sectionId) => {
         if (currentSectionId !== sectionId) {
+            isComicLoaded = false;
             //if (!(store.currentPost?.published))
             const section = store.findLoadedSection(sectionId);
+            setCurrentSectionData((store.mediaType === MediaType.COMIC && section.data === "") ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : section.data);
             setCurrentSectionId(sectionId);
-            setCurrentSectionData(section.data);
             setCurrentSectionName(section.name);
             store.setCommentList(section.comments);
         }
@@ -120,9 +189,9 @@ function PostScreen() {
 
     const handleAddSection = async () => {
         let newSection = await store.addSection(currentSectionId);
+        setCurrentSectionData((store.mediaType === MediaType.COMIC) ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : newSection.data);
         setCurrentSectionId(newSection._id);
         setCurrentSectionName(newSection.name);
-        setCurrentSectionData(newSection.data);
     }
 
     const handleDeleteSection = async () => {
@@ -274,8 +343,8 @@ function PostScreen() {
 
             <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
                 {
-                    store.mediaType === MediaType.COMIC ?
-                        <SidePanelWrap>
+                    (store.mediaType === MediaType.COMIC) && pStore ?
+                        <SidePanelWrap >
                             <SidePanel store={pStore} />
                         </SidePanelWrap>
                         :
@@ -448,22 +517,55 @@ function PostScreen() {
                         null
                     }</>
                     {
-                        (!store.currentPost?.published) ?
+                        (!store.currentPost?.published || readyToSave && store.mediaType === MediaType.COMIC) ?
                             (store.mediaType === MediaType.STORY ?
                                 <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
                                     <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData} />
                                 </Box> :
+                                (pStore) ?
                                 // <ComicWorkspace />
-                                <WorkspaceWrap>
-                                    {/* <Toolbar store={pStore} downloadButtonEnabled /> */}
-                                    <Toolbar store={pStore} />
-                                    <Workspace store={pStore} components={{ PageControls: () => null }} style={{}} />
-                                    <ZoomButtons store={pStore} />
-                                </WorkspaceWrap>)
-                            :
+                                    <PolotnoContainer style={{ height: '100vh', width: '1000px', minHeight: '500px' }}>
+                                        <WorkspaceWrap>
+                                            <Toolbar
+                                            store={pStore}
+                                            components={{
+                                                ActionControls: ({ store }) => {
+                                                return (
+                                                    <div>
+                                                    <DownloadButton store={store} />
+                                                    <Button
+                                                        intent="primary"
+                                                        onClick={() => {
+                                                        alert('Saving');
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </Button>
+                                                    </div>
+                                                );
+                                                },
+                                            }}
+                                            />
+                                            <Workspace 
+                                                store={pStore} 
+                                                components={{ PageControls: () => null }} 
+                                                style={{}} 
+                                                backgroundColor="white"
+                                                pageBorderColor="black" // border around page
+                                                activePageBorderColor="orange"
+                                            />
+                                            <ZoomButtons store={pStore} />
+                                        </WorkspaceWrap>
+                                    </PolotnoContainer>
+                                :
+                                "")
+                                
+                            : (store.mediaType === MediaType.STORY) ?
                             <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
                                 <QEditorReadOnly currentSectionData={currentSectionData} />
                             </Box>
+                                :
+                                <img style={{ height: '100vh', width: 'auto', minHeight: '500px' }} src={currentSectionData}/>
 
                     }
                     <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: 1, marginBottom: 1 }}>
