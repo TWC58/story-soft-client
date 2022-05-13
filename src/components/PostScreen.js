@@ -163,7 +163,6 @@ function PostScreen() {
     }
 
     const handleSave = async () => {
-        console.log(pStore.toDataURL());
         setReadyToSave(true); //wait for this to call useEffect and save
     }
 
@@ -513,7 +512,7 @@ function PostScreen() {
                     {
                         (!store.currentPost?.published || readyToSave && store.mediaType === MediaType.COMIC) ?
                             (store.mediaType === MediaType.STORY ?
-                                <Box className="bp4-dark" sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
                                     <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData} />
                                 </Box> :
                                 (pStore) ?
@@ -559,7 +558,7 @@ function PostScreen() {
                                 <QEditorReadOnly currentSectionData={currentSectionData} />
                             </Box>
                                 :
-                                <img src={currentSectionData}/>
+                                <img style={{ height: '100vh', width: 'auto', minHeight: '500px' }} src={currentSectionData}/>
 
                     }
                     <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: 1, marginBottom: 1 }}>

@@ -125,7 +125,6 @@ export default function AppBanner() {
             <MenuItem onClick={handleLogout}><GoogleLogout /></MenuItem>
         </Menu>
 
-    let editToolbar = "";
     let menu = loggedOutMenu;
     if (auth.loggedIn) {
         menu = loggedInMenu;
@@ -153,7 +152,7 @@ export default function AppBanner() {
     }
 
     let newPostButton = (auth.loggedIn) ?
-        <CreatePostButton /> :
+        <CreatePostButton style={{marginRight: '50px'}}/> :
         "";
 
     console.log("Media type is story: ", store.mediaType === MediaType.STORY);
@@ -183,7 +182,7 @@ export default function AppBanner() {
 
                         </IconButton>
                         <SearchToolbar />
-                        <Box sx={{ flexGrow: 1 }}>{editToolbar}</Box>
+                        <Box sx={{ flexGrow: 1 }}/>
                         {   (!store.currentPost) ?
                             <Button sx={{paddingRight: '5%'}} variant='contained' onClick={handleMediaSwitch}>
                             {
