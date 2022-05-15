@@ -73,7 +73,6 @@ export const GlobalStoreActionType = {
 function GlobalStoreContextProvider(props) {
     // THESE ARE ALL THE THINGS OUR DATA STORE WILL MANAGE
     const [store, setStore] = useState({
-        mediaType: MediaType.COMIC,
         explorePosts: [],
         followingPosts: null,
         searchPosts: null,
@@ -105,7 +104,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.SET_CURRENT_POST: {
                 return setStore({
                     ...store,
-                    mediaType: store.mediaType,
                     explorePosts: store.explorePosts,
                     followingPosts: store.followingPosts,
                     currentPost: payload.currentPost,
@@ -117,7 +115,7 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.SET_MEDIA: {
                 console.log("SET MEDIA to " + payload.mediaType);
                 return setStore({
-                    mediaType: payload.mediaType,
+                    mediaType: auth.mediaType,
                     explorePosts: [],
                     followingPosts: [],
                     searchPosts: null,
@@ -135,7 +133,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.SET_EXPLORE_POSTS: {
                 return setStore({
                     ...store,
-                    mediaType: store.mediaType,
                     explorePosts: payload.explorePosts,
                     followingPosts: store.followingPosts,
                     currentPost: null,
@@ -146,7 +143,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.SET_FOLLOWING_POSTS: {
                 return setStore({
                     ...store,
-                    mediaType: store.mediaType,
                     explorePosts: store.explorePosts,
                     followingPosts: payload.followingPosts,
                     currentPost: null,
@@ -164,7 +160,6 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.GET_USER_INFO: {
                 return setStore({
                     ...store,
-                    mediaType: store.mediaType,
                     explorePosts: store.explorePosts,
                     followingPosts: store.followingPosts,
                     currentPost: store.currentPost,
@@ -275,7 +270,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.searchForPosts = async function (search) {
-        let res = await api.getPosts(store.mediaType, {
+        let res = await api.getPosts(auth.mediaType, {
             "search": search,
             "searchBy": store.searchBy
         }).catch((err) => {
@@ -303,11 +298,12 @@ function GlobalStoreContextProvider(props) {
 
     store.loadFrontPageData = async function () {
         //LOAD EXPLORE
-        let tagsRes = await api.getTags(store.mediaType).catch((err) => {
+        let tagsRes = await api.getTags(auth.mediaType).catch((err) => {
             console.log(err);
         });
 
-        if (tagsRes.status === 200) {
+    
+        if (tagsRes?.status === 200) {
             //now we have the tags and need to create the list of posts for each
             const tags = tagsRes.data.tags;
 
@@ -316,7 +312,7 @@ function GlobalStoreContextProvider(props) {
 
             for (let tag of tags) {
                 //go through each tag and use an api call to search for posts by tag
-                let postsByTagRes = await api.getPosts(store.mediaType, {
+                let postsByTagRes = await api.getPosts(auth.mediaType, {
                     "search": tag.name,
                     "searchBy": "TAG"
                 }).catch((err) => {
@@ -340,7 +336,7 @@ function GlobalStoreContextProvider(props) {
                 //load posts of each user followed
                 for (let followedUser of auth.user.following) {
                     console.log("GETTING USER POSTS OF: ", followedUser)
-                    let response = await api.getPosts(store.mediaType, { search: followedUser, searchBy: "ID" }).catch((err) => {
+                    let response = await api.getPosts(auth.mediaType, { search: followedUser, searchBy: "ID" }).catch((err) => {
                         console.log(err);
                     });
                     console.log("USER POSTS: ", response.data.data);
@@ -507,14 +503,14 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.handleMediaSwitch = () => {
-        console.log("Handle media switch start: " + store.mediaType);
+        console.log("Handle media switch start: " + auth.mediaType);
         storeReducer({
             type: GlobalStoreActionType.SET_MEDIA,
             payload: {
-                mediaType: (store.mediaType === MediaType.STORY) ? MediaType.COMIC : MediaType.STORY
+                mediaType: (auth.mediaType === MediaType.STORY) ? MediaType.COMIC : MediaType.STORY
             }
         });
-        console.log("Handle media switch end: " + store.mediaType);
+        console.log("Handle media switch end: " + auth.mediaType);
     }
 
     store.goHome = () => {
@@ -547,7 +543,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.updatePost = async function (post) {
-        let response = await api.updatePost(store.mediaType, post._id, post).catch((err) => {
+        let response = await api.updatePost(auth.mediaType, post._id, post).catch((err) => {
             console.log(err);
             if (err.response)
                 auth.setError(err.response.errorMessage);
@@ -559,7 +555,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.getPost = async function (postId) {
-        let response = await api.getPost(store.mediaType, postId).catch((err) => {
+        let response = await api.getPost(auth.mediaType, postId).catch((err) => {
             console.log(err);
             if (err.response)
                 auth.setError(err.response.errorMessage);
@@ -577,7 +573,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.getSearchPosts = async function (search, searchBy) {
-        let response = await api.getPosts(store.mediaType, { search: search, searchBy: searchBy }).catch((err) => {
+        let response = await api.getPosts(auth.mediaType, { search: search, searchBy: searchBy }).catch((err) => {
             console.log(err);
             if (err.response)
                 auth.setError(err.response.errorMessage);
@@ -595,7 +591,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.getUserPosts = async function (search, searchBy) {
-        let response = await api.getPosts(store.mediaType, { search: search, searchBy: searchBy }).catch((err) => {
+        let response = await api.getPosts(auth.mediaType, { search: search, searchBy: searchBy }).catch((err) => {
             console.log(err);
             if (err.response)
                 auth.setError(err.response.errorMessage);
@@ -680,7 +676,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.likePost = async function (postId, like) {
-        let response = await api.likePost(store.mediaType, postId, { like: like }).catch((err) => {
+        let response = await api.likePost(auth.mediaType, postId, { like: like }).catch((err) => {
             console.log(err);
             if (err.response) {
                 auth.setError("Like failed!");
@@ -806,7 +802,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.deletePost = async function (postToDelete) {
-        let response = await api.deletePost(store.mediaType, postToDelete);
+        let response = await api.deletePost(auth.mediaType, postToDelete);
         if (response.data.success) {
             store.userPosts = store.userPosts.filter(post => post._id !== postToDelete)
             storeReducer({

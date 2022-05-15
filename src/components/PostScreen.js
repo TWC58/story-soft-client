@@ -26,6 +26,7 @@ import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import { DownloadButton } from 'polotno/toolbar/download-button';
+import { PostOptions } from './PostOptions';
 /*
     This React component lets us edit a loaded list, which only
     happens when we are on the proper route.
@@ -68,24 +69,24 @@ function PostScreen() {
             loadedCurrentSection.name = currentSectionName;
             loadedCurrentSection.data = currentSectionData;
 
-            if (store.currentPost.published && store.mediaType === MediaType.COMIC) {
+            if (store.currentPost.published && auth.mediaType === MediaType.COMIC) {
                 await publishComic();
             }
 
             await store.updatePost(store.currentPost);
-            if (store.mediaType !== MediaType.COMIC || !store.currentPost?.published)
+            if (auth.mediaType !== MediaType.COMIC || !store.currentPost?.published)
                 await store.updateSection(currentSectionId, {
                     name: currentSectionName,
                     data: currentSectionData
                 });
             
 
-            if (store.mediaType === MediaType.COMIC && store.currentPost?.published)
+            if (auth.mediaType === MediaType.COMIC && store.currentPost?.published)
                 window.location.reload(true);
             else
                 setReadyToSave(false);
                 
-            // if (store.mediaType === MediaType.COMIC && store.currentPost?.published)
+            // if (auth.mediaType === MediaType.COMIC && store.currentPost?.published)
             //     handleSetCurrentSection(currentSectionId);
         }
         if (currentPostName === null && store.currentPost) {
@@ -99,7 +100,7 @@ function PostScreen() {
             setCurrentDescription(store.currentPost.summary);
             setCurrentTag(store.currentPost.tags.length > 0 ? store.currentPost.tags[0] : "");
 
-            if (!store.currentPost?.published && store.mediaType === MediaType.COMIC && store.currentPost.loadedRoot.data) {
+            if (!store.currentPost?.published && auth.mediaType === MediaType.COMIC && store.currentPost.loadedRoot.data) {
                 console.log("LOADING ROOT COMIC DATA: " + JSON.stringify(store.currentPost.loadedRoot.data));
                 pStore.loadJSON(store.currentPost.loadedRoot.data);
                 await pStore.waitLoading();
@@ -117,7 +118,7 @@ function PostScreen() {
             auth.setError("Post not found!");
         }
 
-        if (!store.currentPost?.published && store.mediaType === MediaType.COMIC && currentSectionData != "" && JSON.stringify(currentSectionData) != JSON.stringify(pStore.toJSON())) {
+        if (!store.currentPost?.published && auth.mediaType === MediaType.COMIC && currentSectionData != "" && JSON.stringify(currentSectionData) != JSON.stringify(pStore.toJSON())) {
             console.log("Use effect comic load: " + currentSectionData);
             if (currentSectionData != "" && currentSectionData) {
                 pStore.loadJSON(currentSectionData);
@@ -136,6 +137,18 @@ function PostScreen() {
             setCurrentSectionData(pStore.toJSON());
         }
     });
+
+    const getCurrentChildren = () => {
+        var childSections = [];
+        console.log("CURRENT SECTION ID: ", currentSectionId);
+        if(currentSectionId=="12324" || !store.currentPost?.loadedRoot) return childSections;
+        const current = store.findLoadedSection(currentSectionId);
+        current.children.forEach(childID => {
+            childSections.push(store.findLoadedSection(childID));
+        });
+        console.log("CHILD SECTIONS");
+        return childSections;
+    }
 
     const publishComic = async () => {
         await store.forEachSection(async (section) => {
@@ -179,7 +192,7 @@ function PostScreen() {
             isComicLoaded = false;
             //if (!(store.currentPost?.published))
             const section = store.findLoadedSection(sectionId);
-            setCurrentSectionData((store.mediaType === MediaType.COMIC && section.data === "") ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : section.data);
+            setCurrentSectionData((auth.mediaType === MediaType.COMIC && section.data === "") ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : section.data);
             setCurrentSectionId(sectionId);
             setCurrentSectionName(section.name);
             store.setCommentList(section.comments);
@@ -196,7 +209,7 @@ function PostScreen() {
 
     const handleAddSection = async () => {
         let newSection = await store.addSection(currentSectionId);
-        setCurrentSectionData((store.mediaType === MediaType.COMIC) ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : newSection.data);
+        setCurrentSectionData((auth.mediaType === MediaType.COMIC) ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : newSection.data);
         setCurrentSectionId(newSection._id);
         setCurrentSectionName(newSection.name);
     }
@@ -370,7 +383,7 @@ function PostScreen() {
 
             <Box sx={{ borderRadius: '5px', width: '90%', height: '35%', bgcolor: theme.palette.primary.light }}>
                 {
-                    (store.mediaType === MediaType.COMIC) && pStore ?
+                    (auth.mediaType === MediaType.COMIC) && pStore ?
                         <SidePanelWrap >
                             <SidePanel store={pStore} />
                         </SidePanelWrap>
@@ -544,8 +557,8 @@ function PostScreen() {
                         null
                     }</>
                     {
-                        (!store.currentPost?.published || readyToSave && store.mediaType === MediaType.COMIC) ?
-                            (store.mediaType === MediaType.STORY ?
+                        (!store.currentPost?.published || readyToSave && auth.mediaType === MediaType.COMIC) ?
+                            (auth.mediaType === MediaType.STORY ?
                                 <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
                                     <QEditor handleSectionDataChange={handleSectionDataChange} currentSectionData={currentSectionData} />
                                 </Box> :
@@ -587,7 +600,7 @@ function PostScreen() {
                                 :
                                 "")
                                 
-                            : (store.mediaType === MediaType.STORY) ?
+                            : (auth.mediaType === MediaType.STORY) ?
                             <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', overflowY: 'scroll', marginTop: 1, marginBottom: 1, height: '80%', width: '90%', align: 'center' }}>
                                 <QEditorReadOnly currentSectionData={currentSectionData} />
                             </Box>
@@ -599,6 +612,7 @@ function PostScreen() {
                         {store.currentPost ? store.currentPost.published ? null : <Button variant="contained" onClick={handleSave} >Save</Button> : null}
                         {store.currentPost ? store.currentPost.published ? null : <Button variant="contained" onClick={handlePublish}>Publish</Button> : null}
                     </Box>
+                    {0 ? store.currentPost?.published ? store.currentPost?.loadedRoot ? currentSectionId != "12324" ? <PostOptions sections={getCurrentChildren()}/> : null : null : null : null}
                     {store.currentPost ? store.currentPost.published ? auth.user ? store.currentPost.userData.userId === auth.user._id ?
                         <Button sx={{ bgcolor: 'red' }} onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
                         :
@@ -621,7 +635,7 @@ function PostScreen() {
                     {store.currentPost ? store.currentPost.published ?
                         getComments()
                         :
-                        store.mediaType == "COMIC" ?
+                        auth.mediaType == "COMIC" ?
                             getTools()
                             :
                             null

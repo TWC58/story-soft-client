@@ -74,7 +74,7 @@ export default function SearchDropdown() {
           'aria-labelledby': 'lock-button',
           role: 'listbox',
         }}
-        style={{ padding: 1 }}
+        style={{ padding: 10 }}
       >
         {options.map((option, index) => (<>
           <MenuItem

@@ -46,6 +46,7 @@ export default function AppBanner() {
 
     const handleMediaSwitch = () => {
         console.log("MEDIA SWITCH HIT");
+        auth.handleMediaSwitch();
         store.handleMediaSwitch();
     }
 
@@ -58,7 +59,7 @@ export default function AppBanner() {
     };
 
     const handleProfile = async () => {
-        auth.handleProfile(store.mediaType);
+        auth.handleProfile(auth.mediaType);
     }
 
     const handleLogout = async () => {
@@ -125,6 +126,7 @@ export default function AppBanner() {
             <MenuItem onClick={handleLogout}><GoogleLogout /></MenuItem>
         </Menu>
 
+    let editToolbar = "";
     let menu = loggedOutMenu;
     if (auth.loggedIn) {
         menu = loggedInMenu;
@@ -152,11 +154,11 @@ export default function AppBanner() {
     }
 
     let newPostButton = (auth.loggedIn) ?
-        <CreatePostButton style={{marginRight: '50px'}}/> :
+        <CreatePostButton /> :
         "";
 
-    console.log("Media type is story: ", store.mediaType === MediaType.STORY);
-    console.log("Media type is comic: ", store.mediaType === MediaType.COMIC);
+    console.log("Media type is story: ", auth.mediaType === MediaType.STORY);
+    console.log("Media type is comic: ", auth.mediaType === MediaType.COMIC);
 
     return (
         <Stack spacing={0}>
@@ -169,7 +171,7 @@ export default function AppBanner() {
                             aria-label="logo"
                             onClick={handleLogoClick}>
                             {
-                                store.mediaType === MediaType.STORY ?
+                                auth.mediaType === MediaType.STORY ?
                                     <img
                                         style={{ height: '60px', width: '60px' }}
                                         src={`/storyLogo.PNG`}
@@ -182,11 +184,11 @@ export default function AppBanner() {
 
                         </IconButton>
                         <SearchToolbar />
-                        <Box sx={{ flexGrow: 1 }}/>
+                        <Box sx={{ flexGrow: 1 }}>{editToolbar}</Box>
                         {   (!store.currentPost) ?
                             <Button style={{ margin: 10 }} sx={{paddingRight: '5%'}} variant='contained' onClick={handleMediaSwitch}>
                             {
-                                store.mediaType === MediaType.STORY ?
+                                auth.mediaType === MediaType.STORY ?
                                 "Go to Comic" : 
                                 "Go to Story"
                             }

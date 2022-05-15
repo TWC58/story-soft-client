@@ -6,10 +6,13 @@ import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import { useContext } from 'react';
 import { GlobalStoreContext } from '../store'
+import { useTheme } from '@mui/material/styles';
+
 
 export default function CreatePostButton() {
 
   const { store } = useContext(GlobalStoreContext);
+  const theme = useTheme();
 
   React.useEffect(() => {
     const node = loadCSS(
@@ -37,7 +40,7 @@ export default function CreatePostButton() {
         <Icon
             baseClassName="fas"
             className="fa-plus-circle"
-            sx={{ color: '#FF6D00', fontSize: 30, marginRight: '20%' }}
+            sx={{ color: theme.palette.secondary.dark, fontSize: 30, marginRight: '20%' }}
         />
     </IconButton>
   );

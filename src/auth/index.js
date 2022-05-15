@@ -19,6 +19,19 @@ export const AuthActionType = {
     UNMARK_USER_FOR_DELETION: "UNMARK_USER_FOR_DELETION",
     DELETE_USER: "DELETE_USER",
     SET_USER_POSTS: "SET_USER_POSTS",
+    SET_MEDIA: "SET_MEDIA",
+    REFRESH: "REFRESH",
+}
+
+export const MediaType = {
+    COMIC: "COMIC",
+    STORY: "STORY"
+}
+
+export const SearchBy = {
+    TITLE: "TITLE",
+    AUTHOR: "AUTHOR",
+    TAG: "TAG"
 }
 
 const testUser = {
@@ -37,6 +50,7 @@ const testUser = {
 function AuthContextProvider(props) {
 
     const { store } = useContext(GlobalStoreContext);
+    const authData = JSON.parse(window.localStorage.getItem("story-soft-auth"));
 
     const [auth, setAuth] = useState({
         // user: null,
@@ -45,13 +59,22 @@ function AuthContextProvider(props) {
         error: null,
         userMarkedForDeletion: false,
         userPosts: null,
+        mediaType: authData?.mediaType ? authData.mediaType : MediaType.STORY,
     });
+
     const history = useHistory();
 
     useEffect(() => {
+        //authData?.mediaType ? console.log("ALREADY HAVE MEDIA TYPE") : authData.mediaType = MediaType.STORY;
+        console.log("authData: ", authData)
+        authData?.mediaType ? authReducer({ type: AuthActionType.REFRESH, payload: authData }) : console.log("NO PREVIOUS AUTH STATE IN LOCAL STORAGE");
         if (!auth.loggedIn)
             auth.getLoggedIn();
     }, []);
+
+    useEffect(() => {
+        window.localStorage.setItem("story-soft-auth", JSON.stringify({ ...auth, mediaType: auth.mediaType }));
+    })
 
     const authReducer = (action) => {
         const { type, payload } = action;
@@ -59,6 +82,7 @@ function AuthContextProvider(props) {
             case AuthActionType.LOGIN: {
                 console.log(payload);
                 return setAuth({
+                    ...auth,
                     user: payload.user,
                     loggedIn: true,
                     error: payload.error
@@ -67,6 +91,7 @@ function AuthContextProvider(props) {
             case AuthActionType.LOGOUT: {
                 console.log('AuthActionType.LOGOUT triggered...');
                 return setAuth({
+                    ...auth,
                     user: null,
                     loggedIn: false,
                     error: payload.error
@@ -74,6 +99,7 @@ function AuthContextProvider(props) {
             }
             case AuthActionType.GET_LOGGED_IN: {
                 return setAuth({
+                    ...auth,
                     user: payload.user,
                     loggedIn: payload.loggedIn,
                     error: auth.error
@@ -81,6 +107,7 @@ function AuthContextProvider(props) {
             }
             case AuthActionType.REGISTER_USER: {
                 return setAuth({
+                    ...auth,
                     user: payload.user,
                     loggedIn: true,
                     error: auth.error
@@ -88,6 +115,7 @@ function AuthContextProvider(props) {
             }
             case AuthActionType.ERROR: {
                 return setAuth({
+                    ...auth,
                     user: auth.user,
                     loggedIn: auth.loggedIn,
                     error: payload.error
@@ -132,6 +160,17 @@ function AuthContextProvider(props) {
                     userPosts: payload,
                 })
             }
+            case AuthActionType.SET_MEDIA: {
+                console.log("SET MEDIA to " + payload.mediaType);
+                return setAuth({
+                    ...auth,
+                    mediaType: payload.mediaType,
+                });
+            }
+            case AuthActionType.REFRESH: {
+                console.log("REFRSHING AUTH: ", payload);
+                return setAuth(payload);
+            }
             default:
                 return auth;
         }
@@ -150,6 +189,18 @@ function AuthContextProvider(props) {
         return new Array();
     }
 
+    auth.handleMediaSwitch = () => {
+        console.log("Handle media switch start: " + auth.mediaType);
+        const mType = (auth.mediaType === MediaType.STORY) ? MediaType.COMIC : MediaType.STORY;
+        authReducer({
+            type: AuthActionType.SET_MEDIA,
+            payload: {
+                mediaType: mType
+            }
+        });
+        console.log("Handle media switch end: " + auth.mediaType);
+    }
+
     auth.markUserForDeletion = async () => {
         return authReducer({
             type: AuthActionType.MARK_USER_FOR_DELETION,
@@ -166,7 +217,7 @@ function AuthContextProvider(props) {
         let res = await api.deleteUser().catch((err) => {
             console.log(err);
         })
-        if(res.status == 200){
+        if (res.status == 200) {
             return authReducer({
                 type: AuthActionType.DELETE_USER,
             });

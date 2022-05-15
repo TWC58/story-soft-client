@@ -29,7 +29,7 @@ import { LoginSuccess, LoginFailure } from './components/google/loginSuccess';
 const ThemeWrapper = () => {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext);
-    const currentTheme = store.mediaType === "STORY" ? storyTheme : comicTheme;
+    const currentTheme = auth.mediaType === "STORY" ? storyTheme : comicTheme;
 
     return (
         <ThemeProvider theme={currentTheme}>
