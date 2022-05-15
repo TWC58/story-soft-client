@@ -43,6 +43,7 @@ function PostScreen() {
     const [currentDescription, setCurrentDescription] = useState(null);
     const [currentCommentInput, setCurrentCommentInput] = useState(null);
     const [currentTag, setCurrentTag] = useState("");
+    const [userPostsLoaded, setUserPostsLoaded] = useState(false);
     const [readyToSave, setReadyToSave] = useState(false); //when updated, we know we can make API call bc react respects order of state changes
     const [loaded, setLoaded] = useState(false);
     const[pStore, setPStore] = useState(createStore());
@@ -58,8 +59,9 @@ function PostScreen() {
         console.log("CURRENT SECTION DATA: " + JSON.stringify(currentSectionData));
         if (loaded) setLoaded(false);
         
-        if (auth.user){
+        if (auth.user && !userPostsLoaded){
             store.getUserPosts(auth.user._id, 'ID');
+            setUserPostsLoaded(true);
         }
 
         if (readyToSave) {
