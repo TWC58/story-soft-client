@@ -48,6 +48,7 @@ export default function ProfileScreen() {
     useEffect(() => {
         //TODO load posts by current user, split into published/unpublished, then feed to mostpopular and unpublished components
         auth.user?._id ? store.postsBelongToCurrent ? console.log("POSTS ALREADY BELONG TO CURRENT USER") : store.getUserPosts(auth.user._id, 'ID') : console.log("NO USER");
+        auth.user?.username != store.userPosts?.[0].userData.username ? store.getUserPosts(auth.user._id, 'ID') : console.log("POSTS UP TO DATE");
     });
 
     const examplePost = {

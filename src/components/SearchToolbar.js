@@ -27,7 +27,7 @@ const Search = styled('div')(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: alpha(theme.palette.common.white, 0.5),
   },
   marginLeft: 0,
   width: '100%',
@@ -138,10 +138,10 @@ export default function SearchToolbar() {
             <SearchIconWrapper>
               <SearchIcon/>
             </SearchIconWrapper>
-            <StyledInputBase color={theme.palette.primary.dark}
+            <StyledInputBase color="black"
               disabled={store.currentPost !== null}
               placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
+              inputProps={{ 'aria-label': 'search'}}
             />
           </Search>
           <SearchDropdown/>

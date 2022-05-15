@@ -525,7 +525,7 @@ function GlobalStoreContextProvider(props) {
 
     //POSTS
     store.createPost = async function () {
-        let response = await api.createPost(this.mediaType).catch((err) => {
+        let response = await api.createPost(auth.mediaType).catch((err) => {
             console.log(err);
             if (err.response)
                 auth.setError(err.response.errorMessage);
