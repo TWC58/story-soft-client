@@ -49,6 +49,8 @@ function PostScreen() {
     console.log("pStore created");
     let comicSectionData = {};
 
+    const [childSections, setChildSections] = useState(null); //store child sections
+
     let loadAttempted = false;
     let isComicLoaded = false;
 
@@ -99,6 +101,7 @@ function PostScreen() {
             setCurrentSectionData(store.currentPost.loadedRoot.data);
             setCurrentDescription(store.currentPost.summary);
             setCurrentTag(store.currentPost.tags.length > 0 ? store.currentPost.tags[0] : "");
+            setChildSections(getCurrentChildren(store.currentPost.loadedRoot._id));
 
             if (!store.currentPost?.published && auth.mediaType === MediaType.COMIC && store.currentPost.loadedRoot.data) {
                 console.log("LOADING ROOT COMIC DATA: " + JSON.stringify(store.currentPost.loadedRoot.data));
@@ -138,15 +141,17 @@ function PostScreen() {
         }
     });
 
-    const getCurrentChildren = () => {
+    const getCurrentChildren = (id) => {
         var childSections = [];
-        console.log("CURRENT SECTION ID: ", currentSectionId);
-        if(currentSectionId=="12324" || !store.currentPost?.loadedRoot) return childSections;
-        const current = store.findLoadedSection(currentSectionId);
+        console.log("CURRENT SECTION ID: ", id);
+        const current = store.findLoadedSection(id);
+        console.log("GETCURRENTCHILDREN ON: ", current);
+        if(!current) return childSections;
         current.children.forEach(childID => {
+            
             childSections.push(store.findLoadedSection(childID));
         });
-        console.log("CHILD SECTIONS");
+        console.log("CHILD SECTIONS: ", childSections);
         return childSections;
     }
 
@@ -195,6 +200,7 @@ function PostScreen() {
             setCurrentSectionData((auth.mediaType === MediaType.COMIC && section.data === "") ? {"width":1080,"height":1080,"fonts":[],"pages":[]} : section.data);
             setCurrentSectionId(sectionId);
             setCurrentSectionName(section.name);
+            setChildSections(getCurrentChildren(sectionId));
             store.setCommentList(section.comments);
         }
     }
@@ -612,7 +618,7 @@ function PostScreen() {
                         {store.currentPost ? store.currentPost.published ? null : <Button variant="contained" onClick={handleSave} >Save</Button> : null}
                         {store.currentPost ? store.currentPost.published ? null : <Button variant="contained" onClick={handlePublish}>Publish</Button> : null}
                     </Box>
-                    {0 ? store.currentPost?.published ? store.currentPost?.loadedRoot ? currentSectionId != "12324" ? <PostOptions sections={getCurrentChildren()}/> : null : null : null : null}
+                    { childSections ? <PostOptions sections={childSections} handleSetCurrentSection={handleSetCurrentSection}/> : null }
                     {store.currentPost ? store.currentPost.published ? auth.user ? store.currentPost.userData.userId === auth.user._id ?
                         <Button sx={{ bgcolor: 'red' }} onClick={handleDeletePost} variant="contained" className="workspace-button"  >Delete Post</Button>
                         :
